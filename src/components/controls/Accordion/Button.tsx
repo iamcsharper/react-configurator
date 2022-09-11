@@ -27,7 +27,7 @@ export const AccordionButton = ({
         color: colors.link,
         fill: colors.link,
         textTransform: "uppercase",
-        borderBottom: '1px solid red',
+        borderBottom: `2px solid ${colors.black}`,
 
         ".js-focus-visible &.focus-visible:focus": {
           zIndex: 1,

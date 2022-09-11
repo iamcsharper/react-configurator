@@ -1,3 +1,4 @@
+import { scale } from "@scripts/helpers";
 import { HTMLProps, ReactNode } from "react";
 import { AccordionItemHeading as ReactAccordionItemHeading } from "react-accessible-accordion";
 
@@ -13,7 +14,14 @@ export const AccordionHeading = ({
   "aria-level": ariaLevel,
   ...props
 }: AccordionHeadingProps) => (
-  <ReactAccordionItemHeading aria-level={ariaLevel} {...props}>
+  <ReactAccordionItemHeading
+    aria-level={ariaLevel}
+    css={{
+      padding: scale(1),
+      paddingBottom: 0,
+    }}
+    {...props}
+  >
     {children}
   </ReactAccordionItemHeading>
 );

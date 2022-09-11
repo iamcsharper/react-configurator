@@ -11,10 +11,11 @@ const Settings = ({ id }: { id?: string }) => {
 
   useEffect(() => {
     const listener = (evt: KeyboardEvent) => {
-      // if (document.activeElement) {
-      //   console.log("skip have focus");
-      //   return;
-      // }
+      if (document.activeElement) {
+        if (document.activeElement.nodeName.toLocaleLowerCase() !== "body") {
+          return;
+        }
+      }
       let isEscape = false;
       if ("key" in evt) {
         isEscape = evt.key === "Escape" || evt.key === "Esc";
@@ -44,6 +45,7 @@ const Settings = ({ id }: { id?: string }) => {
       Периферия #{id}
       <TestTrigger id="0" title="Tets 1" description="Test 2 description" />
       <TestTrigger id="1" title="Test 2" description="Test 2 description" />
+      <input />
     </div>
   );
 };
@@ -65,11 +67,24 @@ const Details = () => {
   );
 };
 
+const DetailsProviderResetter = ({ id }: { id: string }) => {
+  const { setCurrentData } = useDetails();
+
+  useEffect(() => {
+    setCurrentData(null);
+
+    return () => setCurrentData(null);
+  }, [id]);
+
+  return null;
+};
+
 export default function PeripheryPage() {
   const { id } = useParams<{ id: string }>();
 
   return (
     <DetailsProvider>
+      <DetailsProviderResetter id={`${id}`} />
       <Allotment vertical>
         <Allotment.Pane>
           <Settings id={id} />

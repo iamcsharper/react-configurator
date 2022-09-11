@@ -62,7 +62,7 @@ export const AccordionPanel = ({ children, ...props }: AccordionPanelProps) => {
   };
 
   const panelCSS: CSSObject = {
-    padding: scale(2),
+    padding: scale(1),
   };
 
   return animationType ? (

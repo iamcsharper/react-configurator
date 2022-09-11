@@ -24,7 +24,8 @@
     "react-router-dom": "^6.3.0",
     "react-tabs": "^5.1.0",
     "react-transition-group": "^4.4.5",
-    "redux": "^4.2.0"
+    "redux": "^4.2.0",
+    "vite-plugin-svgr": "^2.2.1"
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.10.2",

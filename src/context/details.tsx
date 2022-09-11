@@ -7,6 +7,7 @@ import {
   useContext,
   useState,
   useMemo,
+  useEffect,
 } from "react";
 
 export interface DetailsData {
@@ -24,10 +25,17 @@ export interface DetailsContextProps {
 const DetailsContext = createContext<DetailsContextProps | null>(null);
 DetailsContext.displayName = "DetailsContext";
 
-export const DetailsProvider: FC<{ children: ReactNode | ReactNode[] }> = ({
-  children,
-}) => {
-  const [currentData, setCurrentData] = useState<DetailsData | null>(null);
+export const DetailsProvider: FC<{
+  children: ReactNode | ReactNode[];
+  initialData?: DetailsContextProps["currentData"];
+}> = ({ children, initialData = null }) => {
+  const [currentData, setCurrentData] = useState<DetailsData | null>(
+    initialData
+  );
+
+  useEffect(() => {
+    setCurrentData(initialData);
+  }, [initialData]);
 
   const value = useMemo(
     () => ({

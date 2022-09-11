@@ -101,7 +101,7 @@ export const Tabs: FC<TabsProps> & TabsCompositionProps = ({
             },
             "&__tab": tabCSS,
             "&__panel": {
-              // display: 'none',
+              display: "none",
               ...(panelFillsHeight && {
                 height: "100%",
               }),

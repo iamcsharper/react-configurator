@@ -12,7 +12,10 @@ function App() {
   return (
     <>
       <GlobalStyles />
-      <Tabs css={{ height: "100%" }} panelFillsHeight>
+      <Tabs
+        css={{ height: "100%", display: "flex", flexDirection: "column" }}
+        panelFillsHeight
+      >
         <Tabs.List horizontalScroll>
           <Tabs.Tab>Периферия</Tabs.Tab>
           <Tabs.Tab>Clock</Tabs.Tab>
