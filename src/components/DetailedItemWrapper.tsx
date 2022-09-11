@@ -1,15 +1,18 @@
 import { useDetails } from "@context/details";
 import { colors } from "@scripts/colors";
 import { scale } from "@scripts/helpers";
+import { ReactNode } from "react";
 
-export const TestTrigger = ({
+export const DetailedItemWrapper = ({
   id,
   title,
   description,
+  children,
 }: {
   id: string;
   title: string;
   description: string;
+  children: ReactNode | ReactNode[];
 }) => {
   const { currentData, setCurrentData } = useDetails();
   const isActive = currentData?.id === id;
@@ -38,7 +41,7 @@ export const TestTrigger = ({
         },
       }}
     >
-      First item
+      {children}
     </div>
   );
 };

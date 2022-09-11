@@ -1,4 +1,4 @@
-import { TestTrigger } from "@components/TestTrigger";
+import { DetailedItemWrapper } from "@components/DetailedItemWrapper";
 import { DetailsProvider, useDetails } from "@context/details";
 import { scale } from "@scripts/helpers";
 import { Allotment } from "allotment";
@@ -43,8 +43,22 @@ const Settings = ({ id }: { id?: string }) => {
       }}
     >
       Периферия #{id}
-      <TestTrigger id="0" title="Tets 1" description="Test 2 description" />
-      <TestTrigger id="1" title="Test 2" description="Test 2 description" />
+      <DetailedItemWrapper
+        id="0"
+        title="Tets 1"
+        description="Test 1 description"
+      >
+        <label>Test field 1</label>
+        <input />
+      </DetailedItemWrapper>
+      <DetailedItemWrapper
+        id="1"
+        title="Test 2"
+        description="Test 2 description"
+      >
+        <label>Test field 2</label>
+        <input />
+      </DetailedItemWrapper>
       <input />
     </div>
   );

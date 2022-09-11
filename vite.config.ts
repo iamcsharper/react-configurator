@@ -4,6 +4,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import svgr from "vite-plugin-svgr";
 
 const base = "https://iamcsharper.github.io/react-configurator/dist/";
+// const base = '';
 
 // https://vitejs.dev/config/
 export default defineConfig({
