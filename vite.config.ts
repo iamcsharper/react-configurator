@@ -3,6 +3,8 @@ import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import svgr from "vite-plugin-svgr";
 
+const base = "https://iamcsharper.github.io/react-configurator/dist/";
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -15,6 +17,7 @@ export default defineConfig({
       },
     }),
   ],
+  base,
   esbuild: {
     define: {
       this: "window",
