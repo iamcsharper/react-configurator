@@ -3,6 +3,7 @@ import Sidebar from '@components/Sidebar';
 import { scale } from '@scripts/helpers';
 import { useFieldCSS } from '@scripts/hooks/useFieldCSS';
 import { useMemo } from 'react';
+import { useForm } from 'react-hook-form';
 import { useLocation } from 'react-router-dom';
 
 interface LinkData {
@@ -153,7 +154,7 @@ const items: LinkGroup[] = [
 //   );
 // };
 
-const SidebarContainer = ({ isDark }: { isDark: boolean}) => {
+const SidebarContainer = ({ isDark }: { isDark: boolean }) => {
   const { pathname } = useLocation();
 
   const activeGroupId = useMemo<string>(() => {
@@ -171,12 +172,34 @@ const SidebarContainer = ({ isDark }: { isDark: boolean}) => {
   }, [pathname]);
 
   const { basicFieldCSS } = useFieldCSS({});
+  const { register, watch } = useForm({
+    defaultValues: {
+      search: '',
+    },
+  });
+
+  const search = watch('search');
+  const filteredItems = useMemo(
+    () =>
+      items.filter((el) => {
+        const term = search.toLowerCase();
+        if (el.label.toLowerCase().includes(term)) return true;
+
+        const concat = el.links
+          .map((e) => e.label)
+          .join(',')
+          .toLowerCase();
+        return concat.includes(term);
+      }),
+    [search],
+  );
 
   return (
     <Sidebar title="Список перифирий">
       <input
         css={[basicFieldCSS, { marginBottom: scale(2) }]}
         placeholder="Поиск"
+        {...register('search')}
       />
       <Sidebar.Nav
         preExpanded={[activeGroupId]}
@@ -185,8 +208,8 @@ const SidebarContainer = ({ isDark }: { isDark: boolean}) => {
         variant={isDark ? 'dark' : 'primary'}
         isIconVertical
       >
-        {items &&
-          items.map((group, index) => (
+        {filteredItems &&
+          filteredItems.map((group, index) => (
             <Sidebar.Group id={`${index}`} key={index} title={group.label}>
               <div
                 css={{
