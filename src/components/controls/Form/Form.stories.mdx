@@ -1,0 +1,38 @@
+import { Meta, Story, Source } from '@storybook/addon-docs';
+import { useForm } from 'react-hook-form';
+import Form from './index';
+
+<Meta title="Components / Controls / Form" component={Form} />
+
+# Компонент формы
+
+<Story
+  name="Basic"
+  args={{
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+    defaultValues: { test: 'bla bla' },
+  }}
+>
+  {(args) => {
+    const methods = useForm(args);
+    return (
+      <Form methods={methods} onSubmit={(vals) => console.log(vals)}>
+        <Form.Field name="test" label="Test field" />
+        <button type="submit">Submit</button>
+      </Form>
+    );
+  }}
+</Story>
+
+<Source
+  dark
+  code={`const methods = useForm(...);
+return (
+    <Form methods={methods} onSubmit={(vals) => console.log(vals)}>
+      <Form.Field name="test" label="Test field" />
+      <button type="submit">Submit</button>
+    </Form>
+);
+`}
+/>

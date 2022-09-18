@@ -8,7 +8,7 @@ import {
   useState,
   useMemo,
   useEffect,
-} from "react";
+} from 'react';
 
 export interface DetailsData {
   id: string;
@@ -18,20 +18,22 @@ export interface DetailsData {
 }
 
 export interface DetailsContextProps {
+  enabled: boolean;
+  setEnabled: Dispatch<SetStateAction<boolean>>;
   currentData: DetailsData | null;
   setCurrentData: Dispatch<SetStateAction<DetailsData | null>>;
 }
 
 const DetailsContext = createContext<DetailsContextProps | null>(null);
-DetailsContext.displayName = "DetailsContext";
+DetailsContext.displayName = 'DetailsContext';
 
 export const DetailsProvider: FC<{
   children: ReactNode | ReactNode[];
-  initialData?: DetailsContextProps["currentData"];
+  initialData?: DetailsContextProps['currentData'];
 }> = ({ children, initialData = null }) => {
-  const [currentData, setCurrentData] = useState<DetailsData | null>(
-    initialData
-  );
+  const [currentData, setCurrentData] =
+    useState<DetailsData | null>(initialData);
+  const [enabled, setEnabled] = useState(true);
 
   useEffect(() => {
     setCurrentData(initialData);
@@ -39,10 +41,12 @@ export const DetailsProvider: FC<{
 
   const value = useMemo(
     () => ({
+      enabled,
+      setEnabled,
       currentData,
       setCurrentData,
     }),
-    [currentData]
+    [currentData, enabled],
   );
 
   return (

@@ -1,10 +1,12 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tsconfigPaths from "vite-tsconfig-paths";
-import svgr from "vite-plugin-svgr";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import svgr from 'vite-plugin-svgr';
+import dotenv from 'dotenv';
 
-const base = "https://iamcsharper.github.io/react-configurator/dist/";
-// const base = '';
+dotenv.config();
+
+const ASSET_URL = process.env.ASSET_URL || '';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,16 +14,19 @@ export default defineConfig({
     svgr(),
     tsconfigPaths(),
     react({
-      jsxImportSource: "@emotion/react",
+      jsxImportSource: '@emotion/react',
       babel: {
-        plugins: ["@emotion/babel-plugin"],
+        plugins: ['@emotion/babel-plugin'],
       },
     }),
   ],
-  base,
+  server: {
+    port: 3000,
+  },
+  base: ASSET_URL,
   esbuild: {
     define: {
-      this: "window",
+      this: 'window',
     },
     jsxFactory: `jsx`,
     // jsxInject: `import { jsx } from '@emotion/react'`,

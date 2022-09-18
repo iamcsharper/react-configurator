@@ -1,3 +1,4 @@
+import { scale } from "@scripts/helpers";
 import cn from "classnames";
 import {
   Children,
@@ -34,6 +35,7 @@ export const TabsList = ({
           maxWidth: "100%",
           overflowY: "hidden",
           overflowX: "auto",
+          paddingBottom: scale(1),
         }),
       }}
       {...props}

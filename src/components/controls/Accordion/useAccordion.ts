@@ -1,6 +1,6 @@
-import { createContext, FC, useContext } from "react";
+import { createContext, useContext } from "react";
 
-// import { SVGRIcon } from "@customTypes/index";
+import { SVGRIcon } from "@customTypes/index";
 
 export interface AccordionContextProps {
   /** CSSTransition handler, triggers after add 'enter' class */
@@ -16,12 +16,12 @@ export interface AccordionContextProps {
   /** Type of panel toggle animation */
   animationType?: "height" | "fadeIn" | "custom";
   /** Icon for arrow */
-  Icon?: FC<any>;
+  Icon?: SVGRIcon;
+  isIconVertical?: boolean;
 }
 
-export const AccordionContext = createContext<
-  AccordionContextProps | undefined
->(undefined);
+export const AccordionContext =
+  createContext<AccordionContextProps | undefined>(undefined);
 
 const useAccordion = (): AccordionContextProps => {
   const context = useContext(AccordionContext);

@@ -1,4 +1,5 @@
 import { colors } from "@scripts/colors";
+import typography from "@scripts/typography";
 
 import { HTMLProps, ReactNode } from "react";
 import { AccordionItemButton as ReactAccordionItemButton } from "react-accessible-accordion";
@@ -14,7 +15,7 @@ export const AccordionButton = ({
   children,
   ...props
 }: AccordionButtonProps) => {
-  const { Icon } = useAccordion();
+  const { Icon, isIconVertical } = useAccordion();
 
   return (
     <ReactAccordionItemButton
@@ -27,12 +28,15 @@ export const AccordionButton = ({
         color: colors.link,
         fill: colors.link,
         textTransform: "uppercase",
-        borderBottom: `2px solid ${colors.black}`,
+        borderBottom: `1px solid ${colors.grey200}`,
 
         ".js-focus-visible &.focus-visible:focus": {
           zIndex: 1,
           // outline: `2px solid ${AT?.buttonOutlineColor}`,
         },
+        userSelect: 'none',
+
+        ...typography("labelMedium"),
       }}
       {...props}
     >
@@ -47,7 +51,13 @@ export const AccordionButton = ({
             transform: "translateY(-50%)",
             transition: "transform ease 300ms, fill ease 300ms",
             '[aria-expanded="true"] &': {
-              transform: "translateY(-50%) rotate(90deg)",
+              ...(isIconVertical
+                ? {
+                    transform: "translateY(-50%) rotate(180deg)",
+                  }
+                : {
+                    transform: "translateY(-50%) rotate(90deg)",
+                  }),
             },
           }}
         />

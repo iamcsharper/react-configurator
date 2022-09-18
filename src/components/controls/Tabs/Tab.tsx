@@ -1,5 +1,8 @@
+import { SVGRIcon } from "@customTypes/index";
+import { scale } from "@scripts/helpers";
+import typography from "@scripts/typography";
 import cn from "classnames";
-import { FC, HTMLProps, ReactNode } from "react";
+import { HTMLProps, ReactNode } from "react";
 import { Tab as ReactTab } from "react-tabs";
 
 export interface TabsTabProps
@@ -9,7 +12,7 @@ export interface TabsTabProps
   /** Disabled tab */
   disabled?: boolean;
   /** Icon */
-  Icon?: FC<any>;
+  Icon?: SVGRIcon;
   baseClass?: string;
   selected?: boolean;
 }
@@ -28,12 +31,16 @@ export const TabsTab = ({
   return (
     <ReactTab
       className={classes}
+      selected={selected}
       {...props}
       selectedClassName="selected"
       disabledClassName="disabled"
+      css={{
+        ...typography("labelMedium"),
+      }}
     >
       <>
-        {Icon && <Icon />}
+        {Icon && <Icon width={scale(3)} height={scale(3)} />}
         {children}
       </>
     </ReactTab>

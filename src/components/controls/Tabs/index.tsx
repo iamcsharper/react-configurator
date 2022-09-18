@@ -38,6 +38,7 @@ export interface TabsProps
   tabListCSS?: CSSObject;
 
   panelFillsHeight?: boolean;
+  forceRender?: boolean;
 }
 
 export const Tabs: FC<TabsProps> & TabsCompositionProps = ({
@@ -58,6 +59,23 @@ export const Tabs: FC<TabsProps> & TabsCompositionProps = ({
       whiteSpace: "nowrap",
       cursor: "pointer",
 
+      height: scale(5),
+      padding: scale(2),
+      borderBottomWidth: 3,
+      marginBottom: -scale(1) + 2,
+      marginRight: scale(1),
+
+      svg: {
+        marginRight: scale(1),
+      },
+
+      borderTopWidth: 0,
+      borderLeftWidth: 0,
+      borderRightWidth: 0,
+      borderStyle: "solid",
+      borderBottomColor: "transparent",
+      transition: "border-bottom-color 0.2s ease",
+
       "&.selected": {
         cursor: "default",
         borderBottomColor: colors.link,
@@ -65,20 +83,6 @@ export const Tabs: FC<TabsProps> & TabsCompositionProps = ({
         fill: colors?.link,
       },
 
-      height: scale(4),
-      padding: scale(2),
-      paddingTop: scale(2, true),
-      paddingBottom: scale(1, true),
-      borderBottomWidth: 3,
-      marginBottom: -0.5,
-      marginRight: scale(1),
-
-      svg: {
-        marginRight: scale(1),
-      },
-
-      borderBottomStyle: "solid",
-      borderBottomColor: "transparent",
       color: colors?.black,
 
       ":hover": {

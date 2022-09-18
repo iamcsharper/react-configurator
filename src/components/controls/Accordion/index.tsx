@@ -1,7 +1,7 @@
 import { FC, HTMLProps, ReactNode, useMemo } from "react";
 import { Accordion as ReactAccordion } from "react-accessible-accordion";
 
-// import ArrowDownIcon from "@icons/small/chevronRight.svg";
+import { ReactComponent as ArrowDownIcon } from "@icons/small/chevronDown.svg";
 
 import AccordionButton, { AccordionButtonProps } from "./Button";
 import AccordionHeading, { AccordionHeadingProps } from "./Heading";
@@ -37,7 +37,8 @@ export const Accordion: FC<AccordionProps> & AccordionCompositionProps = ({
   allowZeroExpanded = true,
   preExpanded,
   onChange,
-  Icon,
+  Icon = ArrowDownIcon,
+  isIconVertical = true,
   animationType,
   transitionTimeout = 300,
   transitionTimeoutExit = transitionTimeout,
@@ -49,6 +50,7 @@ export const Accordion: FC<AccordionProps> & AccordionCompositionProps = ({
   const contextValue = useMemo(
     () => ({
       Icon,
+      isIconVertical,
       animationType,
       transitionTimeout,
       transitionTimeoutExit,
