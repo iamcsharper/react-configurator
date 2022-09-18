@@ -47,6 +47,9 @@ export const themes: Record<keyof typeof Themes, AccordionTheme> = {
       },
 
       '&[aria-expanded="true"]': {
+        ...(state.variant === 'dark' && {
+          color: colors.primary,
+        }),
         svg: {
           ...(state.isIconVertical
             ? {
