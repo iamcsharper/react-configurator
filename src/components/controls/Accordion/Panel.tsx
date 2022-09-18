@@ -1,39 +1,43 @@
-import { CSSObject } from "@emotion/react";
-import { scale } from "@scripts/helpers";
-
-import { HTMLProps, ReactNode } from "react";
+import { HTMLProps, ReactNode, useCallback, useMemo } from 'react';
 import {
   AccordionItemPanel as ReactAccordionItemPanel,
   AccordionItemState as ReactAccordionItemState,
-} from "react-accessible-accordion";
-import { CSSTransition } from "react-transition-group";
+} from 'react-accessible-accordion';
+import { CSSTransition } from 'react-transition-group';
+import { themes } from './themes';
+import { AccordionStateFull } from './types';
 
-import useAccordion from "./useAccordion";
+import useAccordion from './useAccordion';
 
 export interface AccordionPanelProps
-  extends Omit<HTMLProps<HTMLDivElement>, "ref"> {
+  extends Omit<HTMLProps<HTMLDivElement>, 'ref'> {
   /** Panel content */
   children: ReactNode;
 }
 
 export const AccordionPanel = ({ children, ...props }: AccordionPanelProps) => {
   const {
+    panelNoPadding,
     animationType,
     transitionTimeout,
     transitionTimeoutExit,
     onEnter,
     onEntering,
     onExit,
+    isIconVertical,
+    variant,
+    size,
+    theme = themes.basic,
   } = useAccordion();
 
   const handleEnter = (...args: [HTMLElement, boolean]) => {
     const [instance] = args;
     if (onEnter) {
       onEnter(...args);
-    } else if (animationType === "height") {
+    } else if (animationType === 'height') {
       instance.style.height = `0px`;
       instance.style.transition = `height ease ${transitionTimeout}ms`;
-    } else if (animationType === "fadeIn") {
+    } else if (animationType === 'fadeIn') {
       instance.style.animation = `fade-in ${transitionTimeout}ms ease`;
     }
   };
@@ -43,7 +47,7 @@ export const AccordionPanel = ({ children, ...props }: AccordionPanelProps) => {
     if (onEntering) {
       onEntering(...args);
     } else if (
-      animationType === "height" &&
+      animationType === 'height' &&
       instance.children[0] instanceof HTMLElement
     ) {
       instance.style.height = `${instance.children[0].offsetHeight}px`;
@@ -54,16 +58,33 @@ export const AccordionPanel = ({ children, ...props }: AccordionPanelProps) => {
     const [instance] = args;
     if (onExit) {
       onExit(...args);
-    } else if (animationType === "height") {
+    } else if (animationType === 'height') {
       instance.style.height = `0px`;
-    } else if (animationType === "fadeIn") {
+    } else if (animationType === 'fadeIn') {
       instance.style.animation = ``;
     }
   };
 
-  const panelCSS: CSSObject = {
-    padding: scale(1),
-  };
+  const state = useMemo<AccordionStateFull>(
+    () => ({
+      panelNoPadding,
+      isIconVertical,
+      size: size!,
+      variant: variant!,
+    }),
+    [panelNoPadding, isIconVertical, size, variant],
+  );
+
+  const getCSS = useCallback(
+    (key: keyof typeof theme) => {
+      const element = theme[key];
+      if (typeof element === 'function') return element(state);
+      return element;
+    },
+    [state, theme],
+  );
+
+  const panelCSS = useMemo(() => getCSS('panel'), [getCSS]);
 
   return animationType ? (
     <ReactAccordionItemState>
@@ -78,10 +99,10 @@ export const AccordionPanel = ({ children, ...props }: AccordionPanelProps) => {
         >
           <div
             css={{
-              overflow: "hidden",
-              "@keyframes fade-in": {
-                "0%": { opacity: 0 },
-                "100%": { opacity: 1 },
+              overflow: 'hidden',
+              '@keyframes fade-in': {
+                '0%': { opacity: 0 },
+                '100%': { opacity: 1 },
               },
             }}
             {...props}

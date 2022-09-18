@@ -1,12 +1,13 @@
-import Sidebar from "@components/Sidebar";
-import { colors } from "@scripts/colors";
-import { scale } from "@scripts/helpers";
-import { useMemo } from "react";
-import { useLocation, useMatch, Link } from "react-router-dom";
+import NavLink from '@components/NavLink';
+import Sidebar from '@components/Sidebar';
+import { scale } from '@scripts/helpers';
+import { useFieldCSS } from '@scripts/hooks/useFieldCSS';
+import { useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 
 interface LinkData {
   label: string;
-  link: string;
+  to: string;
 }
 
 interface LinkGroup {
@@ -16,144 +17,143 @@ interface LinkGroup {
 
 const items: LinkGroup[] = [
   {
-    label: "Система",
+    label: 'Система',
     links: [
       {
-        label: "Монитор питания",
-        link: "#",
+        label: 'Монитор питания',
+        to: '/',
       },
       {
-        label: "Монитор тактирования",
-        link: "#",
+        label: 'Монитор тактирования',
+        to: '/',
       },
       {
-        label: "ПДП",
-        link: "#",
+        label: 'ПДП',
+        to: '/',
       },
       {
-        label: "Тактирование",
-        link: "#",
+        label: 'Тактирование',
+        to: '/',
       },
       {
-        label: "Прерывания",
-        link: "#",
+        label: 'Прерывания',
+        to: '/',
       },
       {
-        label: "GPIO",
-        link: "#",
+        label: 'GPIO',
+        to: '/',
       },
       {
-        label: "WDT",
-        link: "#",
+        label: 'WDT',
+        to: '/',
       },
       {
         label: "Bus' WDT",
-        link: "#",
+        to: '/',
       },
     ],
   },
   {
-    label: "Аналоговые блоки",
+    label: 'Аналоговые блоки',
     links: [
       {
-        label: "АЦП",
-        link: "#",
+        label: 'АЦП',
+        to: '/',
       },
       {
-        label: "Температурный сенсор",
-        link: "#",
+        label: 'Температурный сенсор',
+        to: '/',
       },
       {
-        label: "ЦАП",
-        link: "#",
+        label: 'ЦАП',
+        to: '/',
       },
     ],
   },
   {
-    label: "Таймеры",
+    label: 'Таймеры',
     links: [
       {
-        label: "RTC",
-        link: "/rtc",
+        label: 'RTC',
+        to: '/rtc',
       },
       {
-        label: "TIMER32",
-        link: "/timer32",
+        label: 'TIMER32',
+        to: '/timer32',
       },
       {
-        label: "TIMER16",
-        link: "/timer16",
+        label: 'TIMER16',
+        to: '/timer16',
       },
     ],
   },
   {
-    label: "Интерфейсы",
+    label: 'Интерфейсы',
     links: [
       {
-        label: "I2C",
-        link: "#",
+        label: 'I2C',
+        to: '/',
       },
       {
-        label: "SPI",
-        link: "#",
+        label: 'SPI',
+        to: '/',
       },
       {
-        label: "SPIFI",
-        link: "#",
+        label: 'SPIFI',
+        to: '/',
       },
       {
-        label: "USART",
-        link: "#",
+        label: 'USART',
+        to: '/',
       },
     ],
   },
   {
-    label: "Криптография",
+    label: 'Криптография',
     links: [
       {
-        label: "Крипто-блок",
-        link: "#",
+        label: 'Крипто-блок',
+        to: '/',
       },
       {
-        label: "CRC",
-        link: "#",
+        label: 'CRC',
+        to: '/',
       },
     ],
   },
 ];
 
-const NavLink = ({ link, label }: LinkData) => {
-  const match = useMatch(`${link}/*`);
+// const NavLink = ({ link, label }: LinkData) => {
+//   const match = useMatch(`${link}/*`);
 
-  return (
-    <Link
-      to={link}
-      css={{
-        color: colors.link,
-        textDecoration: "none",
-        padding: scale(1),
-        background: colors.grey100,
-        borderLeft: `${scale(1, true)}px solid ${colors.grey200}`,
-        ...(match && {
-          borderLeftColor: colors.link,
-          background: colors.link,
-          color: colors.white,
-          cursor: "default",
-        }),
-        ...(!match && {
-          ":hover": {
-            borderLeft: `${scale(1, true)}px solid ${colors.link}`,
-            background: colors.grey300,
-          },
-        }),
-      }}
-    >
-      {label}
-    </Link>
-  );
-};
+//   return (
+//     <Link
+//       to={link}
+//       css={{
+//         color: colors.link,
+//         textDecoration: 'none',
+//         padding: `${scale(1)}px ${scale(2)}px`,
+//         borderRadius: scale(3, true),
+//         border: `1px solid ${colors.grey200}`,
+//         ...(match && {
+//           borderColor: colors.link,
+//           background: colors.link,
+//           color: colors.white,
+//           cursor: 'default',
+//         }),
+//         ...(!match && {
+//           ':hover': {
+//             border: `1px solid ${colors.link}`,
+//           },
+//         }),
+//       }}
+//     >
+//       {label}
+//     </Link>
+//   );
+// };
 
-const SidebarContainer = () => {
+const SidebarContainer = ({ isDark }: { isDark: boolean}) => {
   const { pathname } = useLocation();
 
   const activeGroupId = useMemo<string>(() => {
@@ -162,7 +162,7 @@ const SidebarContainer = () => {
     for (let i = 0; i < items.length; i += 1) {
       const groupItems = items[i].links;
 
-      if (groupItems.map((e) => e.link).includes(pathname)) {
+      if (groupItems.map((e) => e.to).includes(pathname)) {
         groupIndex = i;
         break;
       }
@@ -170,26 +170,39 @@ const SidebarContainer = () => {
     return `${groupIndex}`;
   }, [pathname]);
 
+  const { basicFieldCSS } = useFieldCSS({});
+
   return (
     <Sidebar title="Список перифирий">
+      <input
+        css={[basicFieldCSS, { marginBottom: scale(2) }]}
+        placeholder="Поиск"
+      />
       <Sidebar.Nav
         preExpanded={[activeGroupId]}
         animationType="fadeIn"
         allowMultipleExpanded={false}
+        variant={isDark ? 'dark' : 'primary'}
+        isIconVertical
       >
         {items &&
           items.map((group, index) => (
             <Sidebar.Group id={`${index}`} key={index} title={group.label}>
               <div
                 css={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr",
+                  display: 'grid',
+                  gridTemplateColumns: '1fr',
                   gap: scale(1),
                 }}
               >
-                {/* const match = useMatch(`${path}/*`); */}
-                {group.links.map((link, index) => (
-                  <NavLink {...link} key={index} />
+                {group.links.map(({ to, label }, index) => (
+                  <NavLink
+                    variant={isDark ? 'dark' : 'primary'}
+                    key={index}
+                    to={to}
+                  >
+                    {label}
+                  </NavLink>
                 ))}
               </div>
             </Sidebar.Group>

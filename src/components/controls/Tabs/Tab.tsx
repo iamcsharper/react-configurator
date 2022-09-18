@@ -36,7 +36,7 @@ export const TabsTab = ({
       selectedClassName="selected"
       disabledClassName="disabled"
       css={{
-        ...typography("labelMedium"),
+        ...typography("labelSmall"),
       }}
     >
       <>

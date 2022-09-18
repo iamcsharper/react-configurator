@@ -1,10 +1,9 @@
-import { colors } from "@scripts/colors";
-import typography from "@scripts/typography";
+import { HTMLProps, ReactNode, useCallback, useMemo } from 'react';
+import { AccordionItemButton as ReactAccordionItemButton } from 'react-accessible-accordion';
+import { themes } from './themes';
+import { AccordionStateFull } from './types';
 
-import { HTMLProps, ReactNode } from "react";
-import { AccordionItemButton as ReactAccordionItemButton } from "react-accessible-accordion";
-
-import useAccordion from "./useAccordion";
+import useAccordion from './useAccordion';
 
 export interface AccordionButtonProps extends HTMLProps<HTMLDivElement> {
   /** Heading content */
@@ -15,53 +14,38 @@ export const AccordionButton = ({
   children,
   ...props
 }: AccordionButtonProps) => {
-  const { Icon, isIconVertical } = useAccordion();
+  const {
+    Icon,
+    isIconVertical,
+    variant,
+    size,
+    theme = themes.basic,
+  } = useAccordion();
+
+  const state = useMemo<AccordionStateFull>(
+    () => ({
+      isIconVertical,
+      size: size!,
+      variant: variant!,
+    }),
+    [isIconVertical, size, variant],
+  );
+
+  const getCSS = useCallback(
+    (key: keyof typeof theme) => {
+      const element = theme[key];
+      if (typeof element === 'function') return element(state);
+      return element;
+    },
+    [state, theme],
+  );
+
+  const buttonCSS = useMemo(() => getCSS('button'), [getCSS]);
 
   return (
-    <ReactAccordionItemButton
-      css={{
-        transition:
-          "color ease 200ms, background-color ease 200ms, box-shadow ease 200ms",
-        position: "relative",
-        cursor: "pointer",
-        backgroundColor: "transparent",
-        color: colors.link,
-        fill: colors.link,
-        textTransform: "uppercase",
-        borderBottom: `1px solid ${colors.grey200}`,
-
-        ".js-focus-visible &.focus-visible:focus": {
-          zIndex: 1,
-          // outline: `2px solid ${AT?.buttonOutlineColor}`,
-        },
-        userSelect: 'none',
-
-        ...typography("labelMedium"),
-      }}
-      {...props}
-    >
+    <ReactAccordionItemButton css={buttonCSS} {...props}>
       {children}
-      {Icon && (
-        <Icon
-          aria-hidden
-          css={{
-            position: "absolute",
-            top: "50%",
-            right: 0,
-            transform: "translateY(-50%)",
-            transition: "transform ease 300ms, fill ease 300ms",
-            '[aria-expanded="true"] &': {
-              ...(isIconVertical
-                ? {
-                    transform: "translateY(-50%) rotate(180deg)",
-                  }
-                : {
-                    transform: "translateY(-50%) rotate(90deg)",
-                  }),
-            },
-          }}
-        />
-      )}
+      {Icon && <Icon aria-hidden />}
     </ReactAccordionItemButton>
   );
 };

@@ -1,8 +1,19 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext } from 'react';
 
-import { SVGRIcon } from "@customTypes/index";
+import { SVGRIcon } from '@customTypes/index';
+import { BasicState } from '@scripts/theme';
+import {
+  AccordionSize,
+  AccordionState,
+  AccordionTheme,
+  AccordionVariants,
+} from './types';
 
-export interface AccordionContextProps {
+export interface AccordionContextProps
+  extends Partial<
+      BasicState<typeof AccordionVariants, typeof AccordionSize, AccordionTheme>
+    >,
+    Partial<AccordionState> {
   /** CSSTransition handler, triggers after add 'enter' class */
   onEnter?: (node: HTMLElement, isAppearing: boolean) => void;
   /** CSSTransition handler, triggers after add 'enter-active' class */
@@ -14,10 +25,11 @@ export interface AccordionContextProps {
   /** CSSTransition timeout on exit (if differs) */
   transitionTimeoutExit?: number;
   /** Type of panel toggle animation */
-  animationType?: "height" | "fadeIn" | "custom";
+  animationType?: 'height' | 'fadeIn' | 'custom';
   /** Icon for arrow */
   Icon?: SVGRIcon;
   isIconVertical?: boolean;
+  panelNoPadding?: boolean;
 }
 
 export const AccordionContext =
@@ -28,7 +40,7 @@ const useAccordion = (): AccordionContextProps => {
 
   if (!context) {
     throw new Error(
-      "This component must be used within a <Accordion> component"
+      'This component must be used within a <Accordion> component',
     );
   }
 

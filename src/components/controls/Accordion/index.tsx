@@ -1,13 +1,15 @@
-import { FC, HTMLProps, ReactNode, useMemo } from "react";
-import { Accordion as ReactAccordion } from "react-accessible-accordion";
+import { FC, HTMLProps, ReactNode, useCallback, useMemo } from 'react';
+import { Accordion as ReactAccordion } from 'react-accessible-accordion';
 
-import { ReactComponent as ArrowDownIcon } from "@icons/small/chevronDown.svg";
+import { ReactComponent as ArrowDownIcon } from '@icons/small/chevronDown.svg';
 
-import AccordionButton, { AccordionButtonProps } from "./Button";
-import AccordionHeading, { AccordionHeadingProps } from "./Heading";
-import AccordionItem, { AccordionItemProps } from "./Item";
-import AccordionPanel, { AccordionPanelProps } from "./Panel";
-import { AccordionContext, AccordionContextProps } from "./useAccordion";
+import AccordionButton, { AccordionButtonProps } from './Button';
+import AccordionHeading, { AccordionHeadingProps } from './Heading';
+import AccordionItem, { AccordionItemProps } from './Item';
+import AccordionPanel, { AccordionPanelProps } from './Panel';
+import { AccordionContext, AccordionContextProps } from './useAccordion';
+import { themes } from './themes';
+import { AccordionSize, AccordionStateFull, AccordionVariants } from './types';
 
 export interface AccordionCompositionProps {
   Item: FC<AccordionItemProps>;
@@ -17,8 +19,8 @@ export interface AccordionCompositionProps {
 }
 
 export interface AccordionProps
-  extends Omit<AccordionContextProps, "theme" | "size" | "variant">,
-    Omit<HTMLProps<HTMLDivElement>, "onChange" | "ref" | "size"> {
+  extends AccordionContextProps,
+    Omit<HTMLProps<HTMLDivElement>, 'onChange' | 'ref' | 'size'> {
   /** List of Accordion.Item components */
   children: ReactNode;
   /** Panel change handler */
@@ -42,6 +44,10 @@ export const Accordion: FC<AccordionProps> & AccordionCompositionProps = ({
   animationType,
   transitionTimeout = 300,
   transitionTimeoutExit = transitionTimeout,
+  theme = themes.basic,
+  variant = AccordionVariants.primary,
+  size = AccordionSize.md,
+  panelNoPadding = true,
   onEnter,
   onEntering,
   onExit,
@@ -49,6 +55,10 @@ export const Accordion: FC<AccordionProps> & AccordionCompositionProps = ({
 }) => {
   const contextValue = useMemo(
     () => ({
+      panelNoPadding,
+      theme,
+      size,
+      variant,
       Icon,
       isIconVertical,
       animationType,
@@ -58,8 +68,41 @@ export const Accordion: FC<AccordionProps> & AccordionCompositionProps = ({
       onEntering,
       onExit,
     }),
-    []
+    [
+      Icon,
+      animationType,
+      isIconVertical,
+      onEnter,
+      onEntering,
+      onExit,
+      panelNoPadding,
+      size,
+      theme,
+      transitionTimeout,
+      transitionTimeoutExit,
+      variant,
+    ],
   );
+
+  const state = useMemo<AccordionStateFull>(
+    () => ({
+      isIconVertical,
+      size: size!,
+      variant: variant!,
+    }),
+    [isIconVertical, size, variant],
+  );
+
+  const getCSS = useCallback(
+    (key: keyof typeof theme) => {
+      const element = theme[key];
+      if (typeof element === 'function') return element(state);
+      return element;
+    },
+    [state, theme],
+  );
+
+  const rootCSS = useMemo(() => getCSS('root'), [getCSS]);
 
   return (
     <AccordionContext.Provider value={contextValue}>
@@ -68,9 +111,7 @@ export const Accordion: FC<AccordionProps> & AccordionCompositionProps = ({
         allowZeroExpanded={allowZeroExpanded}
         preExpanded={preExpanded}
         onChange={onChange}
-        css={{
-          width: "100%",
-        }}
+        css={rootCSS}
         {...props}
       >
         {children}

@@ -1,7 +1,8 @@
-import { scale } from "@scripts/helpers";
-import { FC, ReactNode } from "react";
-import SidebarNav, { SidebarNavProps } from "./Nav";
-import SidebarGroup, { SidebarGroupProps } from "./Group";
+import { scale } from '@scripts/helpers';
+import { FC, ReactNode } from 'react';
+import { colors } from '@scripts/colors';
+import SidebarNav, { SidebarNavProps } from './Nav';
+import SidebarGroup, { SidebarGroupProps } from './Group';
 
 interface SidebarComposition {
   Nav: FC<SidebarNavProps>;
@@ -19,13 +20,13 @@ const Sidebar = ({
 }: SidebarProps & Partial<SidebarComposition>) => (
   <div
     css={{
-      maxHeight: "100%",
-      overflow: "hidden",
-      overflowY: "auto",
+      maxHeight: '100%',
+      overflow: 'hidden',
+      overflowY: 'auto',
       padding: scale(2),
     }}
   >
-    <h4 css={{ marginBottom: scale(2) }}>{title}</h4>
+    <h4 css={{ marginBottom: scale(1), color: colors.white }}>{title}</h4>
     {children}
   </div>
 );
