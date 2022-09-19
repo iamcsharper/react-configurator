@@ -16,7 +16,6 @@ export const themes: Record<keyof typeof Themes, AccordionTheme> = {
       userSelect: 'none',
       '.js-focus-visible &.focus-visible:focus': {
         zIndex: 1,
-        // outline: `2px solid ${AT?.buttonOutlineColor}`,
       },
       // TODO: state.transitionTime
       transition:
