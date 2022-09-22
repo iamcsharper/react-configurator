@@ -1,3 +1,8 @@
+import { ElementType, ComponentPropsWithRef } from 'react';
+
+export type MergeElementProps<T extends ElementType, P extends object = {}> =
+  Omit<ComponentPropsWithRef<T>, keyof P> & P;
+
 export const scale = (n: number, isMinor?: boolean) => {
   const prime = isMinor ? 4 : 8;
   return n * prime;
@@ -9,11 +14,18 @@ export const scale = (n: number, isMinor?: boolean) => {
  * @returns
  */
 export const rgba = (color: string, alpha: number) => {
-  if (color.includes('rgb(')) {
-    throw new Error('Unimplemented');
+  const cleanColor = color.replace(/ /g, '');
+  if (cleanColor.includes('rgb(')) {
+    const values = cleanColor
+      .replace(/rgb[a]*\((.*)\)/g, '\\$1')
+      .split(',')
+      .map(Number);
+    values.length = 4;
+    values[3] = alpha;
+    return `rgba(${values.join(',')})`;
   }
 
+  // hex
   const trunc = Math.floor(alpha * 255);
-
-  return `${color}${trunc.toString(16)}`;
+  return `${cleanColor}${trunc.toString(16)}`;
 };

@@ -9,7 +9,7 @@ export interface SidebarGroupProps {
 
 const SidebarGroup = ({ id, title, children }: SidebarGroupProps) => (
   <Accordion.Item uuid={id}>
-    <Accordion.Heading css={{ padding: 0 }}>
+    <Accordion.Heading>
       <Accordion.Button>{title}</Accordion.Button>
     </Accordion.Heading>
     <Accordion.Panel>{children}</Accordion.Panel>

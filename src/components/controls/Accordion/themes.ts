@@ -61,12 +61,11 @@ export const themes: Record<keyof typeof Themes, AccordionTheme> = {
       },
     }),
     heading: {
-      padding: scale(1),
-      paddingBottom: 0,
+      padding: `${scale(1)}px 0`,
     },
     item: () => ({
       ':not(:last-of-type)': {
-        marginBottom: scale(2),
+        marginBottom: scale(1),
       },
     }),
     panel: ({ panelNoPadding }) => ({

@@ -57,6 +57,31 @@ export const DetailsProvider: FC<{
 export const useDetails = () => {
   const context = useContext(DetailsContext);
 
+  useEffect(() => {
+    const listener = (evt: KeyboardEvent) => {
+      if (document.activeElement) {
+        if (document.activeElement.nodeName.toLocaleLowerCase() !== 'body') {
+          return;
+        }
+      }
+      let isEscape = false;
+      if ('key' in evt) {
+        isEscape = evt.key === 'Escape' || evt.key === 'Esc';
+      } else {
+        isEscape = evt.keyCode === 27;
+      }
+      if (isEscape) {
+        context?.setCurrentData(null);
+      }
+    };
+
+    window.addEventListener('keyup', listener);
+
+    return () => {
+      window.removeEventListener('keyup', listener);
+    };
+  }, [context]);
+
   if (!context) {
     throw new Error(`Hook useDetails must be used within HeaderProvider`);
   }

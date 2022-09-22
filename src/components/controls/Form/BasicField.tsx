@@ -2,6 +2,7 @@ import { scale } from '@scripts/helpers';
 import { useFieldCSS } from '@scripts/hooks/useFieldCSS';
 import { forwardRef, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import Legend from '../Legend';
 import { BasicFieldProps, BasicInputProps } from './types';
 
 const BasicInput = forwardRef<any, BasicInputProps>(
@@ -42,10 +43,10 @@ export const BasicField = forwardRef<any, BasicFieldProps>(
       iconCSS,
       className,
       isLegend = false,
-      //   showMessage,
-      //   messageText,
+      showMessage,
+      messageText,
       placeholder,
-      //   labelCSS,
+      labelCSS,
       disabled,
       ...props
     },
@@ -59,31 +60,14 @@ export const BasicField = forwardRef<any, BasicFieldProps>(
 
     const {
       basicFieldCSS,
-      //   fieldWrapperCSS,
-      //   fieldLabelCSS,
-      //   fieldHintCSS,
-      //   fieldErrorCSS,
+      fieldWrapperCSS,
+      fieldLabelCSS,
+      fieldHintCSS,
+      fieldErrorCSS,
     } = useFieldCSS({
       isLabel: !!label,
       isError: !!error,
     });
-
-    console.log('basicFieldCSS', basicFieldCSS);
-
-    //   <Legend
-    //     name={name}
-    //     meta={!props?.disabled ? meta : undefined}
-    //     label={label}
-    //     hint={hint}
-    //     showMessage={showMessage}
-    //     messageText={messageText}
-    //     isLabelBottom={isLabelBottom}
-    //     labelCSS={{ ...fieldLabelCSS, ...labelCSS }}
-    //     fieldWrapperCSS={fieldWrapperCSS}
-    //     hintCSS={fieldHintCSS}
-    //     errorCSS={fieldErrorCSS}
-    //   >
-    //   </Legend>
 
     const commonProps = useMemo(
       () => ({
@@ -96,7 +80,16 @@ export const BasicField = forwardRef<any, BasicFieldProps>(
         hint,
         label,
       }),
-      [],
+      [
+        Icon,
+        basicFieldCSS,
+        className,
+        disabled,
+        hint,
+        iconCSS,
+        label,
+        placeholder,
+      ],
     );
 
     return (
@@ -104,7 +97,17 @@ export const BasicField = forwardRef<any, BasicFieldProps>(
         name={name}
         render={({ field: { ref: hookRef, ...field } }) =>
           isLegend ? (
-            <label htmlFor={name}>
+            <Legend
+              name={name}
+              label={label}
+              hint={hint}
+              showMessage={showMessage}
+              messageText={messageText}
+              labelCSS={{ ...fieldLabelCSS, ...labelCSS }}
+              fieldWrapperCSS={fieldWrapperCSS}
+              hintCSS={fieldHintCSS}
+              errorCSS={fieldErrorCSS}
+            >
               <span>{label}</span>
               <BasicInput
                 {...commonProps}
@@ -120,7 +123,7 @@ export const BasicField = forwardRef<any, BasicFieldProps>(
                 {...field}
                 {...props}
               />
-            </label>
+            </Legend>
           ) : (
             <BasicInput
               {...commonProps}

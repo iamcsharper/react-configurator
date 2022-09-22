@@ -22,35 +22,35 @@ const items: LinkGroup[] = [
     links: [
       {
         label: 'Монитор питания',
-        to: '/',
+        to: '/periphery/system/vcc-monitor',
       },
       {
         label: 'Монитор тактирования',
-        to: '/',
+        to: '/periphery/system/cycle-monitor',
       },
       {
         label: 'ПДП',
-        to: '/',
+        to: '/periphery/system/pdp',
       },
       {
         label: 'Тактирование',
-        to: '/',
+        to: '/periphery/system/cycle',
       },
       {
         label: 'Прерывания',
-        to: '/',
+        to: '/periphery/system/interrupts',
       },
       {
         label: 'GPIO',
-        to: '/',
+        to: '/periphery/system/gpio',
       },
       {
         label: 'WDT',
-        to: '/',
+        to: '/periphery/system/wdt',
       },
       {
         label: "Bus' WDT",
-        to: '/',
+        to: '/periphery/system/bus-wdt',
       },
     ],
   },
@@ -59,15 +59,15 @@ const items: LinkGroup[] = [
     links: [
       {
         label: 'АЦП',
-        to: '/',
+        to: '/periphery/analog/adc',
       },
       {
         label: 'Температурный сенсор',
-        to: '/',
+        to: '/periphery/analog/temp',
       },
       {
         label: 'ЦАП',
-        to: '/',
+        to: '/periphery/analog/dac',
       },
     ],
   },
@@ -76,15 +76,15 @@ const items: LinkGroup[] = [
     links: [
       {
         label: 'RTC',
-        to: '/rtc',
+        to: '/periphery/timers/rtc',
       },
       {
         label: 'TIMER32',
-        to: '/timer32',
+        to: '/periphery/timers/timer32',
       },
       {
         label: 'TIMER16',
-        to: '/timer16',
+        to: '/periphery/timers/timer16',
       },
     ],
   },
@@ -93,19 +93,19 @@ const items: LinkGroup[] = [
     links: [
       {
         label: 'I2C',
-        to: '/',
+        to: '/periphery/interface/i2c',
       },
       {
         label: 'SPI',
-        to: '/',
+        to: '/periphery/interface/spi',
       },
       {
         label: 'SPIFI',
-        to: '/',
+        to: '/periphery/interface/spifi',
       },
       {
         label: 'USART',
-        to: '/',
+        to: '/periphery/interface/usart',
       },
     ],
   },
@@ -114,11 +114,11 @@ const items: LinkGroup[] = [
     links: [
       {
         label: 'Крипто-блок',
-        to: '/',
+        to: '/periphery/crypto/block',
       },
       {
         label: 'CRC',
-        to: '/',
+        to: '/periphery/crypto/crc',
       },
     ],
   },
@@ -205,6 +205,7 @@ const SidebarContainer = ({ isDark }: { isDark: boolean }) => {
         preExpanded={[activeGroupId]}
         animationType="fadeIn"
         allowMultipleExpanded={false}
+        allowZeroExpanded={false}
         variant={isDark ? 'dark' : 'primary'}
         isIconVertical
       >

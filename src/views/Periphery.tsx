@@ -10,10 +10,9 @@ const isDark = true;
 
 const Periphery = () => (
   <BrowserRouter>
-    <Allotment>
+    <Allotment proportionalLayout={false}>
       <Allotment.Pane
-        minSize={250}
-        preferredSize={250}
+        maxSize={250}
         css={{
           ...(isDark && {
             background: colors.black,
@@ -23,21 +22,23 @@ const Periphery = () => (
       >
         <Sidebar isDark={isDark} />
       </Allotment.Pane>
-      <Allotment.Pane>
-        <Routes>
-          <Route path="/">
-            <Route path=":id" element={<PeripheryPage />} />
-          </Route>
-        </Routes>
-      </Allotment.Pane>
-      <Allotment.Pane>
-        <div
-          css={{
-            background: colors.grey300,
-            height: '100%',
-            width: '100%',
-          }}
-        />
+      <Allotment.Pane minSize={500} preferredSize={1200}>
+        <Allotment>
+          <Allotment.Pane>
+            <Routes>
+              <Route path="/periphery/*" element={<PeripheryPage />} />
+            </Routes>
+          </Allotment.Pane>
+          <Allotment.Pane>
+            <div
+              css={{
+                background: colors.grey300,
+                height: '100%',
+                width: '100%',
+              }}
+            />
+          </Allotment.Pane>
+        </Allotment>
       </Allotment.Pane>
     </Allotment>
   </BrowserRouter>
