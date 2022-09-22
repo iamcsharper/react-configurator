@@ -8,8 +8,10 @@ import PeripheryPage from './[Periphery]';
 // TODO: https://github.com/remix-run/react-router/blob/main/docs/getting-started/tutorial.md
 const isDark = true;
 
+const basename = process.env.ASSET_URL;
+
 const Periphery = () => (
-  <BrowserRouter>
+  <BrowserRouter basename={basename}>
     <Allotment proportionalLayout={false}>
       <Allotment.Pane
         maxSize={250}
