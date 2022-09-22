@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import svgr from 'vite-plugin-svgr';
 import dotenv from 'dotenv';
+import EnvironmentPlugin from 'vite-plugin-environment';
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const ASSET_URL = process.env.ASSET_URL || '';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    EnvironmentPlugin(['ASSET_URL']),
     svgr(),
     tsconfigPaths(),
     react({
