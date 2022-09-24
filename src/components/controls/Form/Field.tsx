@@ -39,7 +39,18 @@ const FormField = ({
                   name={name}
                   control={control}
                   render={({ field }) =>
-                    cloneElement(child, { ...field, ...hookFormProps })
+                    cloneElement<any>(child, {
+                      ...field,
+                      ...hookFormProps,
+                      onChange(...args: any[]) {
+                        if (
+                          typeof (child?.props as any)?.onChange === 'function'
+                        ) {
+                          (child.props as any).onChange(...args);
+                        }
+                        field.onChange(...args);
+                      },
+                    })
                   }
                 />
               );

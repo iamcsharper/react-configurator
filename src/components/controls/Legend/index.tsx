@@ -92,7 +92,7 @@ export const Legend = <T extends ElementType = 'div'>({
 
   return jsx(
     as || 'div',
-    { htmlFor: name, ...props },
+    props,
     <>
       {!isLabelBottom && label && (
         <Label

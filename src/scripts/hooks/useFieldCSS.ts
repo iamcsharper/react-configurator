@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 
 export const useFieldCSS = ({
   isError,
-  isLabel,
+  // isLabel,
   isLabelBottom,
   focus,
 }: {
@@ -32,7 +32,7 @@ export const useFieldCSS = ({
       minHeight: 40,
       borderRadius: scale(3, true),
       background: colors?.white,
-      border: `1px solid ${colors?.grey300}`,
+      border: `2px solid ${colors?.grey300}`,
       color: colors?.black,
 
       '::placeholder': {
@@ -88,7 +88,7 @@ export const useFieldCSS = ({
       }),
       lineHeight: `1 !important`,
     }),
-    [focus, isError, isLabel, isLabelBottom],
+    [focus, isError],
   );
 
   const fieldWrapperCSS: CSSObject = {

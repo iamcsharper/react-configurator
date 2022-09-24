@@ -1,110 +1,105 @@
-export {};
+import { CSSObject } from '@emotion/react';
+import { HTMLProps, ReactNode } from 'react';
+import { BasicState, StyleOrFunction } from '@scripts/theme';
 
-// import { CSSObject } from '@emotion/react';
-// import { UseSelectState } from 'downshift';
-// import { HTMLProps, ReactNode } from 'react';
-// import { BasicState, StyleOrFunction } from '@scripts/theme';
+export enum SelectVariants {
+  primary = 'primary',
+  dark = 'dark',
+}
 
-// export enum SelectVariants {
-//   primary = 'primary',
-//   dark = 'dark',
-// }
+export enum SelectSize {
+  md = 'md',
+}
 
-// export enum SelectSize {
-//   md = 'md',
-// }
+export interface SelectState {
+  isOpen: boolean;
+  isOneLine?: boolean;
+  isSearch?: boolean;
+}
 
-// export interface SelectState {
-//   isIconVertical?: boolean;
-//   panelNoPadding?: boolean;
-// }
+export type SelectStateFull = BasicState<
+  typeof SelectVariants,
+  typeof SelectSize
+> &
+  SelectState;
 
-// export type SelectStateFull = BasicState<
-//   typeof SelectVariants,
-//   typeof SelectSize
-// > &
-//   SelectState;
+export interface SelectTheme {
+  legend: StyleOrFunction<SelectStateFull>;
+  field: StyleOrFunction<SelectStateFull & { isFocused: boolean }>;
+  optionList: StyleOrFunction<SelectStateFull>;
+  arrowButton: StyleOrFunction<SelectStateFull>;
+  option: StyleOrFunction<
+    SelectStateFull & {
+      isSelected: boolean;
+      isHover: boolean;
+      isDisabled: boolean;
+    }
+  >;
+}
 
-// type SelectThemePart = StyleOrFunction<SelectStateFull>;
+// TODO:
+// https://gitlab.com/devrosa/rk_front/-/tree/master/src/scripts/themes/select
 
-// export interface SelectTheme {
-  
-// }
+export interface LegendWrapperProps {
+  /** Input name */
+  name?: string;
+  /** Label text */
+  label?: string;
+  /** Hint text */
+  hint?: string;
+  /** Required field */
+  required?: boolean;
+  /** Show message flag */
+  showMessage?: boolean;
+  /** Custom message text */
+  messageText?: string;
+  fieldWrapperCSS?: CSSObject;
+  children: ReactNode;
+}
 
-// // TODO:
-// // https://gitlab.com/devrosa/rk_front/-/tree/master/src/scripts/themes/select
+export interface SelectItemProps<T = string | number | null> {
+  /** Select option value */
+  value: T;
+  /** Select option text */
+  label: ReactNode;
+  disabled?: boolean;
+}
 
-// export interface LegendWrapperProps {
-//   /** Input name */
-//   name?: string;
-//   /** Label text */
-//   label?: string;
-//   /** Hint text */
-//   hint?: string;
-//   /** Required field */
-//   required?: boolean;
-//   /** Show message flag */
-//   showMessage?: boolean;
-//   /** Custom message text */
-//   messageText?: string;
-//   fieldWrapperCSS?: CSSObject;
-//   children: ReactNode;
-// }
-// export interface SelectItemProps {
-//   /** Select option value */
-//   value: string | number | null;
-//   /** Select option text */
-//   label: ReactNode;
-//   disabled?: boolean;
-// }
+export type SelectBaseProps = Omit<
+  HTMLProps<HTMLDivElement>,
+  'size' | 'onChange'
+> &
+  Omit<LegendWrapperProps, 'children' | 'fieldWrapperCSS'>;
 
-// export type OnChangeProps = Partial<UseSelectState<SelectItemProps | null>> & {
-//   name: string;
-// };
+export interface SelectProps<
+  T extends string | number,
+  TName extends string | never,
+> extends Partial<
+      BasicState<typeof SelectVariants, typeof SelectSize, SelectTheme>
+    >,
+    Partial<SelectState>,
+    Omit<SelectBaseProps, 'name'> {
+  name?: TName;
+  /** Options list */
+  items: SelectItemProps<T>[];
+  /** Index of option selected by default */
+  defaultIndex?: number;
+  /** Select option value */
+  value?: string;
+  /** Visually hidden legend */
+  hiddenLegend?: boolean;
+  /** Placeholder text */
+  placeholder?: string;
+  /** legend visible flag */
+  isLegend?: boolean;
+  /** Change event handler */
+  onChange?: (value: T | null) => void;
+  /** Selected item */
+  selectedItem?: SelectItemProps<T>;
+  /** Do we need filter options when typing */
+  isSearch?: boolean;
+  /** additional css for field */
+  fieldCSS?: CSSObject;
+}
 
-// export type SelectBaseProps = Omit<
-//   HTMLProps<HTMLDivElement>,
-//   'size' | 'onChange'
-// > &
-//   Omit<LegendWrapperProps, 'children' | 'fieldWrapperCSS'>;
-
-// export interface SelectProps extends SelectBaseProps {
-//   /** Options list */
-//   items: SelectItemProps[];
-//   /** Index of option selected by default */
-//   defaultIndex?: number;
-//   /** Select option value */
-//   value?: string;
-//   /** Visually hidden legend */
-//   hiddenLegend?: boolean;
-//   /** Placeholder text */
-//   placeholder?: string;
-//   /** Select height */
-//   // heightProp?: number;
-//   /** legend visible flag */
-//   isLegend?: boolean;
-//   /** Change event handler */
-//   onChange?: (changes: OnChangeProps) => void;
-//   /** Selected item */
-//   selectedItem?: SelectItemProps;
-//   /** Simple select without search */
-//   simple?: boolean;
-//   /** Do we need filter options when typing */
-//   search?: boolean;
-//   /** Dropdown placement */
-//   // placement?: 'bottom' | 'top';
-//   /** label bottom position  */
-//   isLabelBottom?: boolean;
-//   /** label in one line */
-//   isOneLine?: boolean;
-//   /** additional css for field */
-//   fieldCSS?: CSSObject;
-//   /** Size for field, different from Option List  */
-//   fieldSize?: ComponentThemeProps['size'];
-//   /** Theme for field, different from Option List  */
-//   fieldTheme?: ComponentThemeProps['theme'];
-//   /** Variant for field, different from Option List  */
-//   fieldVariant?: ComponentThemeProps['variant'];
-// }
-
-// export type SelectedItem = SelectItemProps | null | undefined;
+export type SelectedItem = SelectItemProps | null | undefined;

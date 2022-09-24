@@ -1,8 +1,9 @@
-import { FC, HTMLProps, ReactNode, useCallback, useMemo } from 'react';
+import { FC, HTMLProps, ReactNode, useMemo } from 'react';
 import { Accordion as ReactAccordion } from 'react-accessible-accordion';
 
 import { ReactComponent as ArrowDownIcon } from '@icons/small/chevronDown.svg';
 
+import { useThemeCSSPart } from '@scripts/theme';
 import AccordionButton, { AccordionButtonProps } from './Button';
 import AccordionHeading, { AccordionHeadingProps } from './Heading';
 import AccordionItem, { AccordionItemProps } from './Item';
@@ -93,15 +94,7 @@ export const Accordion: FC<AccordionProps> & AccordionCompositionProps = ({
     [isIconVertical, size, variant],
   );
 
-  const getCSS = useCallback(
-    (key: keyof typeof theme) => {
-      const element = theme[key];
-      if (typeof element === 'function') return element(state);
-      return element;
-    },
-    [state, theme],
-  );
-
+  const getCSS = useThemeCSSPart(theme, state);
   const rootCSS = useMemo(() => getCSS('root'), [getCSS]);
 
   return (

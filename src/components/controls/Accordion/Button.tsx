@@ -1,4 +1,5 @@
-import { HTMLProps, ReactNode, useCallback, useMemo } from 'react';
+import { useThemeCSSPart } from '@scripts/theme';
+import { HTMLProps, ReactNode, useMemo } from 'react';
 import { AccordionItemButton as ReactAccordionItemButton } from 'react-accessible-accordion';
 import { themes } from './themes';
 import { AccordionStateFull } from './types';
@@ -31,14 +32,7 @@ export const AccordionButton = ({
     [isIconVertical, size, variant],
   );
 
-  const getCSS = useCallback(
-    (key: keyof typeof theme) => {
-      const element = theme[key];
-      if (typeof element === 'function') return element(state);
-      return element;
-    },
-    [state, theme],
-  );
+  const getCSS = useThemeCSSPart(theme, state);
 
   const buttonCSS = useMemo(() => getCSS('button'), [getCSS]);
 

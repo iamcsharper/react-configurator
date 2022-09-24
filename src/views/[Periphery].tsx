@@ -1,8 +1,8 @@
 import Timers from '@containers/utility/Periphery/Timers';
 import { DetailsProvider, useDetails } from '@context/details';
 import { scale } from '@scripts/helpers';
-import { Allotment } from 'allotment';
-import { useEffect } from 'react';
+import { Allotment, AllotmentHandle } from 'allotment';
+import { useEffect, useRef } from 'react';
 
 import { Route, Routes, useParams } from 'react-router-dom';
 
@@ -33,6 +33,22 @@ const SplitPanes = () => {
     return () => setCurrentData(null);
   }, [props, setCurrentData]);
 
+  const ref = useRef<AllotmentHandle>(null);
+
+  useEffect(() => {
+    const handle = ref.current;
+
+    const onresize = () => {
+      handle?.reset();
+    };
+
+    window.addEventListener('resize', onresize);
+
+    return () => {
+      window.removeEventListener('resize', onresize);
+    };
+  }, []);
+
   return (
     <Allotment
       vertical
@@ -40,6 +56,7 @@ const SplitPanes = () => {
         const isDetailsVisible = !!sizes[1];
         setEnabled(isDetailsVisible);
       }}
+      ref={ref}
     >
       <Allotment.Pane>
         <Routes>
@@ -48,7 +65,7 @@ const SplitPanes = () => {
         </Routes>
         {/* <Settings id={id} group={group} /> */}
       </Allotment.Pane>
-      <Allotment.Pane preferredSize={150} snap>
+      <Allotment.Pane snap>
         <Details />
       </Allotment.Pane>
     </Allotment>
