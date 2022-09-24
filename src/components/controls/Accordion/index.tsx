@@ -49,6 +49,7 @@ export const Accordion: FC<AccordionProps> & AccordionCompositionProps = ({
   variant = AccordionVariants.primary,
   size = AccordionSize.md,
   panelNoPadding = true,
+  bordered = false,
   onEnter,
   onEntering,
   onExit,
@@ -56,6 +57,7 @@ export const Accordion: FC<AccordionProps> & AccordionCompositionProps = ({
 }) => {
   const contextValue = useMemo(
     () => ({
+      bordered,
       panelNoPadding,
       theme,
       size,
@@ -70,6 +72,7 @@ export const Accordion: FC<AccordionProps> & AccordionCompositionProps = ({
       onExit,
     }),
     [
+      bordered,
       Icon,
       animationType,
       isIconVertical,
@@ -90,8 +93,9 @@ export const Accordion: FC<AccordionProps> & AccordionCompositionProps = ({
       isIconVertical,
       size: size!,
       variant: variant!,
+      bordered,
     }),
-    [isIconVertical, size, variant],
+    [isIconVertical, size, variant, bordered],
   );
 
   const getCSS = useThemeCSSPart(theme, state);

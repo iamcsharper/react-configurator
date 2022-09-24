@@ -11,6 +11,7 @@ export enum AccordionSize {
 
 export interface AccordionState {
   isIconVertical?: boolean;
+  bordered: boolean;
   panelNoPadding?: boolean;
 }
 

@@ -30,6 +30,7 @@ export interface AccordionContextProps
   Icon?: SVGRIcon;
   isIconVertical?: boolean;
   panelNoPadding?: boolean;
+  bordered?: boolean;
 }
 
 export const AccordionContext =

@@ -1,7 +1,7 @@
-import { CSSObject, Global } from "@emotion/react";
-import { colors } from "@scripts/colors";
-import { scale } from "@scripts/helpers";
-import cn from "classnames";
+import { CSSObject, Global } from '@emotion/react';
+import { colors } from '@scripts/colors';
+import { scale } from '@scripts/helpers';
+import cn from 'classnames';
 // import deepmerge from "deepmerge";
 import {
   Children,
@@ -11,12 +11,12 @@ import {
   cloneElement,
   isValidElement,
   useMemo,
-} from "react";
-import { Tabs as ReactTabs } from "react-tabs";
+} from 'react';
+import { Tabs as ReactTabs } from 'react-tabs';
 
-import TabsList, { TabsListProps } from "./List";
-import TabsPanel, { TabsPanelProps } from "./Panel";
-import TabsTab, { TabsTabProps } from "./Tab";
+import TabsList, { TabsListProps } from './List';
+import TabsPanel, { TabsPanelProps } from './Panel';
+import TabsTab, { TabsTabProps } from './Tab';
 
 export interface TabsCompositionProps {
   List: FC<TabsListProps>;
@@ -25,7 +25,7 @@ export interface TabsCompositionProps {
 }
 
 export interface TabsProps
-  extends Omit<HTMLProps<HTMLDivElement>, "onSelect" | "size"> {
+  extends Omit<HTMLProps<HTMLDivElement>, 'onSelect' | 'size'> {
   /** Tabs.List and Tabs.Panel components */
   children: ReactNode;
   /** Initially opened tab in uncontrolled mode */
@@ -53,16 +53,16 @@ export const Tabs: FC<TabsProps> & TabsCompositionProps = ({
 
   const tabCSS: CSSObject = useMemo(
     () => ({
-      display: "flex",
-      alignItems: "center",
-      backgroundColor: "transparent",
-      whiteSpace: "nowrap",
-      cursor: "pointer",
+      display: 'flex',
+      alignItems: 'center',
+      backgroundColor: 'transparent',
+      whiteSpace: 'nowrap',
+      cursor: 'pointer',
 
-      height: scale(5),
+      maxHeight: scale(6) - 1,
       padding: scale(2),
       borderBottomWidth: 3,
-      marginBottom: -scale(1) + 2,
+      marginBottom: 0,
       marginRight: scale(1),
 
       svg: {
@@ -72,12 +72,12 @@ export const Tabs: FC<TabsProps> & TabsCompositionProps = ({
       borderTopWidth: 0,
       borderLeftWidth: 0,
       borderRightWidth: 0,
-      borderStyle: "solid",
-      borderBottomColor: "transparent",
-      transition: "border-bottom-color 0.2s ease",
+      borderStyle: 'solid',
+      borderBottomColor: 'transparent',
+      transition: 'border-bottom-color 0.2s ease',
 
-      "&.selected": {
-        cursor: "default",
+      '&.selected': {
+        cursor: 'default',
         borderBottomColor: colors.link,
         color: colors?.link,
         fill: colors?.link,
@@ -85,12 +85,12 @@ export const Tabs: FC<TabsProps> & TabsCompositionProps = ({
 
       color: colors?.black,
 
-      ":hover": {
+      ':hover': {
         color: colors?.link,
         fill: colors?.link,
       },
     }),
-    []
+    [],
   );
 
   return (
@@ -98,19 +98,20 @@ export const Tabs: FC<TabsProps> & TabsCompositionProps = ({
       <Global
         styles={{
           [`.${baseClass}`]: {
-            "&__list": {
-              display: "flex",
+            '&__list': {
+              display: 'flex',
               borderBottom: `1px solid ${colors.grey200}`,
+              height: scale(6),
               ...tabListCSS,
             },
-            "&__tab": tabCSS,
-            "&__panel": {
-              display: "none",
+            '&__tab': tabCSS,
+            '&__panel': {
+              display: 'none',
               ...(panelFillsHeight && {
-                height: "100%",
+                height: '100%',
               }),
 
-              "&.selected": { display: "block" },
+              '&.selected': { display: 'block' },
             },
           },
         }}
@@ -128,9 +129,9 @@ export const Tabs: FC<TabsProps> & TabsCompositionProps = ({
     </>
   );
 };
-(TabsList as any).tabsRole = "TabList";
-(TabsTab as any).tabsRole = "Tab";
-(TabsPanel as any).tabsRole = "TabPanel";
+(TabsList as any).tabsRole = 'TabList';
+(TabsTab as any).tabsRole = 'Tab';
+(TabsPanel as any).tabsRole = 'TabPanel';
 
 Tabs.List = TabsList;
 Tabs.Tab = TabsTab;

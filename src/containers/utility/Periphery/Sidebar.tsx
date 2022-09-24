@@ -154,7 +154,13 @@ const items: LinkGroup[] = [
 //   );
 // };
 
-const SidebarContainer = ({ isDark }: { isDark: boolean }) => {
+const SidebarContainer = ({
+  isDark,
+  className,
+}: {
+  isDark: boolean;
+  className?: string;
+}) => {
   const { pathname } = useLocation();
 
   const activeGroupId = useMemo<string>(() => {
@@ -194,15 +200,22 @@ const SidebarContainer = ({ isDark }: { isDark: boolean }) => {
     [search],
   );
 
+  const preExpanded = useMemo<string[]>(() => {
+    if (filteredItems.length < 3) return ['0', '1'];
+
+    return [activeGroupId];
+  }, [activeGroupId, filteredItems]);
+
   return (
-    <Sidebar title="Список перифирий">
+    <Sidebar title="Список перифирий" className={className}>
       <input
         css={[basicFieldCSS, { marginBottom: scale(2) }]}
         placeholder="Поиск"
+        autoComplete="off"
         {...register('search')}
       />
       <Sidebar.Nav
-        preExpanded={[activeGroupId]}
+        preExpanded={preExpanded}
         animationType="fadeIn"
         allowMultipleExpanded={false}
         allowZeroExpanded={false}

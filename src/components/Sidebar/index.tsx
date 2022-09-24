@@ -12,11 +12,13 @@ interface SidebarComposition {
 interface SidebarProps {
   title: string;
   children: ReactNode | ReactNode[];
+  className?: string;
 }
 
 const Sidebar = ({
   title,
   children,
+  className,
 }: SidebarProps & Partial<SidebarComposition>) => (
   <div
     css={{
@@ -25,6 +27,7 @@ const Sidebar = ({
       overflowY: 'auto',
       padding: scale(2),
     }}
+    className={className}
   >
     <h4 css={{ marginBottom: scale(1), color: colors.white }}>{title}</h4>
     {children}

@@ -59,13 +59,20 @@ const SplitPanes = () => {
       ref={ref}
     >
       <Allotment.Pane>
-        <Routes>
-          <Route path="timers/*" element={<Timers />} />
-          <Route path="*" element={<p>Work in progress</p>} />
-        </Routes>
-        {/* <Settings id={id} group={group} /> */}
+        <div
+          css={{
+            height: '100%',
+            overflow: 'hidden',
+            overflowY: 'auto',
+          }}
+        >
+          <Routes>
+            <Route path="timers/*" element={<Timers />} />
+            <Route path="*" element={<p>Work in progress</p>} />
+          </Routes>
+        </div>
       </Allotment.Pane>
-      <Allotment.Pane snap>
+      <Allotment.Pane maxSize={150} snap>
         <Details />
       </Allotment.Pane>
     </Allotment>

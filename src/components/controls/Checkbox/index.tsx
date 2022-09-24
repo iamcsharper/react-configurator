@@ -76,6 +76,13 @@ const Checkbox = forwardRef<any, CheckboxProps>(
           width: scale(3),
           height: scale(3),
           backgroundColor: colors.grey100,
+          'input:focus + &': {
+            outline: '2px solid',
+            outlineOffset: 2,
+          },
+          ':active': {
+            outline: 0,
+          },
           'input:checked + &': {
             backgroundColor: colors.link,
           },

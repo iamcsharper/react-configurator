@@ -22,10 +22,16 @@ export const themes: Record<keyof typeof Themes, AccordionTheme> = {
         'color ease 200ms, background-color ease 200ms, box-shadow ease 200ms',
       position: 'relative',
       cursor: 'pointer',
+      ...(state.bordered && {
+        borderBottom: '1px solid transparent',
+        paddingBottom: scale(1),
+        marginBottom: -scale(1),
+      }),
       // ...typography('h6'),
       ...typography('labelSmall'),
       ...(state.variant === 'primary' && {
         backgroundColor: 'transparent',
+        borderBottomColor: colors.grey100,
         color: colors.link,
         fill: colors.link,
         textTransform: 'uppercase',

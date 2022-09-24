@@ -13,16 +13,16 @@ const basename = process.env.BASE_URL;
 const Periphery = () => (
   <BrowserRouter basename={basename}>
     <Allotment proportionalLayout={false}>
-      <Allotment.Pane
-        maxSize={250}
-        css={{
-          ...(isDark && {
-            background: colors.black,
-          }),
-          height: '100%',
-        }}
-      >
-        <Sidebar isDark={isDark} />
+      <Allotment.Pane maxSize={300} minSize={200}>
+        <Sidebar
+          isDark={isDark}
+          css={{
+            ...(isDark && {
+              background: colors.black,
+            }),
+            height: '100%',
+          }}
+        />
       </Allotment.Pane>
       <Allotment.Pane minSize={500} preferredSize={1200}>
         <Allotment>

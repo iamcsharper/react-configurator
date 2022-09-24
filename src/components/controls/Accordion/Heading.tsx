@@ -22,6 +22,7 @@ export const AccordionHeading = ({
     variant,
     size,
     theme = themes.basic,
+    bordered,
   } = useAccordion();
 
   const state = useMemo<AccordionStateFull>(
@@ -29,8 +30,9 @@ export const AccordionHeading = ({
       isIconVertical,
       size: size!,
       variant: variant!,
+      bordered: bordered!,
     }),
-    [isIconVertical, size, variant],
+    [bordered, isIconVertical, size, variant],
   );
 
   const getCSS = useThemeCSSPart(theme, state);
