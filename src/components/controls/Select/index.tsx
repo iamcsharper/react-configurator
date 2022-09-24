@@ -78,7 +78,6 @@ const Select = <T extends string | number, TName extends string | never>(
     value,
     ...props
   }: SelectProps<T, TName>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ref?: any,
 ) => {
   // console.log('select option value:', value);
@@ -269,6 +268,7 @@ const Select = <T extends string | number, TName extends string | never>(
                 disabled,
                 placeholder,
                 autoComplete: 'off',
+                ...(ref && { ref }),
               })}
             />
           )}
@@ -306,71 +306,6 @@ const Select = <T extends string | number, TName extends string | never>(
       </LegendWrapper>
     </div>
   );
-
-  // return (
-  //   <div {...props} css={{ position: 'relative' }}>
-  //     <div {...getComboboxProps()}>
-  //       <LegendWrapper {...legendProps} {...getLabelProps()}>
-  //         <>
-  //           {!isSearch ? (
-  //             <>
-  //               <input {...getInputProps({ css: { display: 'none' } })} />
-  //               <button
-  //                 type="button"
-  //                 {...getToggleButtonProps({
-  //                   css: fieldCSS,
-  //                   disabled,
-  //                 })}
-  //                 aria-label="toggle menu"
-  //               >
-  //                 {selectedItem?.label || placeholder}
-  //               </button>
-  //             </>
-  //           ) : (
-  //             <input
-  //               {...getInputProps({
-  //                 css: fieldCSS,
-  //                 disabled,
-  //                 placeholder,
-  //                 autoComplete: 'off',
-  //               })}
-  //             />
-  //           )}
-  //           <button
-  //             type="button"
-  //             {...getToggleButtonProps({
-  //               disabled,
-  //               css: arrowButton,
-  //             })}
-  //           >
-  //             <ArrowIcon />
-  //           </button>
-
-  //           <ul {...getMenuProps({ css: optionList })}>
-  //             {isOpen &&
-  //               inputItems.map((option, index) => (
-  //                 <li
-  //                   key={option.value}
-  //                   {...getItemProps({
-  //                     item: option,
-  //                     index,
-  //                     css: getCSS('option', {
-  //                       isHover: index === highlightedIndex,
-  //                       isSelected: option.value === selectedItem?.value,
-  //                       isDisabled: option.disabled,
-  //                     }),
-  //                     disabled: option.disabled,
-  //                   })}
-  //                 >
-  //                   {option.label}
-  //                 </li>
-  //               ))}
-  //           </ul>
-  //         </>
-  //       </LegendWrapper>
-  //     </div>
-  //   </div>
-  // );
 };
 
 export default forwardRef(Select);

@@ -23,6 +23,7 @@ export const AccordionItem = ({
     variant,
     size,
     theme = themes.basic,
+    bordered,
   } = useAccordion();
 
   const state = useMemo<AccordionStateFull>(
@@ -30,8 +31,9 @@ export const AccordionItem = ({
       isIconVertical,
       size: size!,
       variant: variant!,
+      bordered: bordered!
     }),
-    [isIconVertical, size, variant],
+    [isIconVertical, size, variant, bordered],
   );
 
   const getCSS = useThemeCSSPart(theme, state);

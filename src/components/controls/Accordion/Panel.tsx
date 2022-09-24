@@ -29,6 +29,7 @@ export const AccordionPanel = ({ children, ...props }: AccordionPanelProps) => {
     variant,
     size,
     theme = themes.basic,
+    bordered,
   } = useAccordion();
 
   const handleEnter = (...args: [HTMLElement, boolean]) => {
@@ -72,8 +73,9 @@ export const AccordionPanel = ({ children, ...props }: AccordionPanelProps) => {
       isIconVertical,
       size: size!,
       variant: variant!,
+      bordered: bordered!,
     }),
-    [panelNoPadding, isIconVertical, size, variant],
+    [panelNoPadding, isIconVertical, size, variant, bordered],
   );
 
   const getCSS = useThemeCSSPart(theme, state);
