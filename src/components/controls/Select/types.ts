@@ -15,6 +15,7 @@ export interface SelectState {
   isOpen: boolean;
   isOneLine?: boolean;
   isSearch?: boolean;
+  hasSelected?: boolean;
 }
 
 export type SelectStateFull = BasicState<
@@ -28,6 +29,7 @@ export interface SelectTheme {
   field: StyleOrFunction<SelectStateFull & { isFocused: boolean }>;
   optionList: StyleOrFunction<SelectStateFull>;
   arrowButton: StyleOrFunction<SelectStateFull>;
+  closeButton: StyleOrFunction<SelectStateFull>;
   option: StyleOrFunction<
     SelectStateFull & {
       isSelected: boolean;
@@ -57,7 +59,7 @@ export interface LegendWrapperProps {
   children: ReactNode;
 }
 
-export interface SelectItemProps<T = string | number | null> {
+export interface SelectItemProps<T extends string | number | null> {
   /** Select option value */
   value: T;
   /** Select option text */
@@ -72,7 +74,7 @@ export type SelectBaseProps = Omit<
   Omit<LegendWrapperProps, 'children' | 'fieldWrapperCSS'>;
 
 export interface SelectProps<
-  T extends string | number,
+  T extends string | number | null,
   TName extends string | never,
 > extends Partial<
       BasicState<typeof SelectVariants, typeof SelectSize, SelectTheme>
@@ -100,6 +102,10 @@ export interface SelectProps<
   isSearch?: boolean;
   /** additional css for field */
   fieldCSS?: CSSObject;
+  emptyLabel?: string;
 }
 
-export type SelectedItem = SelectItemProps | null | undefined;
+export type SelectedItem =
+  | SelectItemProps<string | number | null>
+  | null
+  | undefined;

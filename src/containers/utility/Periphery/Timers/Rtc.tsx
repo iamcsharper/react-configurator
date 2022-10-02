@@ -3,13 +3,63 @@ import Checkbox from '@components/controls/Checkbox';
 import Form from '@components/controls/Form';
 import Select from '@components/controls/Select';
 import Tabs from '@components/controls/Tabs';
+import TimeForm from '@components/controls/TimeForm';
 import { DetailedItemWrapper } from '@components/DetailedItemWrapper';
 import { scale } from '@scripts/helpers';
+import { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 
-const RtcSettings = ({ isAlarmEnabled }: { isAlarmEnabled: boolean }) => {
+const DetailedField = ({
+  label,
+  name,
+  description,
+}: {
+  label: string;
+  name: string;
+  description: string;
+}) => (
+  <DetailedItemWrapper id={name} title={label} description={description}>
+    <Form.Field name={name} label={label} />
+  </DetailedItemWrapper>
+);
+
+const AccordionItem = ({
+  children,
+  title,
+  uuid,
+}: {
+  children: ReactNode[] | ReactNode;
+  title: string;
+  uuid: string;
+}) => (
+  <Accordion.Item uuid={uuid}>
+    <Accordion.Heading>
+      <Accordion.Button>{title}</Accordion.Button>
+    </Accordion.Heading>
+    <Accordion.Panel>{children}</Accordion.Panel>
+  </Accordion.Item>
+);
+
+const RtcSettings = ({
+  isAlarmEnabled,
+  isRtcEnabled,
+}: {
+  isAlarmEnabled: boolean;
+  isRtcEnabled: boolean;
+}) => {
   const form = useForm({
-    defaultValues: { clockingSource: '' },
+    defaultValues: {
+      rtc: {
+        clockingSource: '',
+        todo: '',
+        time: {
+          hours: null,
+          minutes: null,
+          seconds: null,
+        },
+      },
+      alarm: {},
+    },
   });
 
   return (
@@ -18,70 +68,59 @@ const RtcSettings = ({ isAlarmEnabled }: { isAlarmEnabled: boolean }) => {
       onSubmit={(vals) => console.log(vals)}
       css={{ marginTop: scale(2) }}
     >
-      <Form.Field name="clockingSource">
-        <Select
-          label="Тактирование от"
-          items={[
-            {
-              label: 'Внешний осциллятор OSC32K (LSE)',
-              value: 0,
-            },
-            {
-              label: 'Внутренний осциллятор OSC32K (LSI)',
-              value: 1,
-            },
-          ]}
-        />
-      </Form.Field>
-      {isAlarmEnabled && (
-        <Accordion bordered css={{ marginTop: scale(2) }}>
-          <Accordion.Item uuid="time">
-            <Accordion.Heading>
-              <Accordion.Button>Время</Accordion.Button>
-            </Accordion.Heading>
-            <Accordion.Panel>todo</Accordion.Panel>
-          </Accordion.Item>
-          <Accordion.Item uuid="date">
-            <Accordion.Heading>
-              <Accordion.Button>Дата</Accordion.Button>
-            </Accordion.Heading>
-            <Accordion.Panel>
-              <DetailedItemWrapper
-                id="dateCentury"
-                title="Век"
-                description="Число от 0 до 21"
-              >
-                <Form.Field name="dateCentury" label="Век" />
-              </DetailedItemWrapper>
-              Вообще здесь будет нормальный календарь.
-            </Accordion.Panel>
-          </Accordion.Item>
-          <Accordion.Item uuid="gpio">
-            <Accordion.Heading>
-              <Accordion.Button>Регистры общего назначения</Accordion.Button>
-            </Accordion.Heading>
-            <Accordion.Panel>todo</Accordion.Panel>
-          </Accordion.Item>
-          <Accordion.Item uuid="clockTime">
-            <Accordion.Heading>
-              <Accordion.Button>Время будильника</Accordion.Button>
-            </Accordion.Heading>
-            <Accordion.Panel>todo</Accordion.Panel>
-          </Accordion.Item>
-          <Accordion.Item uuid="clockDate">
-            <Accordion.Heading>
-              <Accordion.Button>Дата будильника</Accordion.Button>
-            </Accordion.Heading>
-            <Accordion.Panel>todo</Accordion.Panel>
-          </Accordion.Item>
-          <Accordion.Item uuid="clockCmp">
-            <Accordion.Heading>
-              <Accordion.Button>Сравнение будильника</Accordion.Button>
-            </Accordion.Heading>
-            <Accordion.Panel>todo</Accordion.Panel>
-          </Accordion.Item>
-        </Accordion>
+      {isRtcEnabled && (
+        <Form.Field name="rtc.clockingSource">
+          <Select
+            label="Тактирование от"
+            items={[
+              {
+                label: 'Внешний осциллятор OSC32K',
+                value: 0,
+              },
+              {
+                label: 'Внутренний осциллятор LSI32K',
+                value: 1,
+              },
+            ]}
+          />
+        </Form.Field>
       )}
+      <Accordion bordered css={{ marginTop: scale(2) }}>
+        {isRtcEnabled && (
+          <>
+            <AccordionItem uuid="rtc.date" title="Дата RTC">
+              дата
+            </AccordionItem>
+            <AccordionItem uuid="rtc.time" title="Время RTC">
+              <Form.Field name="rtc.time">
+                {/* <TimePicker /> */}
+                <TimeForm />
+              </Form.Field>
+            </AccordionItem>
+            <AccordionItem uuid="rtc.gpio" title="Регистры RTC">
+              gpio
+            </AccordionItem>
+          </>
+        )}
+        {isAlarmEnabled && (
+          <>
+            <AccordionItem uuid="alarm.time" title="Время будильника">
+              todo
+            </AccordionItem>
+            <AccordionItem uuid="alarm.date" title="Дата будильника">
+              <DetailedField
+                description="Число от 0 до 21"
+                label="Век"
+                name="dateCentury"
+              />
+              Вообще здесь будет нормальный календарь.
+            </AccordionItem>
+            <AccordionItem uuid="alarm.clockTime" title="Время будильника">
+              todo
+            </AccordionItem>
+          </>
+        )}
+      </Accordion>
     </Form>
   );
 };
@@ -125,18 +164,19 @@ const Rtc = () => {
         </DetailedItemWrapper>
         {/* <button type="submit">Submit</button> */}
       </Form>
-      {isRtcEnabled && (
-        <Tabs>
-          <Tabs.List>
-            <Tabs.Tab>Настройки</Tabs.Tab>
-            <Tabs.Tab>Прерывания</Tabs.Tab>
-          </Tabs.List>
-          <Tabs.Panel>
-            <RtcSettings isAlarmEnabled={isAlarmEnabled} />
-          </Tabs.Panel>
-          <Tabs.Panel>Interrupts</Tabs.Panel>
-        </Tabs>
-      )}
+      <Tabs>
+        <Tabs.List>
+          <Tabs.Tab>Настройки</Tabs.Tab>
+          <Tabs.Tab>Прерывания</Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel>
+          <RtcSettings
+            isAlarmEnabled={isAlarmEnabled}
+            isRtcEnabled={isRtcEnabled}
+          />
+        </Tabs.Panel>
+        <Tabs.Panel>Interrupts</Tabs.Panel>
+      </Tabs>
     </div>
   );
 };

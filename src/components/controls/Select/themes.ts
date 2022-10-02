@@ -31,7 +31,7 @@ export const themes: Record<keyof typeof Themes, SelectTheme> = {
         color: colors.white,
 
         ...(state.isFocused && {
-          borderColor: '#000'
+          borderColor: '#000',
         }),
       }),
     }),
@@ -86,7 +86,7 @@ export const themes: Record<keyof typeof Themes, SelectTheme> = {
         cursor: 'not-allowed',
       },
 
-      pointerEvents: state.isSearch ? 'none' : 'all',
+      // pointerEvents: state.isSearch ? 'none' : 'all',
 
       ...(state.size === 'md' && {
         padding: `0 ${scale(3, true)}px`,
@@ -98,6 +98,28 @@ export const themes: Record<keyof typeof Themes, SelectTheme> = {
         }),
         transition: 'transform ease 300ms',
         ...(!state.isOpen && { transform: 'rotate(180deg)' }),
+      },
+    }),
+    closeButton: (state) => ({
+      position: 'absolute',
+      top: 0,
+      right: 24,
+      display: 'grid',
+      alignContent: 'center',
+      height: '100%',
+      ...(!state.hasSelected && { display: 'none' }),
+      ':disabled': {
+        cursor: 'not-allowed',
+      },
+
+      ...(state.size === 'md' && {
+        padding: `0 ${scale(3, true)}px`,
+      }),
+
+      svg: {
+        ...(state.variant === 'dark' && {
+          fill: colors.white,
+        }),
       },
     }),
     legend: {},

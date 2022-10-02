@@ -14,6 +14,7 @@ import { useFieldCSS } from '@scripts/hooks/useFieldCSS';
 import Legend from '@components/controls/Legend';
 
 import { ReactComponent as ArrowIcon } from '@icons/small/chevronUp.svg';
+import { ReactComponent as CloseIcon } from '@icons/small/close.svg';
 
 import { useThemeCSS, useThemeCSSPart } from '@scripts/theme';
 import {
@@ -55,7 +56,7 @@ const LegendWrapper = memo(
 );
 
 // TODO make generic for name
-const Select = <T extends string | number, TName extends string | never>(
+const Select = <T extends string | number | null, TName extends string | never>(
   {
     name,
     label,
@@ -76,6 +77,7 @@ const Select = <T extends string | number, TName extends string | never>(
     fieldCSS: additFieldCSS,
     isOneLine,
     value,
+    emptyLabel,
     ...props
   }: SelectProps<T, TName>,
   ref?: any,
@@ -93,6 +95,7 @@ const Select = <T extends string | number, TName extends string | never>(
 
   const onInputValueChange = useCallback(
     ({ inputValue }: { inputValue?: string }) => {
+      if (emptyLabel && inputValue === emptyLabel) return;
       // TODO: filter;
       setInputItems(
         items.filter((i) =>
@@ -102,11 +105,13 @@ const Select = <T extends string | number, TName extends string | never>(
         ),
       );
     },
-    [items],
+    [items, emptyLabel],
   );
 
   const onSelectedItemChange = useCallback(
-    (changes: UseComboboxStateChange<SelectItemProps>) => {
+    (
+      changes: UseComboboxStateChange<SelectItemProps<string | number | null>>,
+    ) => {
       // if (field) field.onChange(getValue(changes.selectedItem));)
       if (onChange) onChange(changes.selectedItem?.value as T | null);
     },
@@ -115,7 +120,9 @@ const Select = <T extends string | number, TName extends string | never>(
 
   const {
     isOpen,
+    openMenu,
     getToggleButtonProps,
+    reset,
     getLabelProps,
     getMenuProps,
     getInputProps,
@@ -169,6 +176,8 @@ const Select = <T extends string | number, TName extends string | never>(
     focus: isFocused,
   });
 
+  const hasSelected = !!selectedItem;
+
   const state = useMemo<SelectStateFull>(
     () => ({
       size,
@@ -176,11 +185,12 @@ const Select = <T extends string | number, TName extends string | never>(
       isOpen,
       isOneLine,
       isSearch,
+      hasSelected,
     }),
-    [size, variant, isOpen, isOneLine, isSearch],
+    [size, variant, isOpen, isOneLine, isSearch, hasSelected],
   );
 
-  const { arrowButton, optionList } = useThemeCSS(theme, state);
+  const { arrowButton, closeButton, optionList } = useThemeCSS(theme, state);
   const getCSS = useThemeCSSPart(theme, state);
 
   const fieldCSSMain = useMemo(
@@ -268,10 +278,14 @@ const Select = <T extends string | number, TName extends string | never>(
                 disabled,
                 placeholder,
                 autoComplete: 'off',
+                onFocus: openMenu,
                 ...(ref && { ref }),
               })}
             />
           )}
+          <button css={closeButton} type="button" onClick={reset}>
+            <CloseIcon />
+          </button>
           <button
             type="button"
             {...getToggleButtonProps({
