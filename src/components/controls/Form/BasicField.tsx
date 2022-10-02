@@ -5,7 +5,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import Legend from '../Legend';
 import { BasicFieldProps, BasicInputProps } from './types';
 
-const BasicInput = forwardRef<any, BasicInputProps>(
+export const BasicInput = forwardRef<any, BasicInputProps>(
   ({ name, iconCSS, basicFieldCSS, Icon, className, ...props }, ref) => (
     <>
       <input

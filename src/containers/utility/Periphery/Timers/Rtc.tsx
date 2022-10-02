@@ -1,9 +1,10 @@
 import Accordion from '@components/controls/Accordion';
 import Checkbox from '@components/controls/Checkbox';
+import DateForm, { DateFormValues } from '@components/controls/DateForm';
 import Form from '@components/controls/Form';
 import Select from '@components/controls/Select';
 import Tabs from '@components/controls/Tabs';
-import TimeForm from '@components/controls/TimeForm';
+import TimeForm, { TimeFormValues } from '@components/controls/TimeForm';
 import { DetailedItemWrapper } from '@components/DetailedItemWrapper';
 import { scale } from '@scripts/helpers';
 import typography from '@scripts/typography';
@@ -41,6 +42,15 @@ const AccordionItem = ({
   </Accordion.Item>
 );
 
+interface RtcData {
+  rtc: {
+    clockingSource: string;
+    time: TimeFormValues;
+    date: DateFormValues;
+  };
+  alarm: {};
+}
+
 const RtcSettings = ({
   isAlarmEnabled,
   isRtcEnabled,
@@ -48,15 +58,21 @@ const RtcSettings = ({
   isAlarmEnabled: boolean;
   isRtcEnabled: boolean;
 }) => {
-  const form = useForm({
+  const form = useForm<RtcData>({
     defaultValues: {
       rtc: {
         clockingSource: '',
-        todo: '',
         time: {
           hours: null,
           minutes: null,
           seconds: null,
+        },
+        date: {
+          century: null,
+          day: null,
+          month: null,
+          weekDay: null,
+          year: null,
         },
       },
       alarm: {},
@@ -90,7 +106,9 @@ const RtcSettings = ({
         {isRtcEnabled && (
           <>
             <AccordionItem uuid="rtc.date" title="Дата RTC">
-              дата
+              <Form.Field name="rtc.date">
+                <DateForm />
+              </Form.Field>
             </AccordionItem>
             <AccordionItem uuid="rtc.time" title="Время RTC">
               <Form.Field name="rtc.time">

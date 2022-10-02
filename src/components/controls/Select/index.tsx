@@ -17,6 +17,7 @@ import { ReactComponent as ArrowIcon } from '@icons/small/chevronUp.svg';
 import { ReactComponent as CloseIcon } from '@icons/small/close.svg';
 
 import { useThemeCSS, useThemeCSSPart } from '@scripts/theme';
+import { getScrollParent, mergeRefs } from '@scripts/helpers';
 import {
   LegendWrapperProps,
   SelectItemProps,
@@ -77,8 +78,10 @@ const Select = <T extends string | number | null, TName extends string | never>(
     fieldCSS: additFieldCSS,
     isOneLine,
     value,
-    emptyLabel,
+    emptyValue,
     applyOnExactLabel,
+    scrollParent: scrollParentFromProps,
+    isScrollIntoView = true,
     ...props
   }: SelectProps<T, TName>,
   ref?: any,
@@ -95,10 +98,12 @@ const Select = <T extends string | number | null, TName extends string | never>(
   }, [items]);
 
   const [inputValue, setInputValue] = useState('');
+  const isNotFound = !inputItems.length && !!items.length;
 
   const onInputValueChange = useCallback(
     ({ inputValue }: { inputValue?: string }) => {
-      if (emptyLabel && inputValue === emptyLabel) return;
+      setInputValue(inputValue || '');
+
       const newItems = items.filter((i) =>
         getLabel(i)
           .toLowerCase()
@@ -107,13 +112,11 @@ const Select = <T extends string | number | null, TName extends string | never>(
       // TODO: filter;
       setInputItems(newItems);
 
-      if (newItems.length === 1 && applyOnExactLabel) {
+      if (newItems.length === 1 && items.length > 1 && applyOnExactLabel) {
         onChange?.(newItems[0].value);
       }
-
-      setInputValue(inputValue || '');
     },
-    [applyOnExactLabel, emptyLabel, items, onChange],
+    [applyOnExactLabel, items, onChange],
   );
 
   const onSelectedItemChange = useCallback(
@@ -163,13 +166,20 @@ const Select = <T extends string | number | null, TName extends string | never>(
     onSelectedItemChange,
   });
 
-  const hiddenInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [isFocused, setFocused] = useState(false);
+
+  const scrollParent = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    scrollParent.current =
+      scrollParentFromProps || getScrollParent(inputRef.current);
+  }, [scrollParentFromProps]);
 
   useEffect(() => {
     const onFocus = () => setFocused(true);
     const onBlur = () => setFocused(false);
-    const input = hiddenInputRef.current;
+    const input = inputRef.current;
 
     input?.addEventListener('focus', onFocus);
     input?.addEventListener('blur', onBlur);
@@ -187,22 +197,47 @@ const Select = <T extends string | number | null, TName extends string | never>(
     fieldErrorCSS,
   } = useFieldCSS({
     isLabel: !!label,
-    isError: false, // TODO
+    isError: isNotFound,
     focus: isFocused,
   });
 
   const hasSelected = !!selectedItem;
+  const isOpenMeaningful = isOpen && !isNotFound;
+
+  const menuListRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (
+      isOpenMeaningful &&
+      menuListRef.current &&
+      scrollParent.current &&
+      isScrollIntoView
+    ) {
+      const yOffset = 200;
+      const scrollY = scrollParent.current.scrollTop;
+
+      const y = menuListRef.current.getBoundingClientRect().top;
+      const newY = y + scrollY - yOffset;
+
+      const dy = Math.abs(scrollY - newY);
+
+      if (dy > yOffset * 0.8) {
+        // TODO: threshold. do not scroll when its already visible
+        scrollParent.current.scrollTo({ top: newY, behavior: 'smooth' });
+      }
+    }
+  }, [isOpenMeaningful, isScrollIntoView]);
 
   const state = useMemo<SelectStateFull>(
     () => ({
       size,
       variant,
-      isOpen,
+      isOpen: isOpenMeaningful,
       isOneLine,
       isSearch,
       hasSelected,
     }),
-    [size, variant, isOpen, isOneLine, isSearch, hasSelected],
+    [size, variant, isOpenMeaningful, isOneLine, isSearch, hasSelected],
   );
 
   const { arrowButton, closeButton, optionList } = useThemeCSS(theme, state);
@@ -261,7 +296,7 @@ const Select = <T extends string | number | null, TName extends string | never>(
             <>
               <input
                 {...getInputProps({
-                  ref: hiddenInputRef,
+                  ref: mergeRefs([inputRef, ref]),
                   css: {
                     clip: 'rect(0, 0, 0, 0)',
                     position: 'absolute',
@@ -296,15 +331,15 @@ const Select = <T extends string | number | null, TName extends string | never>(
                 onFocus: () => {
                   openMenu();
 
-                  if (emptyLabel && selectedItem?.label === emptyLabel) {
+                  if (emptyValue && selectedItem?.value === emptyValue) {
                     setInputValue('');
                   }
                 },
-                ...(ref && { ref }),
+                ref: mergeRefs([inputRef, ref]),
               })}
             />
           )}
-          {emptyLabel !== selectedItem?.label && (
+          {emptyValue !== selectedItem?.value && (
             <button css={closeButton} type="button" onClick={reset}>
               <CloseIcon />
             </button>
@@ -319,7 +354,7 @@ const Select = <T extends string | number | null, TName extends string | never>(
             <ArrowIcon />
           </button>
 
-          <ul {...getMenuProps({ css: optionList })}>
+          <ul {...getMenuProps({ css: optionList, ref: menuListRef })}>
             {isOpen &&
               inputItems.map((option, index) => (
                 <li

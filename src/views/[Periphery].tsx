@@ -62,7 +62,8 @@ const SplitPanes = () => {
           css={{
             height: '100%',
             overflow: 'hidden',
-            overflowY: 'auto',
+            overflowY: 'scroll',
+            paddingBottom: scale(40),
           }}
         >
           <Routes>

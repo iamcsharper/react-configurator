@@ -4,51 +4,45 @@ import { forwardRef, useMemo } from 'react';
 import Select from '../Select';
 import { SelectItemProps } from '../Select/types';
 
+export interface TimeFormValues {
+  hours: string | null;
+  minutes: string | null;
+  seconds: string | null;
+}
+
 export interface TimeFormProps {
-  value?: { hours: string; minutes: string; seconds: string };
-  onChange?: (value: {
-    hours: string | null;
-    minutes: string | null;
-    seconds: string | null;
-  }) => void;
+  value?: TimeFormValues;
+  onChange?: (value: TimeFormValues) => void;
 }
 
 const getTerm = (val?: string | string | null) =>
   val === null ? 'XX' : `${val}`.padStart(2, '0');
 
-const emptyLabel = 'Любое значение';
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TimeForm = ({ value, onChange }: TimeFormProps, _ref: any) => {
   const optionsHours = useMemo<SelectItemProps<string | null>[]>(
-    () => [
-      { label: emptyLabel, value: null },
-      ...[...Array(24)].map((_, i) => ({
+    () =>
+      [...Array(24)].map((_, i) => ({
         value: `${i}`.padStart(2, '0'),
         label: `${i}`.padStart(2, '0'),
       })),
-    ],
     [],
   );
   const optionsMinutes = useMemo<SelectItemProps<string | null>[]>(
-    () => [
-      { label: emptyLabel, value: null },
-      ...[...Array(60)].map((_, i) => ({
+    () =>
+      [...Array(60)].map((_, i) => ({
         value: `${i}`.padStart(2, '0'),
         label: `${i}`.padStart(2, '0'),
       })),
-    ],
     [],
   );
 
   const optionsSeconds = useMemo<SelectItemProps<string | null>[]>(
-    () => [
-      { label: emptyLabel, value: null },
-      ...[...Array(60)].map((_, i) => ({
+    () =>
+      [...Array(60)].map((_, i) => ({
         value: `${i}`.padStart(2, '0'),
         label: `${i}`.padStart(2, '0'),
       })),
-    ],
     [],
   );
 
@@ -85,7 +79,7 @@ const TimeForm = ({ value, onChange }: TimeFormProps, _ref: any) => {
           selectedItem={optionsHours.find((e) => e.value === value?.hours)}
           isSearch
           applyOnExactLabel
-          emptyLabel={emptyLabel}
+          emptyValue={null}
         />
         <Select
           items={optionsMinutes}
@@ -97,7 +91,7 @@ const TimeForm = ({ value, onChange }: TimeFormProps, _ref: any) => {
           selectedItem={optionsMinutes.find((e) => e.value === value?.minutes)}
           isSearch
           applyOnExactLabel
-          emptyLabel={emptyLabel}
+          emptyValue={null}
         />
         <Select
           items={optionsSeconds}
@@ -109,7 +103,7 @@ const TimeForm = ({ value, onChange }: TimeFormProps, _ref: any) => {
           selectedItem={optionsSeconds.find((e) => e.value === value?.seconds)}
           isSearch
           applyOnExactLabel
-          emptyLabel={emptyLabel}
+          emptyValue={null}
         />
       </div>
     </div>

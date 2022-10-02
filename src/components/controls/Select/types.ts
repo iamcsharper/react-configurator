@@ -102,9 +102,13 @@ export interface SelectProps<
   isSearch?: boolean;
   /** additional css for field */
   fieldCSS?: CSSObject;
-  emptyLabel?: string;
+  emptyValue?: T;
   // Автоматически выбирать опцию при наличии первого полного совпадения
   applyOnExactLabel?: boolean;
+  // Автоматически скроллит родителя к менюшке
+  isScrollIntoView?: boolean;
+  scrollParent?: HTMLElement;
+  openMenuOnInputClick?: boolean;
 }
 
 export type SelectedItem =

@@ -64,7 +64,7 @@ export const useFieldCSS = ({
           ...typography('paragraphExtraSmall'),
 
           ...(isError && {
-            color: colors.error,
+            color: colors.errorDark,
           }),
         },
       },
@@ -77,7 +77,7 @@ export const useFieldCSS = ({
           color: colors.grey600,
 
           ...(isError && {
-            color: colors.error,
+            color: colors.errorDark,
           }),
         },
       }),
@@ -108,7 +108,7 @@ export const useFieldCSS = ({
     }),
 
     ...(isError && {
-      color: colors.error,
+      color: colors.errorDark,
     }),
   };
 
@@ -121,7 +121,7 @@ export const useFieldCSS = ({
   const fieldErrorCSS: CSSObject = {
     ...typography('paragraphSmall'),
     marginTop: scale(1),
-    color: colors.error,
+    color: colors.errorDark,
   };
 
   return {

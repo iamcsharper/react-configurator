@@ -36,6 +36,7 @@ export const colors = {
   primaryPressed: '#029a6e',
   backgroundDark: '#050f58',
   error: '#ffe9e9',
+  errorDark: '#ff8787',
   invertedHover: '#eceffa',
   primaryDisabled: '#bdbdbd',
   backgroundPurple: '#a41a80',
