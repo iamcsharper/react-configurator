@@ -7,18 +7,17 @@ import { useEffect, useRef } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 
 const Details = () => {
-  const { currentData } = useDetails();
+  const { currentData /* setEnabled */ } = useDetails();
 
   return (
     <div css={{ padding: scale(2) }}>
-      {currentData ? (
-        <>
-          <h4 css={{ marginBottom: scale(1) }}>{currentData?.title}</h4>
-          <p>{currentData?.description}</p>
-        </>
-      ) : (
-        <>Не выбрано</>
-      )}
+      <div css={{ display: 'flex', justifyContent: 'space-between' }}>
+        <h4 css={{ marginBottom: scale(1) }}>
+          {currentData?.title || 'Не выбрано'}
+        </h4>
+        {/* <span onClick={() => setEnabled(false)}>x</span> */}
+      </div>
+      {currentData && <p>{currentData?.description}</p>}
     </div>
   );
 };

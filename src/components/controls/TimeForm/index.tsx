@@ -1,6 +1,6 @@
 import { colors } from '@scripts/colors';
 import { scale } from '@scripts/helpers';
-import { useMemo } from 'react';
+import { forwardRef, useMemo } from 'react';
 import Select from '../Select';
 import { SelectItemProps } from '../Select/types';
 
@@ -18,7 +18,8 @@ const getTerm = (val?: string | string | null) =>
 
 const emptyLabel = 'Любое значение';
 
-const TimeForm = ({ value, onChange }: TimeFormProps) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const TimeForm = ({ value, onChange }: TimeFormProps, _ref: any) => {
   const optionsHours = useMemo<SelectItemProps<string | null>[]>(
     () => [
       { label: emptyLabel, value: null },
@@ -68,45 +69,51 @@ const TimeForm = ({ value, onChange }: TimeFormProps) => {
         <strong>Выбрано время:</strong>
         <p>{formatted}</p>
       </div>
-      <Select
-        items={optionsHours}
-        label="Часы"
-        onChange={(hour) => {
-          if (value) onChange?.({ ...value, hours: hour ? `${hour}` : null });
+      <div
+        css={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr 1fr',
+          gap: scale(1),
         }}
-        selectedItem={optionsHours.find((e) => e.value === value?.hours)}
-        isSearch
-        emptyLabel={emptyLabel}
-        css={{ marginBottom: scale(1) }}
-      />
-
-      <Select
-        items={optionsMinutes}
-        label="Минуты"
-        onChange={(minute) => {
-          if (value)
-            onChange?.({ ...value, minutes: minute ? `${minute}` : null });
-        }}
-        selectedItem={optionsMinutes.find((e) => e.value === value?.minutes)}
-        isSearch
-        emptyLabel={emptyLabel}
-        css={{ marginBottom: scale(1) }}
-      />
-
-      <Select
-        items={optionsSeconds}
-        label="Секунды"
-        onChange={(second) => {
-          if (value)
-            onChange?.({ ...value, seconds: second ? `${second}` : null });
-        }}
-        selectedItem={optionsSeconds.find((e) => e.value === value?.seconds)}
-        isSearch
-        emptyLabel={emptyLabel}
-        css={{ marginBottom: scale(1) }}
-      />
+      >
+        <Select
+          items={optionsHours}
+          label="Часы"
+          onChange={(hour) => {
+            if (value) onChange?.({ ...value, hours: hour ? `${hour}` : null });
+          }}
+          selectedItem={optionsHours.find((e) => e.value === value?.hours)}
+          isSearch
+          applyOnExactLabel
+          emptyLabel={emptyLabel}
+        />
+        <Select
+          items={optionsMinutes}
+          label="Минуты"
+          onChange={(minute) => {
+            if (value)
+              onChange?.({ ...value, minutes: minute ? `${minute}` : null });
+          }}
+          selectedItem={optionsMinutes.find((e) => e.value === value?.minutes)}
+          isSearch
+          applyOnExactLabel
+          emptyLabel={emptyLabel}
+        />
+        <Select
+          items={optionsSeconds}
+          label="Секунды"
+          onChange={(second) => {
+            if (value)
+              onChange?.({ ...value, seconds: second ? `${second}` : null });
+          }}
+          selectedItem={optionsSeconds.find((e) => e.value === value?.seconds)}
+          isSearch
+          applyOnExactLabel
+          emptyLabel={emptyLabel}
+        />
+      </div>
     </div>
   );
 };
 
-export default TimeForm;
+export default forwardRef(TimeForm);

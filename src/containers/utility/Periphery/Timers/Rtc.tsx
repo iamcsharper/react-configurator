@@ -6,6 +6,7 @@ import Tabs from '@components/controls/Tabs';
 import TimeForm from '@components/controls/TimeForm';
 import { DetailedItemWrapper } from '@components/DetailedItemWrapper';
 import { scale } from '@scripts/helpers';
+import typography from '@scripts/typography';
 import { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -136,13 +137,13 @@ const Rtc = () => {
   return (
     <div
       css={{
-        display: 'grid',
-        gridTemplateColumns: '1fr',
-        gap: scale(1),
+        minHeight: '100%',
         padding: scale(2),
       }}
     >
-      <h4>Настройки RTC</h4>
+      <h4 css={{ marginBottom: scale(2), ...typography('h4') }}>
+        Настройки RTC
+      </h4>
       <Form methods={form} onSubmit={(vals) => console.log(vals)}>
         <DetailedItemWrapper id="0" title="RTC" description="Информация об RTC">
           <Form.Field name="rtc">
@@ -164,7 +165,7 @@ const Rtc = () => {
         </DetailedItemWrapper>
         {/* <button type="submit">Submit</button> */}
       </Form>
-      <Tabs>
+      <Tabs css={{ marginTop: scale(2) }}>
         <Tabs.List>
           <Tabs.Tab>Настройки</Tabs.Tab>
           <Tabs.Tab>Прерывания</Tabs.Tab>

@@ -103,6 +103,8 @@ export interface SelectProps<
   /** additional css for field */
   fieldCSS?: CSSObject;
   emptyLabel?: string;
+  // Автоматически выбирать опцию при наличии первого полного совпадения
+  applyOnExactLabel?: boolean;
 }
 
 export type SelectedItem =

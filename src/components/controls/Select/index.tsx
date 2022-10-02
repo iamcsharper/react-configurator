@@ -78,6 +78,7 @@ const Select = <T extends string | number | null, TName extends string | never>(
     isOneLine,
     value,
     emptyLabel,
+    applyOnExactLabel,
     ...props
   }: SelectProps<T, TName>,
   ref?: any,
@@ -93,19 +94,26 @@ const Select = <T extends string | number | null, TName extends string | never>(
     }
   }, [items]);
 
+  const [inputValue, setInputValue] = useState('');
+
   const onInputValueChange = useCallback(
     ({ inputValue }: { inputValue?: string }) => {
       if (emptyLabel && inputValue === emptyLabel) return;
-      // TODO: filter;
-      setInputItems(
-        items.filter((i) =>
-          getLabel(i)
-            .toLowerCase()
-            .includes(inputValue?.toLowerCase() || ''),
-        ),
+      const newItems = items.filter((i) =>
+        getLabel(i)
+          .toLowerCase()
+          .includes(inputValue?.toLowerCase() || ''),
       );
+      // TODO: filter;
+      setInputItems(newItems);
+
+      if (newItems.length === 1 && applyOnExactLabel) {
+        onChange?.(newItems[0].value);
+      }
+
+      setInputValue(inputValue || '');
     },
-    [items, emptyLabel],
+    [applyOnExactLabel, emptyLabel, items, onChange],
   );
 
   const onSelectedItemChange = useCallback(
@@ -114,6 +122,12 @@ const Select = <T extends string | number | null, TName extends string | never>(
     ) => {
       // if (field) field.onChange(getValue(changes.selectedItem));)
       if (onChange) onChange(changes.selectedItem?.value as T | null);
+      setInputValue(
+        (old) =>
+          (old === changes.selectedItem?.label
+            ? old
+            : `${changes.selectedItem?.label}`) || '',
+      );
     },
     [onChange],
   );
@@ -133,6 +147,7 @@ const Select = <T extends string | number | null, TName extends string | never>(
   } = useCombobox({
     items: inputItems,
     // фильтрация items по значению
+    inputValue,
     onInputValueChange: isSearch ? onInputValueChange : undefined,
     // приводит item к строковому значению
     itemToString: getLabel,
@@ -278,14 +293,22 @@ const Select = <T extends string | number | null, TName extends string | never>(
                 disabled,
                 placeholder,
                 autoComplete: 'off',
-                onFocus: openMenu,
+                onFocus: () => {
+                  openMenu();
+
+                  if (emptyLabel && selectedItem?.label === emptyLabel) {
+                    setInputValue('');
+                  }
+                },
                 ...(ref && { ref }),
               })}
             />
           )}
-          <button css={closeButton} type="button" onClick={reset}>
-            <CloseIcon />
-          </button>
+          {emptyLabel !== selectedItem?.label && (
+            <button css={closeButton} type="button" onClick={reset}>
+              <CloseIcon />
+            </button>
+          )}
           <button
             type="button"
             {...getToggleButtonProps({
