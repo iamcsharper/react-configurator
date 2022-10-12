@@ -90,9 +90,9 @@ const Select = <T extends string | number | null, TName extends string | never>(
   const [innerValue, setInnerValue] = useState(defaultValue);
   // console.log('select option value:', value);
 
-  if (!selectedItemFromProps && !selectedItemFromProps) {
-    console.error('[Select] Must provide a value or selectedItem');
-  }
+  // if (!selectedItemFromProps && !selectedItemFromProps) {
+  //   console.error('[Select] Must provide a value or selectedItem');
+  // }
 
   const value = valueFromProps || selectedItemFromProps?.value || innerValue;
 

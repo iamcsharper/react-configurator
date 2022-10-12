@@ -1,3 +1,4 @@
+import ByteTable from '@components/ByteTable';
 import Accordion from '@components/controls/Accordion';
 import Checkbox from '@components/controls/Checkbox';
 import DateForm, { DateFormValues } from '@components/controls/DateForm';
@@ -8,7 +9,7 @@ import TimeForm, { TimeFormValues } from '@components/controls/TimeForm';
 import { DetailedItemWrapper } from '@components/DetailedItemWrapper';
 import { scale } from '@scripts/helpers';
 import typography from '@scripts/typography';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 const DetailedField = ({
@@ -79,6 +80,13 @@ const RtcSettings = ({
     },
   });
 
+  const [data, setData] = useState(() =>
+    [...Array(10).keys()].map((e) => ({
+      address: `R${e}`,
+      value: 0,
+    })),
+  );
+
   return (
     <Form
       methods={form}
@@ -116,8 +124,15 @@ const RtcSettings = ({
                 <TimeForm />
               </Form.Field>
             </AccordionItem>
-            <AccordionItem uuid="rtc.gpio" title="Регистры RTC">
-              gpio
+            <AccordionItem uuid="rtc.registers" title="Регистры RTC">
+              {/* TODO: Form.Field-ready ByteTable OR <Controller /> */}
+              <ByteTable
+                data={data}
+                setData={setData}
+                onChangeData={(id, value) => {
+                  console.log('changed byte table in rtc registers', id, value);
+                }}
+              />
             </AccordionItem>
           </>
         )}

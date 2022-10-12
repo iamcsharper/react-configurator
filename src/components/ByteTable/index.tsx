@@ -1,4 +1,8 @@
+import Select from '@components/controls/Select';
+import { SelectItemProps } from '@components/controls/Select/types';
 import Table from '@components/Table';
+import { scale } from '@scripts/helpers';
+import { usePrevious } from '@scripts/hooks/usePrevious';
 import { ColumnDef, RowData } from '@tanstack/react-table';
 import { useMemo, useState, useEffect, Dispatch, SetStateAction } from 'react';
 
@@ -10,13 +14,14 @@ interface ByteTableRow {
 export interface ByteTableProps {
   addrCol?: ColumnDef<ByteTableRow>;
   data: ByteTableRow[];
-  setData: Dispatch<SetStateAction<ByteTableRow[]>>;
+  setData?: Dispatch<SetStateAction<ByteTableRow[]>>;
+  onChangeData?: (id: number, value: number) => void;
 }
 
 const defaultAddrCol: ColumnDef<ByteTableRow> = {
   accessorKey: 'address',
   header: 'Адрес',
-  cell: ({ getValue }) => `R${getValue()}`,
+  cell: ({ getValue }) => `${getValue()}`,
 };
 
 declare module '@tanstack/react-table' {
@@ -26,16 +31,23 @@ declare module '@tanstack/react-table' {
   }
 }
 
+const parseValue = (value: string) =>
+  value?.startsWith('0b')
+    ? parseInt(value.replace('0b', ''), 2)
+    : parseInt(value || '0', 10);
+
 const ByteTable = ({
   addrCol = defaultAddrCol,
   data,
   setData,
+  onChangeData,
 }: ByteTableProps) => {
   const columns = useMemo<ColumnDef<ByteTableRow>[]>(
     () => [
       addrCol,
       {
         accessorKey: 'value',
+        header: 'Значение',
         // eslint-disable-next-line react/no-unstable-nested-components
         cell: function Cell({
           getValue,
@@ -43,7 +55,25 @@ const ByteTable = ({
           column: { id },
           table,
         }) {
-          const initialValue = getValue();
+          const formats = useMemo(
+            () => [
+              {
+                label: 'Десятичный',
+                value: 'dec',
+              },
+              {
+                label: 'Двоичный',
+                value: 'bin',
+              },
+            ],
+            [],
+          );
+
+          const [format, setFormat] = useState<SelectItemProps<string>>(
+            formats[0],
+          );
+
+          const initialValue = getValue() as string;
           // We need to keep and update the state of the cell normally
           const [value, setValue] = useState(initialValue);
 
@@ -52,17 +82,51 @@ const ByteTable = ({
             table.options.meta?.updateData(index, id, value);
           };
 
+          const prevInitialValue = usePrevious(initialValue);
+
           // If the initialValue is changed external, sync it up with our state
           useEffect(() => {
-            setValue(initialValue);
-          }, [initialValue]);
+            if (initialValue === prevInitialValue) return;
+
+            if (format?.value === 'bin') {
+              const parsedValue = parseValue(initialValue);
+              setValue(`0b${parsedValue.toString(2).padStart(8, '0')}`);
+            } else {
+              setValue(initialValue);
+            }
+          }, [initialValue, format, prevInitialValue]);
 
           return (
-            <input
-              value={value as string}
-              onChange={(e) => setValue(e.target.value)}
-              onBlur={onBlur}
-            />
+            <div css={{ display: 'flex' }}>
+              {/* TODO: masked input */}
+              <input
+                value={value as string}
+                onChange={(e) => setValue(e.target.value)}
+                onBlur={onBlur}
+                css={{ padding: scale(1) }}
+              />
+              <Select
+                css={{
+                  minWidth: scale(20),
+                }}
+                fieldCSS={{
+                  borderTopLeftRadius: '0!important',
+                  borderBottomLeftRadius: '0!important',
+                }}
+                selectedItem={format}
+                onChange={(e) => {
+                  setFormat(formats.find((f) => f.value === e)!);
+                  const parsedValue = parseValue(value);
+
+                  if (e === 'bin') {
+                    setValue(`0b${parsedValue.toString(2).padStart(8, '0')}`);
+                  } else {
+                    setValue(parsedValue.toString(10));
+                  }
+                }}
+                items={formats}
+              />
+            </div>
           );
         },
       },
@@ -77,7 +141,8 @@ const ByteTable = ({
       options={{
         meta: {
           updateData: (rowIndex, columnId, value) => {
-            setData((old) =>
+            onChangeData?.(rowIndex, value as number);
+            setData?.((old) =>
               old.map((row, index) => {
                 if (index === rowIndex) {
                   return {
