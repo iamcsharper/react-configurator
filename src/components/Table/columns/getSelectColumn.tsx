@@ -10,6 +10,7 @@ export const getSelectColumn = <D,>(
   header: ({ table }) =>
     maxRowSelect ? null : (
       <IndeterminateCheckbox
+        id={name}
         parentTableName={name}
         onChange={table.getToggleAllRowsSelectedHandler()}
         indeterminate={table.getIsSomeRowsSelected()}
