@@ -77,7 +77,8 @@ const Select = <T extends string | number | null, TName extends string | never>(
     variant = SelectVariants.primary,
     fieldCSS: additFieldCSS,
     isOneLine,
-    value,
+    value: valueFromProps,
+    defaultValue,
     emptyValue,
     applyOnExactLabel,
     scrollParent: scrollParentFromProps,
@@ -86,7 +87,14 @@ const Select = <T extends string | number | null, TName extends string | never>(
   }: SelectProps<T, TName>,
   ref?: any,
 ) => {
+  const [innerValue, setInnerValue] = useState(defaultValue);
   // console.log('select option value:', value);
+
+  if (!selectedItemFromProps && !selectedItemFromProps) {
+    console.error('[Select] Must provide a value or selectedItem');
+  }
+
+  const value = valueFromProps || selectedItemFromProps?.value || innerValue;
 
   const [inputItems, setInputItems] = useState(items);
   const itemsRef = useRef(items);
@@ -125,6 +133,7 @@ const Select = <T extends string | number | null, TName extends string | never>(
     ) => {
       // if (field) field.onChange(getValue(changes.selectedItem));)
       if (onChange) onChange(changes.selectedItem?.value as T | null);
+      setInnerValue(`${changes.selectedItem?.value}`);
       setInputValue(
         (old) =>
           (old === changes.selectedItem?.label

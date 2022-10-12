@@ -46,6 +46,7 @@ export const themes: Record<keyof typeof Themes, ButtonTheme> = {
         ...(state.rounded && {
           borderRadius,
         }),
+        border: '1px solid',
 
         ...(state.block && {
           display: 'block',
@@ -61,24 +62,51 @@ export const themes: Record<keyof typeof Themes, ButtonTheme> = {
         },
       };
 
+      let variantCSS: CSSObject = {};
+
+      switch (state.variant) {
+        case 'primary': {
+          variantCSS = {
+            borderColor: 'transparent',
+            background: colors.primary,
+            color: colors.black,
+            ':hover': {
+              background: colors.primaryHover,
+            },
+            ':active': {
+              background: colors.primaryPressed,
+            },
+            ':disabled': {
+              background: colors.grey400,
+            },
+          };
+          break;
+        }
+        case 'ghost': {
+          variantCSS = {
+            borderColor: colors.grey600,
+            background: 'transparent',
+            color: colors.black,
+            ':hover': {
+              background: colors.grey100,
+            },
+            ':active': {
+              background: colors.grey200,
+            },
+            ':disabled': {
+              borderColor: colors.grey400,
+              background: colors.grey400,
+            },
+          };
+          break;
+        }
+        default:
+          break;
+      }
+
       return deepmerge.all([
         base,
-        {
-          border: '1px solid',
-
-          borderColor: 'transparent',
-          background: colors.primary,
-          color: colors.black,
-          ':hover': {
-            background: colors.primaryHover,
-          },
-          ':active': {
-            background: colors.primaryPressed,
-          },
-          ':disabled': {
-            background: colors.grey400,
-          },
-        },
+        variantCSS,
       ]) as CSSObject;
     },
     icon: (state) => {

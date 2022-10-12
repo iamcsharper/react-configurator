@@ -1,6 +1,6 @@
 import { scale } from '@scripts/helpers';
 import { useFieldCSS } from '@scripts/hooks/useFieldCSS';
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useCallback, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import Legend from '../Legend';
 import { BasicFieldProps, BasicInputProps } from './types';
@@ -52,9 +52,14 @@ export const BasicField = forwardRef<any, BasicFieldProps>(
     },
     ref,
   ) => {
+    const formContext = useFormContext(); // retrieve all hook methods
     const {
+      control,
       formState: { errors },
-    } = useFormContext(); // retrieve all hook methods
+    } = formContext || {
+      control: null,
+      formState: {},
+    };
 
     const error = errors?.[name];
 
@@ -92,55 +97,66 @@ export const BasicField = forwardRef<any, BasicFieldProps>(
       ],
     );
 
+    const InnerComponent = useCallback(
+      ({ innerRef, field }: { innerRef: any; field?: any }) =>
+        isLegend ? (
+          <Legend
+            name={name}
+            label={label}
+            hint={hint}
+            showMessage={showMessage}
+            messageText={messageText}
+            labelCSS={{ ...fieldLabelCSS, ...labelCSS }}
+            fieldWrapperCSS={fieldWrapperCSS}
+            hintCSS={fieldHintCSS}
+            errorCSS={fieldErrorCSS}
+          >
+            <span>{label}</span>
+            <BasicInput {...commonProps} ref={ref} {...field} {...props} />
+          </Legend>
+        ) : (
+          <BasicInput {...commonProps} ref={innerRef} {...field} {...props} />
+        ),
+      [
+        commonProps,
+        fieldErrorCSS,
+        fieldHintCSS,
+        fieldLabelCSS,
+        fieldWrapperCSS,
+        hint,
+        isLegend,
+        label,
+        labelCSS,
+        messageText,
+        name,
+        props,
+        ref,
+        showMessage,
+      ],
+    );
+
+    if (!name || !control) {
+      return <InnerComponent innerRef={ref} />;
+    }
+
     return (
       <Controller
         name={name}
-        render={({ field: { ref: hookRef, ...field } }) =>
-          isLegend ? (
-            <Legend
-              name={name}
-              label={label}
-              hint={hint}
-              showMessage={showMessage}
-              messageText={messageText}
-              labelCSS={{ ...fieldLabelCSS, ...labelCSS }}
-              fieldWrapperCSS={fieldWrapperCSS}
-              hintCSS={fieldHintCSS}
-              errorCSS={fieldErrorCSS}
-            >
-              <span>{label}</span>
-              <BasicInput
-                {...commonProps}
-                ref={(newRef) => {
-                  hookRef(newRef);
+        control={control}
+        render={({ field: { ref: hookRef, ...field } }) => (
+          <InnerComponent
+            field={field}
+            innerRef={(newRef: any) => {
+              hookRef(newRef);
 
-                  if (typeof ref === 'function') {
-                    ref(newRef);
-                  } else if (ref) {
-                    ref.current = newRef;
-                  }
-                }}
-                {...field}
-                {...props}
-              />
-            </Legend>
-          ) : (
-            <BasicInput
-              {...commonProps}
-              ref={(newRef) => {
-                hookRef(newRef);
-
-                if (typeof ref === 'function') {
-                  ref(newRef);
-                } else if (ref) {
-                  ref.current = newRef;
-                }
-              }}
-              {...field}
-              {...props}
-            />
-          )
-        }
+              if (typeof ref === 'function') {
+                ref(newRef);
+              } else if (ref) {
+                ref.current = newRef;
+              }
+            }}
+          />
+        )}
       />
     );
   },

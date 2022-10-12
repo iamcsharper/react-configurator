@@ -101,3 +101,4 @@ const Tooltip: FC<TippyProps> = ({
 };
 
 export default Tooltip;
+export * from './ContentBtn';

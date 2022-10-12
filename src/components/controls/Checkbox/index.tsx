@@ -24,7 +24,7 @@ export interface CheckboxProps extends HTMLProps<HTMLInputElement> {
   forceControlled?: boolean;
 }
 
-const Checkbox = forwardRef<any, CheckboxProps>(
+const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   (
     {
       name,
@@ -43,7 +43,8 @@ const Checkbox = forwardRef<any, CheckboxProps>(
   ) => {
     const id = `${name}-${value}`;
     const innerRef = useRef<HTMLInputElement>(null);
-    const { control } = useFormContext();
+    const formContext = useFormContext();
+    const { control } = formContext || {};
 
     const actualRef = ref || innerRef;
 
@@ -134,7 +135,7 @@ const Checkbox = forwardRef<any, CheckboxProps>(
       [],
     );
 
-    if (name && !forceControlled) {
+    if (name && !forceControlled && control) {
       return (
         <Controller
           name={name}

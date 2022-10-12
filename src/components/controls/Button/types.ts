@@ -8,6 +8,7 @@ import { CSSObject } from '@emotion/react';
 
 export enum ButtonVariants {
   primary = 'primary',
+  ghost = 'ghost',
   // TODO: secondary, success, warning, danger
 }
 

@@ -1,20 +1,20 @@
-const path = require("path");
-const react = require("@vitejs/plugin-react");
+const path = require('path');
+const react = require('@vitejs/plugin-react');
 const ViteRequireContext =
-  require("@originjs/vite-plugin-require-context").default;
-const tsconfigPaths = require("vite-tsconfig-paths").default;
-const svgr = require("vite-plugin-svgr");
-const { mergeConfig } = require("vite");
+  require('@originjs/vite-plugin-require-context').default;
+const tsconfigPaths = require('vite-tsconfig-paths').default;
+const svgr = require('vite-plugin-svgr');
+const { mergeConfig } = require('vite');
 
 module.exports = {
   stories: [
-    "../src/**/intro/welcome.stories.mdx",
-    "../src/**/intro/*.stories.mdx",
-    "../src/**/*.stories.mdx",
+    '../src/**/intro/welcome.stories.mdx',
+    '../src/**/intro/*.stories.mdx',
+    '../src/**/*.stories.mdx',
   ],
   addons: [
     {
-      name: "@storybook/addon-docs",
+      name: '@storybook/addon-docs',
       options: {
         configureJSX: true,
         // babelOptions: {},
@@ -22,18 +22,19 @@ module.exports = {
         // transcludeMarkdown: true,
       },
     },
-    "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "@storybook/addon-interactions",
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
+    '@storybook/addon-interactions',
     // "storybook-addon-paddings",
-    "storybook-react-i18next",
+    'storybook-react-i18next',
+    'storybook-addon-react-router-v6',
   ],
-  framework: "@storybook/react",
+  framework: '@storybook/react',
   core: {
-    builder: "@storybook/builder-vite",
+    builder: '@storybook/builder-vite',
   },
   typescript: {
-    reactDocgen: "none",
+    reactDocgen: 'none',
   },
   features: {
     storyStoreV7: true,
@@ -43,7 +44,7 @@ module.exports = {
   async viteFinal(config) {
     config.plugins = config.plugins.filter(
       (plugin) =>
-        !(Array.isArray(plugin) && plugin[0]?.name.includes("vite:react"))
+        !(Array.isArray(plugin) && plugin[0]?.name.includes('vite:react')),
     );
 
     config.plugins.push(svgr());
@@ -51,11 +52,11 @@ module.exports = {
     config.plugins.push(
       react({
         exclude: [/\.stories\.(t|j)sx?$/, /node_modules/],
-        jsxImportSource: "@emotion/react",
+        jsxImportSource: '@emotion/react',
         babel: {
-          plugins: ["@emotion/babel-plugin"],
+          plugins: ['@emotion/babel-plugin'],
         },
-      })
+      }),
     );
 
     config.plugins.push(ViteRequireContext());
@@ -67,7 +68,7 @@ module.exports = {
     config.esbuild = {
       // Fixed: [vite] warning: Top-level "this" will be replaced with undefined since this file is an ECMAScript module
       // https://github.com/vitejs/vite/issues/8644
-      logOverride: { "this-is-undefined-in-esm": "silent" },
+      logOverride: { 'this-is-undefined-in-esm': 'silent' },
     };
 
     config.plugins.push(
@@ -75,23 +76,17 @@ module.exports = {
       tsconfigPaths({
         // My tsconfig.json isn't simply in viteConfig.root,
         // so I've passed an explicit path to it:
-        projects: [path.resolve(__dirname, "../tsconfig.json")],
-      })
+        projects: [path.resolve(__dirname, '../tsconfig.json')],
+      }),
     );
 
     return mergeConfig(config, {
       resolve: {
         alias: {
-          "@components": path.resolve(__dirname, "../src/components"),
-          // '@components': resolver('../src/components'),
-          // '@scripts': resolver('../src/scripts'),
-          // '@context': resolver('../src/context'),
-          // '@icons': resolver('../src/icons'),
-          // '@controls': resolver('../src/components/controls'),
-          // '@customTypes': resolver('../src/customTypes'),
-          // '@api': resolver('../src/api'),
-          // '@images': resolver('../src/images'),
-          "next-i18next": "react-i18next",
+          '@components': path.resolve(__dirname, '../src/components'),
+          '@scripts': path.resolve(__dirname, '../src/scripts'),
+          '@icons': path.resolve(__dirname, '../src/icons'),
+          'next-i18next': 'react-i18next',
         },
       },
     });
