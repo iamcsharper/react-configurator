@@ -1,7 +1,13 @@
 import Select from '@components/controls/Select';
 import { SelectItemProps } from '@components/controls/Select/types';
 import Table from '@components/Table';
-import { scale } from '@scripts/helpers';
+import {
+  fastLog2,
+  getNextPowerOfSixteen,
+  getNextPowerOfTwo,
+  scale,
+} from '@scripts/helpers';
+import { useFieldCSS } from '@scripts/hooks/useFieldCSS';
 import { usePrevious } from '@scripts/hooks/usePrevious';
 import { ColumnDef, RowData } from '@tanstack/react-table';
 import { useMemo, useState, useEffect, Dispatch, SetStateAction } from 'react';
@@ -62,11 +68,18 @@ const formatValue = (value: string | number, format: ByteTableFormat) => {
   }
 
   if (format === ByteTableFormat.BIN) {
-    return `0b${parsedValue.toString(2).padStart(32, '0')}`;
+    const nextPower = fastLog2(getNextPowerOfTwo(parsedValue));
+    const padLength = Math.min(nextPower, 32);
+    return `0b${parsedValue.toString(2).padStart(padLength, '0')}`;
   }
 
   if (format === ByteTableFormat.HEX) {
-    return `0x${parsedValue.toString(16).toUpperCase().padStart(8, '0')}`;
+    const nextPower = getNextPowerOfSixteen(parsedValue);
+    const padLength = Math.min(nextPower, 8);
+    return `0x${parsedValue
+      .toString(16)
+      .toUpperCase()
+      .padStart(padLength, '0')}`;
   }
 
   return parsedValue.toString(10);
@@ -132,14 +145,25 @@ const ByteTable = ({
             setValue(formatValue(initialValue, format.value));
           }, [initialValue, format, prevInitialValue]);
 
+          const { basicFieldCSS } = useFieldCSS({});
+
           return (
-            <div css={{ display: 'flex' }}>
+            <div css={{ display: 'flex', width: '100%' }}>
               {/* TODO: masked input */}
               <input
                 value={value as string}
                 onChange={(e) => setValue(e.target.value)}
                 onBlur={onBlur}
-                css={{ padding: scale(1), minWidth: scale(30) }}
+                css={[
+                  basicFieldCSS,
+                  {
+                    borderTopRightRadius: '0!important',
+                    borderBottomRightRadius: '0!important',
+                    borderRight: 'none',
+                    minWidth: scale(30),
+                    flexGrow: 2,
+                  },
+                ]}
               />
               <Select
                 css={{
@@ -169,6 +193,9 @@ const ByteTable = ({
     <Table
       columns={columns}
       data={data}
+      css={{
+        overflow: 'unset',
+      }}
       options={{
         meta: {
           updateData: (rowIndex, columnId, value) => {

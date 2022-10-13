@@ -69,7 +69,7 @@ const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
 
   const { basicFieldCSS } = useFieldCSS({});
 
-  console.log('value?.month', value?.month);
+  // console.log('value?.month', value?.month);
 
   return (
     <div>

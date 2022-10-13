@@ -56,6 +56,9 @@ export const useFieldCSS = ({
       },
 
       //   ...(isLabel && isLabelBottom && {}), TODO:
+      ':focus-visible': {
+        outline: 'none'
+      },
 
       ':focus': {
         borderColor: colors?.borderFocus,

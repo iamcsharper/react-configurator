@@ -27,10 +27,15 @@ export const StyledCell = styled.td({
   '&:last-of-type': { paddingRight: scale(2) },
 });
 
-export const StyledRow = styled.tr({
+export const StyledRow = styled.tr(({ hoverable }: { hoverable: boolean }) => ({
   background: colors.white,
+  ...(hoverable && {
+    ':hover': {
+      background: colors.grey100,
+    },
+  }),
   cursor: 'default !important',
-});
+}));
 
 export const SortingIcon: FC<{ isSortedDesc: boolean | undefined }> = ({
   isSortedDesc,

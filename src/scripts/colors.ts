@@ -43,7 +43,7 @@ export const colors = {
   invertedPressed: '#e4e9fc',
   backgroundBlue: 'rgba(0, 24, 127, 0.25)',
   warning: '#f9f3e5',
-  borderFocus: 'rgba(63, 148, 223, 0.3)',
+  borderFocus: 'rgba(63, 148, 223, 0.5)',
   borderLight: 'rgba(255, 255, 255, 0.16)',
   invertedDisabled: '#f2f2f2',
   backgroundGrey: '#eceffa',

@@ -145,6 +145,12 @@ const Select = <T extends string | number | null, TName extends string | never>(
     [onChange],
   );
 
+  // Если селект контроллируется извне
+  let controlledSelectedItem = selectedItemFromProps || null;
+  if (value !== undefined) {
+    controlledSelectedItem = items.find((item) => item.value === value) || null;
+  }
+
   const {
     isOpen,
     openMenu,
@@ -168,11 +174,7 @@ const Select = <T extends string | number | null, TName extends string | never>(
       defaultIndex !== undefined ? defaultIndex : undefined,
     initialSelectedItem:
       defaultIndex !== undefined ? items[defaultIndex] : null,
-    // Если селект контроллируется извне
-    selectedItem: selectedItemFromProps,
-    ...(value !== undefined && {
-      selectedItem: items.find((item) => item.value === value) || null,
-    }),
+    selectedItem: controlledSelectedItem,
     onSelectedItemChange,
   });
 

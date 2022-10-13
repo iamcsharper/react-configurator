@@ -1,8 +1,8 @@
-import classNames from 'classnames';
+// import classNames from 'classnames';
 import { useCallback, useMemo } from 'react';
 import { NavLink as ReactNavLink } from 'react-router-dom';
 import { themes } from './themes';
-import { NavLinkProps, NavLinkStateFull, NAV_LINK_ACTIVE } from './types';
+import { NavLinkProps, NavLinkStateFull /* NAV_LINK_ACTIVE */ } from './types';
 
 const NavLink = ({
   theme = themes.basic,
@@ -35,7 +35,7 @@ const NavLink = ({
   const labelCSS = useMemo(() => getCSS('label'), [getCSS]);
   // const iconCSS = useMemo(() => getCSS('icon'), [getCSS]);
 
-  console.log(classNames(className || '', { [NAV_LINK_ACTIVE]: true }));
+  // console.log(classNames(className || '', { [NAV_LINK_ACTIVE]: true }));
 
   return (
     <ReactNavLink to={to} className={className} css={labelCSS}>

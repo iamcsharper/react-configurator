@@ -2,8 +2,9 @@ import GlobalStyles from '@components/GlobalStyles';
 import { useState } from 'react';
 import { ReactComponent as GraphIcon } from '@icons/large/graph.svg';
 import { ReactComponent as ClockIcon } from '@icons/large/clock.svg';
-import Periphery from './views/Periphery';
-import Tabs from './components/controls/Tabs';
+import AppProviders from '@components/AppProviders';
+import Tabs from '@components/controls/Tabs';
+import Periphery from '@views/Periphery';
 
 // https://redux.js.org/usage/configuring-your-store
 
@@ -11,7 +12,7 @@ function App() {
   const [tab, setTab] = useState(0);
 
   return (
-    <>
+    <AppProviders>
       <GlobalStyles />
       <Tabs
         selectedIndex={tab}
@@ -28,7 +29,7 @@ function App() {
         </Tabs.Panel>
         <Tabs.Panel>123123</Tabs.Panel>
       </Tabs>
-    </>
+    </AppProviders>
   );
 }
 

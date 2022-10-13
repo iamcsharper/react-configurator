@@ -43,6 +43,8 @@
     "react-tabs": "^5.1.0",
     "react-transition-group": "^4.4.5",
     "redux": "^4.2.0",
+    "redux-persist": "^6.0.0",
+    "redux-thunk": "^2.4.1",
     "rollup": "^2.79.0",
     "tippy.js": "^6.3.7",
     "vite-plugin-svgr": "^2.2.1"

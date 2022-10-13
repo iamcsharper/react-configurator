@@ -3,9 +3,9 @@ import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Sidebar from '@containers/utility/Periphery/Sidebar';
+import Microchip from '@components/Microchip';
 import PeripheryPage from './[Periphery]';
 
-// TODO: https://github.com/remix-run/react-router/blob/main/docs/getting-started/tutorial.md
 const isDark = true;
 
 const basename = process.env.BASE_URL;
@@ -32,13 +32,7 @@ const Periphery = () => (
             </Routes>
           </Allotment.Pane>
           <Allotment.Pane>
-            <div
-              css={{
-                background: colors.grey300,
-                height: '100%',
-                width: '100%',
-              }}
-            />
+            <Microchip />
           </Allotment.Pane>
         </Allotment>
       </Allotment.Pane>

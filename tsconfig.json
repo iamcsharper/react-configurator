@@ -23,6 +23,8 @@
     "jsxImportSource": "@emotion/react",
     "paths": {
       "@components/*": ["./src/components/*"],
+      "@views/*": ["./src/views/*"],
+      "@store/*": ["./src/store/*"],
       "@containers/*": ["./src/containers/*"],
       "@scripts/*": ["./src/scripts/*"],
       "@hooks/*": ["./src/scripts/hooks/*"],

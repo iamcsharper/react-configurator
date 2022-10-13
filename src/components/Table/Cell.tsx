@@ -27,7 +27,7 @@ export interface CellProps {
   value: any;
 }
 
-export const Cell: FC<CellProps> = ({ value, type }) => {
+export const Cell: FC<CellProps> = ({ value, type  }) => {
   const linkStyles = useLinkCSS();
 
   if ((value === undefined || value === null) && type !== 'photo') return '-';

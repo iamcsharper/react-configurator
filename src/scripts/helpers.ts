@@ -67,3 +67,41 @@ export const getScrollParent = (ele: HTMLElement | null): HTMLElement | null =>
     : isScrollable(ele)
     ? ele
     : getScrollParent(ele.parentElement);
+
+type ArrayLengthMutationKeys = 'splice' | 'push' | 'pop' | 'shift' | 'unshift';
+export type FixedLengthArray<T, L extends number, TObj = [T, ...Array<T>]> =
+  Pick<TObj, Exclude<keyof TObj, ArrayLengthMutationKeys>> & {
+    readonly length: L;
+    [I: number]: T;
+    [Symbol.iterator]: () => IterableIterator<T>;
+  };
+
+export const getNextPowerOfTwo = (value: number): number => {
+  let result = value;
+  // eslint-disable-next-line no-plusplus
+  result--;
+  result |= result >> 1;
+  result |= result >> 2;
+  result |= result >> 4;
+  result |= result >> 8;
+  result |= result >> 16;
+  // eslint-disable-next-line no-plusplus
+  result++;
+
+  return result;
+};
+
+// TODO: opimize to bitwise
+export const getNextPowerOfSixteen = (n: number) => {
+  if (n < 16) return 16;
+  let p = 1;
+  while (p < n) p <<= 4;
+  return p;
+};
+
+export const fastLog2 = (V: number) => {
+  let c = V;
+  // eslint-disable-next-line no-plusplus
+  for (let n = 31; n > 0; c >>> n ? ((c = n), (n = 0)) : n--);
+  return c;
+};

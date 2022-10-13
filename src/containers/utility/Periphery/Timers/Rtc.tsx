@@ -1,16 +1,27 @@
 import ByteTable from '@components/ByteTable';
 import Accordion from '@components/controls/Accordion';
 import Checkbox from '@components/controls/Checkbox';
-import DateForm, { DateFormValues } from '@components/controls/DateForm';
+import DateForm from '@components/controls/DateForm';
 import Form from '@components/controls/Form';
 import Select from '@components/controls/Select';
 import Tabs from '@components/controls/Tabs';
-import TimeForm, { TimeFormValues } from '@components/controls/TimeForm';
+import TimeForm from '@components/controls/TimeForm';
 import { DetailedItemWrapper } from '@components/DetailedItemWrapper';
 import { scale } from '@scripts/helpers';
 import typography from '@scripts/typography';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+
+import {
+  RtcState,
+  setRtcRegister,
+  setAlarmEnabled,
+  setRtcEnabled,
+  setRtcDate,
+  setRtcSource,
+} from '@store/timers/rtc';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@store/index';
 
 const DetailedField = ({
   label,
@@ -43,75 +54,70 @@ const AccordionItem = ({
   </Accordion.Item>
 );
 
-interface RtcData {
-  rtc: {
-    clockingSource: string;
-    time: TimeFormValues;
-    date: DateFormValues;
-  };
-  alarm: {};
-}
+const RtcSettings = () => {
+  const dispatch = useDispatch();
+  const rtc = useSelector<RootState, RtcState>((state) => state.timers.rtc);
+  const rehydrated = useSelector<RootState, boolean>(
+    // eslint-disable-next-line no-underscore-dangle
+    (state) => state._persist.rehydrated,
+  );
+  const { rtcEnabled, alarmEnabled } = rtc;
 
-const RtcSettings = ({
-  isAlarmEnabled,
-  isRtcEnabled,
-}: {
-  isAlarmEnabled: boolean;
-  isRtcEnabled: boolean;
-}) => {
-  const form = useForm<RtcData>({
-    defaultValues: {
-      rtc: {
-        clockingSource: '',
-        time: {
-          hours: null,
-          minutes: null,
-          seconds: null,
-        },
-        date: {
-          century: null,
-          day: null,
-          month: null,
-          weekDay: null,
-          year: null,
-        },
-      },
-      alarm: {},
-    },
+  console.log(rehydrated);
+
+  const form = useForm({
+    defaultValues: rtc,
   });
 
-  const [data, setData] = useState(() =>
-    [...Array(10).keys()].map((e) => ({
-      address: `R${e}`,
-      value: 0,
+  const rtcDate = form.watch('rtcDate');
+  useEffect(() => {
+    dispatch(setRtcDate(rtcDate));
+  }, [dispatch, rtcDate]);
+
+  const rtcSource = form.watch('rtcSource');
+  useEffect(() => {
+    // TODO: bug Select does not provider correct bindings
+    console.log(rtcSource);
+    dispatch(setRtcSource(rtcSource));
+  }, [dispatch, rtcSource]);
+
+  const [registers, setRegisters] = useState(() =>
+    rtc.rtcRegisters.map((e, i) => ({
+      address: `R${i}`,
+      value: e,
     })),
   );
 
   return (
     <Form
       methods={form}
-      onSubmit={(vals) => console.log(vals)}
+      onSubmit={(vals) => {
+        console.log(vals);
+      }}
       css={{ marginTop: scale(2) }}
     >
-      {isRtcEnabled && (
+      {rtcEnabled && (
         <Form.Field name="rtc.clockingSource">
           <Select
             label="Тактирование от"
             items={[
               {
                 label: 'Внешний осциллятор OSC32K',
-                value: 0,
+                value: 1,
               },
               {
                 label: 'Внутренний осциллятор LSI32K',
-                value: 1,
+                value: 2,
               },
             ]}
           />
         </Form.Field>
       )}
-      <Accordion bordered css={{ marginTop: scale(2) }}>
-        {isRtcEnabled && (
+      <Accordion
+        bordered
+        css={{ marginTop: scale(2), marginBottom: scale(12) }}
+      >
+        {rtcEnabled && (
           <>
             <AccordionItem uuid="rtc.date" title="Дата RTC">
               <Form.Field name="rtc.date">
@@ -127,16 +133,21 @@ const RtcSettings = ({
             <AccordionItem uuid="rtc.registers" title="Регистры RTC">
               {/* TODO: Form.Field-ready ByteTable OR <Controller /> */}
               <ByteTable
-                data={data}
-                setData={setData}
+                data={registers}
+                setData={setRegisters}
                 onChangeData={(id, value) => {
-                  console.log('changed byte table in rtc registers', id, value);
+                  dispatch(
+                    setRtcRegister({
+                      index: id,
+                      value,
+                    }),
+                  );
                 }}
               />
             </AccordionItem>
           </>
         )}
-        {isAlarmEnabled && (
+        {alarmEnabled && (
           <>
             <AccordionItem uuid="alarm.time" title="Время будильника">
               todo
@@ -160,12 +171,16 @@ const RtcSettings = ({
 };
 
 const Rtc = () => {
-  const form = useForm({
-    defaultValues: { rtc: false, alarm: false },
-  });
+  const dispatch = useDispatch();
+  const rtc = useSelector<
+    RootState,
+    { rtcEnabled: boolean; alarmEnabled: boolean }
+  >((state) => ({
+    rtcEnabled: state.timers.rtc.rtcEnabled,
+    alarmEnabled: state.timers.rtc.alarmEnabled,
+  }));
 
-  const isRtcEnabled = form.watch('rtc');
-  const isAlarmEnabled = form.watch('alarm');
+  const { alarmEnabled, rtcEnabled } = rtc;
 
   return (
     <div
@@ -177,37 +192,44 @@ const Rtc = () => {
       <h4 css={{ marginBottom: scale(2), ...typography('h4') }}>
         Настройки RTC
       </h4>
-      <Form methods={form} onSubmit={(vals) => console.log(vals)}>
-        <DetailedItemWrapper id="0" title="RTC" description="Информация об RTC">
-          <Form.Field name="rtc">
-            <Checkbox value="1" forceControlled>
-              Включить RTC
-            </Checkbox>
-          </Form.Field>
-        </DetailedItemWrapper>
+
+      <DetailedItemWrapper id="0" title="RTC" description="Информация об RTC">
+        <Checkbox
+          name="rtc"
+          value="1"
+          checked={rtcEnabled}
+          onChange={(e) => {
+            dispatch(setRtcEnabled(e.currentTarget.checked));
+          }}
+        >
+          Включить RTC
+        </Checkbox>
+      </DetailedItemWrapper>
+      {rtcEnabled && (
         <DetailedItemWrapper
           id="1"
           title="Будильник"
           description="Информация о будильнике. Также можно выделять в группы)"
         >
-          <Form.Field name="alarm">
-            <Checkbox value="1" forceControlled>
-              Будильник
-            </Checkbox>
-          </Form.Field>
+          <Checkbox
+            name="alarm"
+            value="1"
+            checked={alarmEnabled}
+            onChange={(e) => {
+              dispatch(setAlarmEnabled(e.currentTarget.checked));
+            }}
+          >
+            Будильник
+          </Checkbox>
         </DetailedItemWrapper>
-        {/* <button type="submit">Submit</button> */}
-      </Form>
+      )}
       <Tabs css={{ marginTop: scale(2) }}>
         <Tabs.List>
           <Tabs.Tab>Настройки</Tabs.Tab>
           <Tabs.Tab>Прерывания</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel>
-          <RtcSettings
-            isAlarmEnabled={isAlarmEnabled}
-            isRtcEnabled={isRtcEnabled}
-          />
+          <RtcSettings />
         </Tabs.Panel>
         <Tabs.Panel>Interrupts</Tabs.Panel>
       </Tabs>
