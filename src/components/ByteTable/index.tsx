@@ -31,10 +31,46 @@ declare module '@tanstack/react-table' {
   }
 }
 
-const parseValue = (value: string) =>
-  value?.startsWith('0b')
-    ? parseInt(value.replace('0b', ''), 2)
-    : parseInt(value || '0', 10);
+export enum ByteTableFormat {
+  BIN = 'bin',
+  DEC = 'dec',
+  HEX = 'hex',
+}
+
+const parseValue = (value?: string | number) => {
+  if (typeof value === 'number') return value;
+  if (typeof value !== 'string') return null;
+
+  if (value.startsWith('0x')) {
+    // hex
+    return parseInt(value.replace('0x', ''), 16);
+  }
+
+  if (value.startsWith('0b')) {
+    return parseInt(value.replace('0b', ''), 2);
+  }
+
+  return parseInt(value, 10);
+};
+
+const formatValue = (value: string | number, format: ByteTableFormat) => {
+  const parsedValue = parseValue(value);
+
+  if (parsedValue === null) {
+    console.error('error parseing value:', value);
+    return '';
+  }
+
+  if (format === ByteTableFormat.BIN) {
+    return `0b${parsedValue.toString(2).padStart(32, '0')}`;
+  }
+
+  if (format === ByteTableFormat.HEX) {
+    return `0x${parsedValue.toString(16).toUpperCase().padStart(8, '0')}`;
+  }
+
+  return parsedValue.toString(10);
+};
 
 const ByteTable = ({
   addrCol = defaultAddrCol,
@@ -58,20 +94,25 @@ const ByteTable = ({
           const formats = useMemo(
             () => [
               {
-                label: 'Десятичный',
-                value: 'dec',
+                label: '10-чный',
+                value: ByteTableFormat.DEC,
               },
               {
-                label: 'Двоичный',
-                value: 'bin',
+                label: '2-чный',
+                value: ByteTableFormat.BIN,
+              },
+
+              {
+                label: '16-ричный',
+                value: ByteTableFormat.HEX,
               },
             ],
             [],
           );
 
-          const [format, setFormat] = useState<SelectItemProps<string>>(
-            formats[0],
-          );
+          const [format, setFormat] = useState<
+            SelectItemProps<ByteTableFormat>
+          >(formats[0]);
 
           const initialValue = getValue() as string;
           // We need to keep and update the state of the cell normally
@@ -88,12 +129,7 @@ const ByteTable = ({
           useEffect(() => {
             if (initialValue === prevInitialValue) return;
 
-            if (format?.value === 'bin') {
-              const parsedValue = parseValue(initialValue);
-              setValue(`0b${parsedValue.toString(2).padStart(8, '0')}`);
-            } else {
-              setValue(initialValue);
-            }
+            setValue(formatValue(initialValue, format.value));
           }, [initialValue, format, prevInitialValue]);
 
           return (
@@ -103,12 +139,13 @@ const ByteTable = ({
                 value={value as string}
                 onChange={(e) => setValue(e.target.value)}
                 onBlur={onBlur}
-                css={{ padding: scale(1) }}
+                css={{ padding: scale(1), minWidth: scale(30) }}
               />
               <Select
                 css={{
                   minWidth: scale(20),
                 }}
+                isClearable={false}
                 fieldCSS={{
                   borderTopLeftRadius: '0!important',
                   borderBottomLeftRadius: '0!important',
@@ -116,13 +153,7 @@ const ByteTable = ({
                 selectedItem={format}
                 onChange={(e) => {
                   setFormat(formats.find((f) => f.value === e)!);
-                  const parsedValue = parseValue(value);
-
-                  if (e === 'bin') {
-                    setValue(`0b${parsedValue.toString(2).padStart(8, '0')}`);
-                  } else {
-                    setValue(parsedValue.toString(10));
-                  }
+                  setValue(formatValue(initialValue, e as ByteTableFormat));
                 }}
                 items={formats}
               />

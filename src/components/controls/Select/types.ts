@@ -109,6 +109,7 @@ export interface SelectProps<
   isScrollIntoView?: boolean;
   scrollParent?: HTMLElement;
   openMenuOnInputClick?: boolean;
+  isClearable?: boolean;
 }
 
 export type SelectedItem =

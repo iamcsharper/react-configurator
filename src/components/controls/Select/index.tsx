@@ -83,6 +83,7 @@ const Select = <T extends string | number | null, TName extends string | never>(
     applyOnExactLabel,
     scrollParent: scrollParentFromProps,
     isScrollIntoView = true,
+    isClearable = true,
     ...props
   }: SelectProps<T, TName>,
   ref?: any,
@@ -348,7 +349,7 @@ const Select = <T extends string | number | null, TName extends string | never>(
               })}
             />
           )}
-          {emptyValue !== selectedItem?.value && (
+          {emptyValue !== selectedItem?.value && isClearable && (
             <button css={closeButton} type="button" onClick={reset}>
               <CloseIcon />
             </button>
