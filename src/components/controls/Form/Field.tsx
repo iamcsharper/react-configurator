@@ -43,8 +43,6 @@ const FormField = <T extends Record<string, any> = never>({
                       ...field,
                       ...hookFormProps,
                       onChange(...args: any[]) {
-                        console.log('select onChange fired!', ...args);
-                        console.log('field=', field);
                         if (
                           typeof (child?.props as any)?.onChange === 'function'
                         ) {

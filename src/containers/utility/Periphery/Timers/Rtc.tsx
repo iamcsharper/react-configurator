@@ -63,7 +63,7 @@ const RtcSettings = () => {
   );
   const { rtcEnabled, alarmEnabled } = rtc;
 
-  console.log(rehydrated);
+  console.log('rehydrated', rehydrated);
 
   const form = useForm({
     defaultValues: rtc,
@@ -77,7 +77,6 @@ const RtcSettings = () => {
   const rtcSource = form.watch('rtcSource');
   useEffect(() => {
     // TODO: bug Select does not provider correct bindings
-    console.log(rtcSource);
     dispatch(setRtcSource(rtcSource));
   }, [dispatch, rtcSource]);
 

@@ -90,7 +90,12 @@ const Select = <T extends string | number | null, TName extends string | never>(
 ) => {
   const [innerValue, setInnerValue] = useState(defaultValue);
 
-  const value = valueFromProps || selectedItemFromProps?.value || innerValue;
+  const value =
+    valueFromProps !== undefined
+      ? valueFromProps
+      : selectedItemFromProps?.value || innerValue;
+
+  if (valueFromProps !== undefined) console.log('value:', valueFromProps);
 
   const [inputItems, setInputItems] = useState(items);
   const itemsRef = useRef(items);
@@ -106,6 +111,7 @@ const Select = <T extends string | number | null, TName extends string | never>(
 
   const onInputValueChange = useCallback(
     ({ inputValue }: { inputValue?: string }) => {
+      console.log('onInputValueChange:', inputValue);
       setInputValue(inputValue || '');
 
       const newItems = items.filter((i) =>
@@ -130,17 +136,20 @@ const Select = <T extends string | number | null, TName extends string | never>(
       // if (field) field.onChange(getValue(changes.selectedItem));)
       if (onChange) onChange(changes.selectedItem?.value as T | null);
       setInnerValue(`${changes.selectedItem?.value}`);
-      setInputValue(
-        (old) =>
-          (old === changes.selectedItem?.label
-            ? old
-            : `${changes.selectedItem?.label}`) || '',
-      );
+      setInputValue((old) => {
+        console.log(
+          'onSelectedItemChange:',
+          old,
+          'newLabel',
+          changes.selectedItem?.label,
+        );
+        if (old === changes.selectedItem?.label) return old;
+
+        return `${changes.selectedItem?.label}` || '';
+      });
     },
     [onChange],
   );
-
-  console.log('select value:', value, 'name=', name);
 
   const {
     isOpen,
@@ -172,6 +181,7 @@ const Select = <T extends string | number | null, TName extends string | never>(
     ...(value !== undefined && {
       selectedItem: items.find((item) => item.value === value) || null,
     }),
+    ...(value === emptyValue && {}),
     onSelectedItemChange,
   });
 

@@ -1,7 +1,7 @@
 import { colors } from '@scripts/colors';
 import { scale } from '@scripts/helpers';
 import { useFieldCSS } from '@scripts/hooks/useFieldCSS';
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useEffect, useMemo, useState } from 'react';
 import Legend from '../Legend';
 import Select from '../Select';
 import { SelectItemProps } from '../Select/types';
@@ -69,6 +69,23 @@ const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
 
   const { basicFieldCSS } = useFieldCSS({});
 
+  const [year, setYear] = useState(value?.year || '');
+  const [day, setDay] = useState(value?.day || '');
+
+  useEffect(() => {
+    setYear((old) => {
+      if (value?.year && old !== value?.year) return value?.year;
+      return old;
+    });
+  }, [value?.year]);
+
+  useEffect(() => {
+    setDay((old) => {
+      if (value?.day && old !== value?.day) return value?.day;
+      return old;
+    });
+  }, [value?.day]);
+
   // console.log('value?.month', value?.month);
 
   return (
@@ -109,7 +126,10 @@ const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
               if (value)
                 onChange?.({
                   ...value,
-                  century: century === null ? null : +`${century}`,
+                  century:
+                    century === null || century === undefined
+                      ? null
+                      : +`${century}`,
                 });
             }}
             selectedItem={optionsCenturies.find(
@@ -128,6 +148,7 @@ const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
             type="number"
             min={`${minYear}`}
             max={`${maxYear}`}
+            value={year}
             onChange={(e) => {
               if (value) {
                 onChange?.({
@@ -142,10 +163,12 @@ const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
           items={optionsMonths}
           label="Месяц"
           onChange={(month) => {
+            console.log('onChange month:', month);
             if (value)
               onChange?.({
                 ...value,
-                month: month === null ? null : +`${month}`,
+                month:
+                  month === null || month === undefined ? null : +`${month}`,
               });
           }}
           selectedItem={optionsMonths.find((e) => e.value === value?.month)}
@@ -159,7 +182,9 @@ const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
             css={[basicFieldCSS, {}]}
             placeholder="День"
             type="number"
+            value={day}
             onChange={(e) => {
+              setDay(e.currentTarget.value);
               if (value) {
                 onChange?.({
                   ...value,
