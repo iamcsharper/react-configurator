@@ -12,7 +12,7 @@ const ASSET_URL = process.env.ASSET_URL || '';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    EnvironmentPlugin(['ASSET_URL', 'BASE_URL']),
+    EnvironmentPlugin(['ASSET_URL', 'BASE_URL', 'USE_LOCAL_STORAGE']),
     svgr(),
     tsconfigPaths(),
     react({
