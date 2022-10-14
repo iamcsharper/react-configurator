@@ -89,11 +89,6 @@ const Select = <T extends string | number | null, TName extends string | never>(
   ref?: any,
 ) => {
   const [innerValue, setInnerValue] = useState(defaultValue);
-  // console.log('select option value:', value);
-
-  // if (!selectedItemFromProps && !selectedItemFromProps) {
-  //   console.error('[Select] Must provide a value or selectedItem');
-  // }
 
   const value = valueFromProps || selectedItemFromProps?.value || innerValue;
 
@@ -145,11 +140,7 @@ const Select = <T extends string | number | null, TName extends string | never>(
     [onChange],
   );
 
-  // Если селект контроллируется извне
-  let controlledSelectedItem = selectedItemFromProps || null;
-  if (value !== undefined) {
-    controlledSelectedItem = items.find((item) => item.value === value) || null;
-  }
+  console.log('select value:', value, 'name=', name);
 
   const {
     isOpen,
@@ -174,7 +165,13 @@ const Select = <T extends string | number | null, TName extends string | never>(
       defaultIndex !== undefined ? defaultIndex : undefined,
     initialSelectedItem:
       defaultIndex !== undefined ? items[defaultIndex] : null,
-    selectedItem: controlledSelectedItem,
+    // Если селект контроллируется извне
+    ...(selectedItemFromProps !== undefined && {
+      selectedItem: selectedItemFromProps,
+    }),
+    ...(value !== undefined && {
+      selectedItem: items.find((item) => item.value === value) || null,
+    }),
     onSelectedItemChange,
   });
 

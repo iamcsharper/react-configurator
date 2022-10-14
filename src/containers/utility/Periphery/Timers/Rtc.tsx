@@ -97,7 +97,7 @@ const RtcSettings = () => {
       css={{ marginTop: scale(2) }}
     >
       {rtcEnabled && (
-        <Form.Field name="rtc.clockingSource">
+        <Form.Field<RtcState> name="rtcSource">
           <Select
             label="Тактирование от"
             items={[
@@ -119,18 +119,18 @@ const RtcSettings = () => {
       >
         {rtcEnabled && (
           <>
-            <AccordionItem uuid="rtc.date" title="Дата RTC">
-              <Form.Field name="rtc.date">
+            <AccordionItem uuid="rtcDate" title="Дата RTC">
+              <Form.Field<RtcState> name="rtcDate">
                 <DateForm />
               </Form.Field>
             </AccordionItem>
             <AccordionItem uuid="rtc.time" title="Время RTC">
-              <Form.Field name="rtc.time">
+              <Form.Field<RtcState> name="rtcTime">
                 {/* <TimePicker /> */}
                 <TimeForm />
               </Form.Field>
             </AccordionItem>
-            <AccordionItem uuid="rtc.registers" title="Регистры RTC">
+            <AccordionItem uuid="rtcRegisters" title="Регистры RTC">
               {/* TODO: Form.Field-ready ByteTable OR <Controller /> */}
               <ByteTable
                 data={registers}

@@ -33,7 +33,7 @@ export const BasicInput = forwardRef<any, BasicInputProps>(
   ),
 );
 
-export const BasicField = forwardRef<any, BasicFieldProps>(
+export const BasicField = forwardRef<any, BasicFieldProps<any>>(
   (
     {
       name,

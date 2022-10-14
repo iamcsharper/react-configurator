@@ -102,6 +102,7 @@ export const Tabs: FC<TabsProps> & TabsCompositionProps = ({
               display: 'flex',
               borderBottom: `1px solid ${colors.grey200}`,
               height: scale(6),
+              flexShrink: 0,
               ...tabListCSS,
             },
             '&__tab': tabCSS,

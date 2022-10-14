@@ -2,8 +2,8 @@ import { SVGRIcon } from '@customTypes/index';
 import { CSSObject } from '@emotion/react';
 import { ReactNode } from 'react';
 
-export interface BasicFieldProps {
-  name: string;
+export interface BasicFieldProps<T extends Record<string, any> = never> {
+  name: T extends never ? string : keyof T;
   label?: string | ReactNode;
   showMessage?: boolean;
   messageText?: string;
@@ -18,7 +18,8 @@ export interface BasicFieldProps {
   disabled?: boolean;
 }
 
-export interface FormFieldProps extends BasicFieldProps {
+export interface FormFieldProps<T extends Record<string, any> = never>
+  extends BasicFieldProps<T> {
   children?: ReactNode | ReactNode[];
 }
 

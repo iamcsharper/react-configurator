@@ -3,13 +3,13 @@ import { Controller, useFormContext } from 'react-hook-form';
 import BasicField from './BasicField';
 import { FormFieldProps } from './types';
 
-const FormField = ({
+const FormField = <T extends Record<string, any> = never>({
   name,
   children,
   isLegend = true,
   className,
   ...props
-}: FormFieldProps) => {
+}: FormFieldProps<T>) => {
   const { control } = useFormContext(); // retrieve all hook methods
 
   const isCheckbox =
@@ -43,6 +43,8 @@ const FormField = ({
                       ...field,
                       ...hookFormProps,
                       onChange(...args: any[]) {
+                        console.log('select onChange fired!', ...args);
+                        console.log('field=', field);
                         if (
                           typeof (child?.props as any)?.onChange === 'function'
                         ) {

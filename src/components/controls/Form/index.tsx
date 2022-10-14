@@ -3,8 +3,8 @@ import { FormProvider, UseFormReturn } from 'react-hook-form';
 import FormField from './Field';
 import { FormFieldProps } from './types';
 
-export interface FormCompositionProps {
-  Field: FC<FormFieldProps>;
+export interface FormCompositionProps<T extends Record<string, any> = never> {
+  Field: FC<FormFieldProps<T>>;
 }
 
 export interface FormProps<T extends Record<string, any>>
@@ -25,7 +25,7 @@ const Form = <T extends Record<string, any>>({
   onSubmit,
   isSubmitOnEnter = false,
   ...props
-}: FormProps<T>) => (
+}: FormProps<T> & Partial<FormCompositionProps<T>>) => (
   <FormProvider {...methods}>
     <form
       onSubmit={methods.handleSubmit(onSubmit)}
