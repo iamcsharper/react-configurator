@@ -1,26 +1,10 @@
+import DetailsPane from '@components/DetailsPane';
 import Timers from '@containers/utility/Periphery/Timers';
 import { DetailsProvider, useDetails } from '@context/details';
-import { scale } from '@scripts/helpers';
 import { Allotment, AllotmentHandle } from 'allotment';
 import { useEffect, useRef } from 'react';
 
 import { Route, Routes, useParams } from 'react-router-dom';
-
-const Details = () => {
-  const { currentData /* setEnabled */ } = useDetails();
-
-  return (
-    <div css={{ padding: scale(2) }}>
-      <div css={{ display: 'flex', justifyContent: 'space-between' }}>
-        <h4 css={{ marginBottom: scale(1) }}>
-          {currentData?.title || 'Не выбрано'}
-        </h4>
-        {/* <span onClick={() => setEnabled(false)}>x</span> */}
-      </div>
-      {currentData && <p>{currentData?.description}</p>}
-    </div>
-  );
-};
 
 const SplitPanes = () => {
   const props = useParams();
@@ -73,7 +57,7 @@ const SplitPanes = () => {
         </div>
       </Allotment.Pane>
       <Allotment.Pane maxSize={150} snap>
-        <Details />
+        <DetailsPane />
       </Allotment.Pane>
     </Allotment>
   );

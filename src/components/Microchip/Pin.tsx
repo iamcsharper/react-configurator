@@ -21,9 +21,10 @@ const Pin = ({ name, isActive, children, onClick }: PinProps) => (
       type="button"
       css={{
         width: '100%',
-        height: scale(2),
+        height: scale(3),
         cursor: 'pointer',
         padding: `${scale(1, true)}px ${scale(1)}px`,
+        background: colors.grey100,
         ...(isActive && {
           background: colors.primary,
           color: colors.black,
@@ -31,9 +32,9 @@ const Pin = ({ name, isActive, children, onClick }: PinProps) => (
       }}
       onClick={onClick}
     >
-      <span>{name}</span>
-      {children}
+      {name}
     </button>
+    {children}
   </div>
 );
 

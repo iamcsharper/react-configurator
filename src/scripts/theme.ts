@@ -1,48 +1,65 @@
 import { CSSObject } from '@emotion/react';
 import { useCallback, useMemo } from 'react';
 
-export type BasicState<V, S, T = never> = {
-  variant: V | keyof V;
-  size: S | keyof S;
+type EnumLike = Record<string, any>;
+
+export type BaseThemeState<
+  V extends EnumLike,
+  S extends EnumLike,
+  T extends EnumLike = never,
+> = {
+  variant?: V | keyof V;
+  size?: S | keyof S;
   theme?: T;
 };
 
-export type StyleOrFunction<FullState extends BasicState<any, any, any>> =
-  | CSSObject
-  | ((state: Omit<FullState, 'theme'>) => CSSObject);
+export type Fn<T, Args extends any[] = any[]> = (...args: Args) => T;
+export type ValueOrFunction<T, Args extends any[] = any[]> = T | Fn<T, Args>;
 
-// type Guard<T, S extends BasicState<any,any,any>> = T extends StyleOrFunction<infer R extends S>
-//       ? (Omit<R, keyof S> extends never ? Partial<S> : never)
-//       : never;
+export type StyleDefinition<State extends BaseThemeState<any, any, any>> =
+  ValueOrFunction<CSSObject, [state: Omit<State, 'theme'>]>;
+
+export type OptionizedCSS<T> = Record<keyof T, CSSObject>;
+export const extractCSSOption = <T>(
+  optionized: OptionizedCSS<T>,
+  option: T | keyof T,
+) => optionized[option as keyof T] as CSSObject;
+
+export type ThemeDefininitionLike<State extends BaseThemeState<any, any, any>> =
+  Record<any, StyleDefinition<State>>;
 
 export const useThemeCSSPart = <
-  T,
-  S extends BasicState<any, any, any>,
-  K extends keyof T,
+  S extends Omit<BaseThemeState<any, any, any>, 'theme'>,
+  T extends ValueOrFunction<Record<any, StyleDefinition<S>>, [S]>,
 >(
   theme: T,
   state: S,
-) =>
-  useCallback(
-    (
+) => {
+  const actualTheme = useMemo<ThemeDefininitionLike<S>>(
+    () => (typeof theme === 'function' ? theme(state) : theme),
+    [state, theme],
+  );
+
+  return useCallback(
+    <K extends T extends Fn<infer t> ? keyof t : keyof T>(
       key: K,
-      extraData?: T[K] extends StyleOrFunction<infer U>
-        ? Omit<U, keyof S> extends never
-          ? never
-          : Partial<Omit<U, keyof S>>
+      extraData?: (
+        T extends (...args: any[]) => infer R ? R[K] : T[K]
+      ) extends ValueOrFunction<CSSObject, [state: infer A]>
+        ? Omit<A, keyof S>
         : never,
     ) => {
-      const element = theme[key];
+      const element = actualTheme[key];
       if (typeof element === 'function')
         return element(
           extraData ? { ...state, ...extraData } : state,
         ) as CSSObject;
       return element as CSSObject;
     },
-    [state, theme],
+    [state, actualTheme],
   );
+};
 
-// TODO: return components object and hook that returns useMemo
 export const useThemeCSS = <T extends { [key: string]: any }, S>(
   theme: T,
   state: S,
@@ -59,3 +76,18 @@ export const useThemeCSS = <T extends { [key: string]: any }, S>(
 
     return res as Record<keyof T, CSSObject>;
   }, [state, theme]);
+
+export const getSameEnumValue = <
+  Source extends EnumLike,
+  Dest extends EnumLike,
+>(
+  sourceKey: keyof Source | Source,
+  dest: Dest,
+  fallback: Dest | undefined = undefined,
+) => {
+  if (Object.keys(dest).includes(sourceKey.toString())) {
+    return dest[sourceKey as any] as Dest[keyof Dest];
+  }
+
+  return fallback;
+};

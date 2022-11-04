@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { FixedLengthArray } from '@scripts/helpers';
+import { z } from 'zod';
+import { toZod } from 'tozod';
 
 export enum RtcSourceType {
   External = 1,
@@ -14,11 +15,24 @@ export interface RtcDate {
   day: number | null;
 }
 
+export const rtcDateSchema: toZod<RtcDate> = z.object({
+  century: z.nullable(z.number()),
+  year: z.nullable(z.number()),
+  month: z.nullable(z.number()),
+  day: z.nullable(z.number()),
+});
+
 export interface RtcTime {
   hours: number | null;
   minutes: number | null;
   seconds: number | null;
 }
+
+export const rtcTimeSchema: toZod<RtcTime> = z.object({
+  hours: z.nullable(z.number()),
+  minutes: z.nullable(z.number()),
+  seconds: z.nullable(z.number()),
+});
 
 export interface RtcState {
   rtcEnabled: boolean;
@@ -27,10 +41,19 @@ export interface RtcState {
   rtcSource: RtcSourceType;
   rtcDate: RtcDate;
   rtcTime: RtcTime;
-  rtcRegisters: FixedLengthArray<number, 16>;
+  rtcRegisters: number[];
 
   // TODO: alarm date and time?
 }
+
+export const rtcStateSchema: toZod<Omit<RtcState, 'rtcSource'>> = z.object({
+  alarmEnabled: z.boolean(),
+  rtcEnabled: z.boolean(),
+  rtcSource: z.nativeEnum(RtcSourceType),
+  rtcDate: rtcDateSchema,
+  rtcTime: rtcTimeSchema,
+  rtcRegisters: z.number().array().length(16),
+});
 
 const initialState: RtcState = {
   alarmEnabled: false,
@@ -54,6 +77,7 @@ export const rtcSlice = createSlice({
   name: 'rtc',
   initialState,
   reducers: {
+    setRtc: (_, action: PayloadAction<RtcState>) => ({ ...action.payload }),
     setAlarmEnabled: (state, action: PayloadAction<boolean>) => {
       state.alarmEnabled = action.payload;
     },
@@ -90,6 +114,7 @@ export const rtcSlice = createSlice({
 });
 
 export const {
+  setRtc,
   setAlarmEnabled,
   setRtcEnabled,
   setRtcDate,

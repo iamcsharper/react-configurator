@@ -1,67 +1,76 @@
-import { Children, cloneElement, FC, isValidElement } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
-import BasicField from './BasicField';
+import { Children, cloneElement, FC, forwardRef, isValidElement } from 'react';
+import { useController, useFormContext } from 'react-hook-form';
+import Input from '../Input';
 import { FormFieldProps } from './types';
 
-const FormField = <T extends Record<string, any> = never>({
-  name,
-  children,
-  isLegend = true,
-  className,
-  ...props
-}: FormFieldProps<T>) => {
-  const { control } = useFormContext(); // retrieve all hook methods
+const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
+  (
+    {
+      name,
+      children,
+      size = 'md',
+      className,
+      wrapperCSS,
+      block = true,
+      ...props
+    },
+    ref,
+  ) => {
+    const { control, setValue } = useFormContext(); // retrieve all hook methods
 
-  const isCheckbox =
-    isValidElement(children) && (children?.type as FC)?.name === 'Checkbox';
-  const isRadio =
-    isValidElement(children) && (children?.type as FC)?.name === 'Radio';
+    const isCheckbox =
+      isValidElement(children) && (children?.type as FC)?.name === 'Checkbox';
+    const isRadio =
+      isValidElement(children) && (children?.type as FC)?.name === 'Radio';
 
-  const inputProps = {
-    type: 'text',
-    name,
-    ...(!isCheckbox && !isRadio && { isLegend }),
-    ...props,
-  };
+    const { field, fieldState } = useController({
+      name,
+      control,
+    });
 
-  return (
-    <div css={{ width: '100%' }} className={className}>
-      {children ? (
-        <>
-          {Children.map(children, (child) => {
-            if (isValidElement(child)) {
-              const hookFormProps = {
-                id: (child?.type as FC)?.displayName !== 'Legend' ? name : '',
-              };
+    const inputProps = {
+      name,
+      size,
+      error: fieldState.error?.message,
+      value: field.value,
+      onBlur: field.onBlur,
+      ref,
+      label: props.label,
+      ...(!isCheckbox && !isRadio && { isLegend: true, label: '' }),
+      ...props,
+    };
 
-              return (
-                <Controller
-                  name={name}
-                  control={control}
-                  render={({ field }) =>
-                    cloneElement<any>(child, {
-                      ...field,
-                      ...hookFormProps,
-                      onChange(...args: any[]) {
-                        if (
-                          typeof (child?.props as any)?.onChange === 'function'
-                        ) {
-                          (child.props as any).onChange(...args);
-                        }
-                        field.onChange(...args);
-                      },
-                    })
-                  }
-                />
-              );
-            }
-          })}
-        </>
-      ) : (
-        <BasicField {...inputProps} {...props} />
-      )}
-    </div>
-  );
-};
+    return (
+      <div css={{ width: '100%' }} className={className}>
+        {children ? (
+          <>
+            {Children.map(children, (child) => {
+              if (isValidElement(child)) {
+                return cloneElement<any>(child, {
+                  ...inputProps,
+                  ...child.props,
+                  onChange(...args: any[]) {
+                    if (typeof (child?.props as any)?.onChange === 'function') {
+                      (child.props as any).onChange(...args);
+                    }
+                    field.onChange(...args);
+                  },
+                });
+              }
+            })}
+          </>
+        ) : (
+          <Input
+            {...inputProps}
+            block={block}
+            css={wrapperCSS}
+            onChange={field.onChange}
+            onClear={() => setValue(name, '')}
+          />
+        )}
+      </div>
+    );
+  },
+);
 
 export default FormField;

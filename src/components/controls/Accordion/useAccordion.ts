@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 
 import { SVGRIcon } from '@customTypes/index';
-import { BasicState } from '@scripts/theme';
+import { BaseThemeState } from '@scripts/theme';
 import {
   AccordionSize,
   AccordionState,
@@ -11,7 +11,7 @@ import {
 
 export interface AccordionContextProps
   extends Partial<
-      BasicState<typeof AccordionVariants, typeof AccordionSize, AccordionTheme>
+      BaseThemeState<typeof AccordionVariants, typeof AccordionSize, AccordionTheme>
     >,
     Partial<AccordionState> {
   /** CSSTransition handler, triggers after add 'enter' class */

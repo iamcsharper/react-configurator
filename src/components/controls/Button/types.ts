@@ -1,6 +1,6 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { SVGRIcon } from '@customTypes/index';
-import { BasicState, StyleOrFunction } from '@scripts/theme';
+import { BaseThemeState, StyleDefinition } from '@scripts/theme';
 
 import { MergeElementProps } from '@scripts/helpers';
 import { ElementType, ReactNode } from 'react';
@@ -28,20 +28,20 @@ export interface ButtonState {
   rounded: boolean;
 }
 
-export type ButtonStateFull = BasicState<
+export type ButtonStateFull = BaseThemeState<
   typeof ButtonVariants,
   typeof ButtonSize
 > &
   ButtonState;
 
 export interface ButtonTheme {
-  button: StyleOrFunction<ButtonStateFull>;
-  icon: StyleOrFunction<ButtonStateFull>;
+  button: StyleDefinition<ButtonStateFull>;
+  icon: StyleDefinition<ButtonStateFull>;
 }
 
 export interface ButtonBaseProps
   extends Partial<
-      BasicState<typeof ButtonVariants, typeof ButtonSize, ButtonTheme>
+      BaseThemeState<typeof ButtonVariants, typeof ButtonSize, ButtonTheme>
     >,
     Partial<ButtonState> {
   /** Button content. */

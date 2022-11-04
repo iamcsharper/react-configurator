@@ -9,8 +9,8 @@ import AccordionHeading, { AccordionHeadingProps } from './Heading';
 import AccordionItem, { AccordionItemProps } from './Item';
 import AccordionPanel, { AccordionPanelProps } from './Panel';
 import { AccordionContext, AccordionContextProps } from './useAccordion';
-import { themes } from './themes';
-import { AccordionSize, AccordionStateFull, AccordionVariants } from './types';
+import { accordionThemes } from './themes';
+import { AccordionSize, AccordionThemeState, AccordionVariants } from './types';
 
 export interface AccordionCompositionProps {
   Item: FC<AccordionItemProps>;
@@ -45,7 +45,7 @@ export const Accordion: FC<AccordionProps> & AccordionCompositionProps = ({
   animationType,
   transitionTimeout = 300,
   transitionTimeoutExit = transitionTimeout,
-  theme = themes.basic,
+  theme = accordionThemes.basic,
   variant = AccordionVariants.primary,
   size = AccordionSize.md,
   panelNoPadding = true,
@@ -88,7 +88,7 @@ export const Accordion: FC<AccordionProps> & AccordionCompositionProps = ({
     ],
   );
 
-  const state = useMemo<AccordionStateFull>(
+  const state = useMemo<AccordionThemeState>(
     () => ({
       isIconVertical,
       size: size!,

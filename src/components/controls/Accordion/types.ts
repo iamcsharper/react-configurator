@@ -1,4 +1,8 @@
-import { BasicState, StyleOrFunction } from '@scripts/theme';
+import {
+  BaseThemeState,
+  StyleDefinition,
+  ValueOrFunction,
+} from '@scripts/theme';
 
 export enum AccordionVariants {
   primary = 'primary',
@@ -15,18 +19,21 @@ export interface AccordionState {
   panelNoPadding?: boolean;
 }
 
-export type AccordionStateFull = BasicState<
+export type AccordionThemeState = BaseThemeState<
   typeof AccordionVariants,
   typeof AccordionSize
 > &
   AccordionState;
 
-type AccordionThemePart = StyleOrFunction<AccordionStateFull>;
+type AccordionThemePart = StyleDefinition<AccordionThemeState>;
 
-export interface AccordionTheme {
-  root: AccordionThemePart;
-  item: AccordionThemePart;
-  heading: AccordionThemePart;
-  button: AccordionThemePart;
-  panel: AccordionThemePart;
-}
+export type AccordionTheme = ValueOrFunction<
+  {
+    root: AccordionThemePart;
+    item: AccordionThemePart;
+    heading: AccordionThemePart;
+    button: AccordionThemePart;
+    panel: AccordionThemePart;
+  },
+  [AccordionThemeState]
+>;

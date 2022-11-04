@@ -1,6 +1,6 @@
 import { CSSObject } from '@emotion/react';
 import { HTMLProps, ReactNode } from 'react';
-import { BasicState, StyleOrFunction } from '@scripts/theme';
+import { BaseThemeState, StyleDefinition } from '@scripts/theme';
 
 export enum SelectVariants {
   primary = 'primary',
@@ -18,19 +18,19 @@ export interface SelectState {
   hasSelected?: boolean;
 }
 
-export type SelectStateFull = BasicState<
+export type SelectStateFull = BaseThemeState<
   typeof SelectVariants,
   typeof SelectSize
 > &
   SelectState;
 
 export interface SelectTheme {
-  legend: StyleOrFunction<SelectStateFull>;
-  field: StyleOrFunction<SelectStateFull & { isFocused: boolean }>;
-  optionList: StyleOrFunction<SelectStateFull>;
-  arrowButton: StyleOrFunction<SelectStateFull>;
-  closeButton: StyleOrFunction<SelectStateFull>;
-  option: StyleOrFunction<
+  legend: StyleDefinition<SelectStateFull>;
+  field: StyleDefinition<SelectStateFull & { isFocused: boolean }>;
+  optionList: StyleDefinition<SelectStateFull>;
+  arrowButton: StyleDefinition<SelectStateFull>;
+  closeButton: StyleDefinition<SelectStateFull>;
+  option: StyleDefinition<
     SelectStateFull & {
       isSelected: boolean;
       isHover: boolean;
@@ -77,7 +77,7 @@ export interface SelectProps<
   T extends string | number | null,
   TName extends string | never,
 > extends Partial<
-      BasicState<typeof SelectVariants, typeof SelectSize, SelectTheme>
+      BaseThemeState<typeof SelectVariants, typeof SelectSize, SelectTheme>
     >,
     Partial<SelectState>,
     Omit<SelectBaseProps, 'name'> {

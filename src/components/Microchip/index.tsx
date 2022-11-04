@@ -11,8 +11,8 @@ import PinColumn, { PinColumnProps } from './PinColumn';
 
 // TODO
 
-const BTN_WIDTH = scale(16);
 const SIZE = scale(32);
+const COL_WIDTH = scale(10);
 const COLUMN_PINS_COUNT = 8;
 
 const Microchip = () => {
@@ -49,39 +49,40 @@ const Microchip = () => {
     })[] = [
       // левая
       {
-        left: -BTN_WIDTH - SIZE,
-        top: -SIZE,
+        left: -COL_WIDTH,
+        top: scale(3),
         pins: [],
         rotation: 0,
       },
       // нижняя
       {
-        left: -BTN_WIDTH / 2,
-        top: BTN_WIDTH / 2,
+        left: (scale(3) * (COLUMN_PINS_COUNT * 3 - 2)) / 6,
+        top: SIZE - COL_WIDTH / 2 - scale(3),
         pins: [],
         rotation: -90,
       },
       // правая
       {
         left: SIZE,
-        top: -SIZE,
+        top: scale(3),
         pins: [],
         rotation: 0,
+        reverse: true,
       },
       // верхняя
       {
-        left: -BTN_WIDTH / 2,
-        top: -(SIZE + BTN_WIDTH) / 2,
+        left: (scale(3) * (COLUMN_PINS_COUNT * 3 - 2)) / 6,
+        top: -SIZE / 2 - (scale(2) - 2),
         pins: [],
         rotation: -90,
+        reverse: true,
       },
     ];
 
     for (let j = 0; j < 4; j += 1) {
       const arr: { name: string; id: number }[] = [];
       for (let i = 0; i < COLUMN_PINS_COUNT; i += 1) {
-        const id =
-          (j < 2 ? i : COLUMN_PINS_COUNT - 1 - i) + j * COLUMN_PINS_COUNT;
+        const id = i + j * COLUMN_PINS_COUNT;
 
         arr.push({
           id,
@@ -96,7 +97,15 @@ const Microchip = () => {
   }, []);
 
   return (
-    <div ref={wrapperRef}>
+    <div
+      ref={wrapperRef}
+      css={{
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <Droppanel
         initialPos={initialPos}
         isOpen={isOpen}
@@ -112,30 +121,27 @@ const Microchip = () => {
         css={{
           position: 'relative',
         }}
-        style={{
-          transform,
-        }}
+        // style={{
+        //   transform,
+        // }}
       >
         <div
           ref={draggableRef}
           css={{
-            position: 'absolute',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             background: colors.grey200,
             userSelect: 'none',
 
-            width: scale(32),
-            height: scale(32),
-            left: -scale(16),
-            top: -scale(16),
+            width: SIZE,
+            height: SIZE,
           }}
         >
           MIK32 (QFPN32)
         </div>
         {cols.map((col, i) => (
-          <PinColumn key={i} {...col}>
+          <PinColumn key={i} width={COL_WIDTH} {...col}>
             {col.pins.map((pin, p_i) => (
               <Pin
                 key={p_i}

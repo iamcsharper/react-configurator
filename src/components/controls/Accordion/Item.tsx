@@ -1,8 +1,8 @@
 import { useThemeCSSPart } from '@scripts/theme';
 import { HTMLProps, ReactNode, useMemo } from 'react';
 import { AccordionItem as ReactAccordionItem } from 'react-accessible-accordion';
-import { themes } from './themes';
-import { AccordionStateFull } from './types';
+import { accordionThemes } from './themes';
+import { AccordionThemeState } from './types';
 import useAccordion from './useAccordion';
 
 export interface AccordionItemProps
@@ -22,16 +22,16 @@ export const AccordionItem = ({
     isIconVertical,
     variant,
     size,
-    theme = themes.basic,
+    theme = accordionThemes.basic,
     bordered,
   } = useAccordion();
 
-  const state = useMemo<AccordionStateFull>(
+  const state = useMemo<AccordionThemeState>(
     () => ({
       isIconVertical,
       size: size!,
       variant: variant!,
-      bordered: bordered!
+      bordered: bordered!,
     }),
     [isIconVertical, size, variant, bordered],
   );

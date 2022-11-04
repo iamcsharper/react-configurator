@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useThemeCSS } from '@scripts/theme';
 import { ElementType, Ref, forwardRef, useMemo } from 'react';
 import { ButtonProps, ButtonStateFull } from './types';
-import { themes } from './themes';
+import { buttonThemes } from './themes/index';
 
 /**
  * Button component.
@@ -17,7 +17,7 @@ const Button = <T extends ElementType = 'button'>(
     children,
     block = false,
     size = 'md',
-    theme = themes.basic,
+    theme = buttonThemes.basic,
     variant = 'primary',
     Icon,
     FaIcon,

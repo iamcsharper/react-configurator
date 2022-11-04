@@ -6,6 +6,7 @@ export interface PinColumnProps {
   top: number;
   rotation: number;
   width?: number;
+  reverse?: boolean;
 }
 
 const PinColumn = ({
@@ -14,6 +15,7 @@ const PinColumn = ({
   width,
   rotation,
   children,
+  reverse,
 }: PinColumnProps) => (
   <div
     css={{
@@ -27,7 +29,8 @@ const PinColumn = ({
     <div
       css={{
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: reverse ? 'column-reverse' : 'column',
+        width: '100%',
       }}
     >
       {children}

@@ -1,4 +1,4 @@
-import { BasicState, StyleOrFunction } from '@scripts/theme';
+import { BaseThemeState, StyleDefinition } from '@scripts/theme';
 import { ReactNode } from 'react';
 import { To } from 'react-router-dom';
 
@@ -17,20 +17,20 @@ export interface NavLinkState {
   rounded: boolean;
 }
 
-export type NavLinkStateFull = BasicState<
+export type NavLinkStateFull = BaseThemeState<
   typeof NavLinkVariants,
   typeof NavLinkSize
 > &
   NavLinkState;
 
 export interface NavLinkTheme {
-  label: StyleOrFunction<NavLinkStateFull>;
-  icon: StyleOrFunction<NavLinkStateFull>;
+  label: StyleDefinition<NavLinkStateFull>;
+  icon: StyleDefinition<NavLinkStateFull>;
 }
 
 export interface NavLinkProps
   extends Partial<
-      BasicState<typeof NavLinkVariants, typeof NavLinkSize, NavLinkTheme>
+      BaseThemeState<typeof NavLinkVariants, typeof NavLinkSize, NavLinkTheme>
     >,
     Partial<NavLinkState> {
   to: To;

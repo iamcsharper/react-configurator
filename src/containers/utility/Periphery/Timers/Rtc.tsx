@@ -3,25 +3,27 @@ import Accordion from '@components/controls/Accordion';
 import Checkbox from '@components/controls/Checkbox';
 import DateForm from '@components/controls/DateForm';
 import Form from '@components/controls/Form';
-import Select from '@components/controls/Select';
+import Select from '@components/controls/NewSelect';
 import Tabs from '@components/controls/Tabs';
 import TimeForm from '@components/controls/TimeForm';
 import { DetailedItemWrapper } from '@components/DetailedItemWrapper';
-import { scale } from '@scripts/helpers';
+import { scale, withValidation } from '@scripts/helpers';
 import typography from '@scripts/typography';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import deepEqual from 'fast-deep-equal';
 
 import {
   RtcState,
-  setRtcRegister,
-  setAlarmEnabled,
+  setRtc,
   setRtcEnabled,
-  setRtcDate,
-  setRtcSource,
+  setAlarmEnabled,
+  rtcStateSchema,
 } from '@store/timers/rtc';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@store/index';
+import { colors } from '@scripts/colors';
+import Button from '@components/controls/Button';
 
 const DetailedField = ({
   label,
@@ -65,83 +67,95 @@ const RtcSettings = () => {
 
   console.log('rehydrated', rehydrated);
 
-  const form = useForm({
+  const form = useForm<RtcState>({
     defaultValues: rtc,
+    ...withValidation(rtcStateSchema),
   });
 
-  const rtcDate = form.watch('rtcDate');
-  useEffect(() => {
-    dispatch(setRtcDate(rtcDate));
-  }, [dispatch, rtcDate]);
-
-  const rtcSource = form.watch('rtcSource');
-  useEffect(() => {
-    // TODO: bug Select does not provider correct bindings
-    dispatch(setRtcSource(rtcSource));
-  }, [dispatch, rtcSource]);
-
-  const [registers, setRegisters] = useState(() =>
-    rtc.rtcRegisters.map((e, i) => ({
-      address: `R${i}`,
-      value: e,
-    })),
+  const registersData = useMemo(
+    () =>
+      form.getValues().rtcRegisters.map((e, i) => ({
+        address: `R${i}`,
+        value: e,
+      })),
+    [form],
   );
+
+  const values = form.watch();
+  const { setValue } = form;
+
+  const onChangeRegister = useCallback(
+    (rowIdx: number, value: number) => {
+      const { rtcRegisters } = values;
+      setValue(
+        'rtcRegisters',
+        rtcRegisters.map((e) => {
+          if (e !== rowIdx) return e;
+          return value;
+        }),
+      );
+    },
+    [setValue, values],
+  );
+
+  const isDirty = useMemo(() => !deepEqual(values, rtc), [values, rtc]);
 
   return (
     <Form
       methods={form}
       onSubmit={(vals) => {
         console.log(vals);
+
+        dispatch(setRtc(vals));
       }}
       css={{ marginTop: scale(2) }}
     >
       {rtcEnabled && (
-        <Form.Field<RtcState> name="rtcSource">
+        <Form.Field name="rtcSource">
           <Select
             label="Тактирование от"
-            items={[
+            options={[
               {
-                label: 'Внешний осциллятор OSC32K',
+                key: 'Внешний осциллятор OSC32K',
                 value: 1,
               },
               {
-                label: 'Внутренний осциллятор LSI32K',
+                key: 'Внутренний осциллятор LSI32K',
                 value: 2,
               },
             ]}
           />
         </Form.Field>
       )}
+      rtcSource: {values.rtcSource}
       <Accordion
         bordered
         css={{ marginTop: scale(2), marginBottom: scale(12) }}
       >
         {rtcEnabled && (
           <>
-            <AccordionItem uuid="rtcDate" title="Дата RTC">
-              <Form.Field<RtcState> name="rtcDate">
+            <AccordionItem uuid="rtcDate" title="Дата и время RTC">
+              <Form.Field name="rtcDate">
                 <DateForm />
               </Form.Field>
-            </AccordionItem>
-            <AccordionItem uuid="rtc.time" title="Время RTC">
-              <Form.Field<RtcState> name="rtcTime">
-                {/* <TimePicker /> */}
+              <Form.Field name="rtcTime">
                 <TimeForm />
               </Form.Field>
             </AccordionItem>
             <AccordionItem uuid="rtcRegisters" title="Регистры RTC">
               {/* TODO: Form.Field-ready ByteTable OR <Controller /> */}
               <ByteTable
-                data={registers}
-                setData={setRegisters}
-                onChangeData={(id, value) => {
-                  dispatch(
-                    setRtcRegister({
-                      index: id,
-                      value,
-                    }),
-                  );
-                }}
+                data={registersData}
+                onChangeRow={onChangeRegister}
+                // onChangeData={(id, value) => {
+                //   TODO: change form data
+                //   dispatch(
+                //     setRtcRegister({
+                //       index: id,
+                //       value,
+                //     }),
+                //   );
+                // }}
               />
             </AccordionItem>
           </>
@@ -165,6 +179,21 @@ const RtcSettings = () => {
           </>
         )}
       </Accordion>
+      {isDirty && (
+        <div
+          css={{
+            position: 'sticky',
+            bottom: 0,
+            background: colors.white,
+            paddingTop: scale(2),
+            paddingBottom: scale(2),
+          }}
+        >
+          <Button size="sm" type="submit">
+            Сохранить
+          </Button>
+        </div>
+      )}
     </Form>
   );
 };
@@ -222,7 +251,7 @@ const Rtc = () => {
           </Checkbox>
         </DetailedItemWrapper>
       )}
-      <Tabs css={{ marginTop: scale(2) }}>
+      <Tabs css={{ marginTop: scale(2), height: '100%' }}>
         <Tabs.List>
           <Tabs.Tab>Настройки</Tabs.Tab>
           <Tabs.Tab>Прерывания</Tabs.Tab>

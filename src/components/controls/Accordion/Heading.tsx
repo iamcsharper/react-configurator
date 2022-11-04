@@ -1,8 +1,8 @@
 import { useThemeCSSPart } from '@scripts/theme';
 import { HTMLProps, ReactNode, useMemo } from 'react';
 import { AccordionItemHeading as ReactAccordionItemHeading } from 'react-accessible-accordion';
-import { themes } from './themes';
-import { AccordionStateFull } from './types';
+import { accordionThemes } from './themes';
+import { AccordionThemeState } from './types';
 import useAccordion from './useAccordion';
 
 export interface AccordionHeadingProps extends HTMLProps<HTMLDivElement> {
@@ -21,11 +21,11 @@ export const AccordionHeading = ({
     isIconVertical,
     variant,
     size,
-    theme = themes.basic,
+    theme = accordionThemes.basic,
     bordered,
   } = useAccordion();
 
-  const state = useMemo<AccordionStateFull>(
+  const state = useMemo<AccordionThemeState>(
     () => ({
       isIconVertical,
       size: size!,

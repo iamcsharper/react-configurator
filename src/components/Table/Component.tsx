@@ -65,7 +65,7 @@ const Table = <D,>({
     }),
     onExpandedChange: setExpanded,
     getExpandedRowModel: getExpandedRowModel(),
-    debugTable: true,
+    // debugTable: true,
     ...options,
   });
 

@@ -5,8 +5,8 @@ import {
   AccordionItemState as ReactAccordionItemState,
 } from 'react-accessible-accordion';
 import { CSSTransition } from 'react-transition-group';
-import { themes } from './themes';
-import { AccordionStateFull } from './types';
+import { accordionThemes } from './themes';
+import { AccordionThemeState } from './types';
 
 import useAccordion from './useAccordion';
 
@@ -28,7 +28,7 @@ export const AccordionPanel = ({ children, ...props }: AccordionPanelProps) => {
     isIconVertical,
     variant,
     size,
-    theme = themes.basic,
+    theme = accordionThemes.basic,
     bordered,
   } = useAccordion();
 
@@ -67,7 +67,7 @@ export const AccordionPanel = ({ children, ...props }: AccordionPanelProps) => {
     }
   };
 
-  const state = useMemo<AccordionStateFull>(
+  const state = useMemo<AccordionThemeState>(
     () => ({
       panelNoPadding,
       isIconVertical,

@@ -6,6 +6,9 @@ import {
   RefCallback,
 } from 'react';
 
+import { Schema } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 export type MergeElementProps<T extends ElementType, P extends object = {}> =
   Omit<ComponentPropsWithRef<T>, keyof P> & P;
 
@@ -105,3 +108,7 @@ export const fastLog2 = (V: number) => {
   for (let n = 31; n > 0; c >>> n ? ((c = n), (n = 0)) : n--);
   return c;
 };
+
+export const withValidation = (schema: Schema) => ({
+  resolver: zodResolver(schema),
+});

@@ -10,9 +10,9 @@ import {
 import { useFieldCSS } from '@scripts/hooks/useFieldCSS';
 import { usePrevious } from '@scripts/hooks/usePrevious';
 import { ColumnDef, RowData } from '@tanstack/react-table';
-import { useMemo, useState, useEffect, Dispatch, SetStateAction } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
-interface ByteTableRow {
+export interface ByteTableRow {
   address: string;
   value: number;
 }
@@ -20,8 +20,7 @@ interface ByteTableRow {
 export interface ByteTableProps {
   addrCol?: ColumnDef<ByteTableRow>;
   data: ByteTableRow[];
-  setData?: Dispatch<SetStateAction<ByteTableRow[]>>;
-  onChangeData?: (id: number, value: number) => void;
+  onChangeRow?: (rowIndex: number, value: number) => void;
 }
 
 const defaultAddrCol: ColumnDef<ByteTableRow> = {
@@ -88,8 +87,7 @@ const formatValue = (value: string | number, format: ByteTableFormat) => {
 const ByteTable = ({
   addrCol = defaultAddrCol,
   data,
-  setData,
-  onChangeData,
+  onChangeRow,
 }: ByteTableProps) => {
   const columns = useMemo<ColumnDef<ByteTableRow>[]>(
     () => [
@@ -198,19 +196,8 @@ const ByteTable = ({
       }}
       options={{
         meta: {
-          updateData: (rowIndex, columnId, value) => {
-            onChangeData?.(rowIndex, value as number);
-            setData?.((old) =>
-              old.map((row, index) => {
-                if (index === rowIndex) {
-                  return {
-                    ...old[rowIndex]!,
-                    [columnId]: value,
-                  };
-                }
-                return row;
-              }),
-            );
+          updateData: (rowIndex, _, value) => {
+            onChangeRow?.(rowIndex, value as number);
           },
         },
       }}
