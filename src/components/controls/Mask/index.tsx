@@ -83,9 +83,11 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
       (event: FocusEvent<HTMLInputElement>) => {
         setFocused(false);
 
-        if (onBlur) {
-          onBlur(event);
-        }
+        setTimeout(() => {
+          if (onBlur) {
+            onBlur(event);
+          }
+        }, 0);
       },
       [onBlur],
     );

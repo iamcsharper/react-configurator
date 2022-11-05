@@ -34,7 +34,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       indeterminate,
       children,
       className,
-      checked: checkedFromProps,
+      checked,
       forceControlled,
       // showError,
       ...props
@@ -183,7 +183,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           id={id}
           type="checkbox"
           value={value}
-          {...(checkedFromProps && { checked: checkedFromProps })}
+          checked={checked}
           css={{ position: 'absolute', clip: 'rect(0, 0, 0, 0)' }}
         />
         <label

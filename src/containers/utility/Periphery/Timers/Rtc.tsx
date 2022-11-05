@@ -26,19 +26,19 @@ import { colors } from '@scripts/colors';
 import Button from '@components/controls/Button';
 import FormControl from '@components/controls/FormControl';
 
-const DetailedField = ({
-  label,
-  name,
-  description,
-}: {
-  label: string;
-  name: string;
-  description: string;
-}) => (
-  <DetailedItemWrapper id={name} title={label} description={description}>
-    <Form.Field name={name} label={label} />
-  </DetailedItemWrapper>
-);
+// const DetailedField = ({
+//   label,
+//   name,
+//   description,
+// }: {
+//   label: string;
+//   name: string;
+//   description: string;
+// }) => (
+//   <DetailedItemWrapper id={name} title={label} description={description}>
+//     <Form.Field name={name} label={label} />
+//   </DetailedItemWrapper>
+// );
 
 const AccordionItem = ({
   children,
@@ -78,13 +78,14 @@ const RtcSettings = () => {
   const { control } = form;
 
   const isDirty = useMemo(() => !deepEqual(values, rtc), [values, rtc]);
-  // console.log('isDirty=', isDirty, 'rtc:', rtc, 'values:', values);
+  console.log('isDirty=', isDirty, 'rtc:', rtc, 'values:', values);
 
   return (
     <Form
       methods={form}
       onSubmit={(vals) => {
-        console.error('SAVING VALS: ', vals);
+        form.setValue('rtcEnabled', rtcEnabled);
+        form.setValue('alarmEnabled', alarmEnabled);
 
         dispatch(
           setRtc({
@@ -134,6 +135,7 @@ const RtcSettings = () => {
                 control={control}
                 render={({ fieldState, field }) => (
                   <FormControl
+                    block
                     label="Таблица регистров"
                     error={JSON.stringify(fieldState.error)}
                   >
@@ -150,11 +152,11 @@ const RtcSettings = () => {
               todo
             </AccordionItem>
             <AccordionItem uuid="alarm.date" title="Дата будильника">
-              <DetailedField
+              {/* <DetailedField
                 description="Число от 0 до 21"
                 label="Век"
                 name="dateCentury"
-              />
+              /> */}
               Вообще здесь будет нормальный календарь.
             </AccordionItem>
             <AccordionItem uuid="alarm.clockTime" title="Время будильника">

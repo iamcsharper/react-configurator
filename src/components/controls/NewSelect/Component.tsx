@@ -43,8 +43,9 @@ Select.displayName = 'Select';
 
 export const FormSelect = forwardRef<
   HTMLDivElement,
-  SelectProps & {
+  Omit<SelectProps, 'onChange'> & {
     value?: any;
+    onChange?: (valueOrValues: string | string[]) => void;
   }
 >(({ name, multiple, options, onChange, onBlur, value, ...props }, ref) => {
   const selectedValues = useMemo(() => {
@@ -76,6 +77,7 @@ export const FormSelect = forwardRef<
         onChange?.(payload.selected?.value);
       }}
       onBlur={(e) => {
+        console.log('select on blur!', e);
         // field?.onBlur(e);
         onBlur?.(e);
       }}

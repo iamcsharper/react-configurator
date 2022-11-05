@@ -67,7 +67,10 @@ export const Field = ({
         outline: 'none!important',
       }}
       onFocus={handleFocus}
-      onBlur={handleBlur}
+      onBlur={() => {
+        console.log('handling blur on field div wrapper');
+        handleBlur();
+      }}
     >
       <FormControl
         block
@@ -94,10 +97,7 @@ export const Field = ({
         {...restProps}
         {...innerProps}
       >
-        <div
-          className="control"
-          css={getCSS('field')}
-        >
+        <div className="control" css={getCSS('field')}>
           {placeholder && !filled && (
             <span
               css={{

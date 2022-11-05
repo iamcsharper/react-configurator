@@ -122,11 +122,14 @@ const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
             options={optionsCenturies}
             label="Век"
             onChange={(century) => {
-              if (value)
-                onChange?.({
+              if (value) {
+                const newVal = {
                   ...value,
-                  century: century.selected?.value,
-                });
+                  century: century ? +century : null,
+                };
+                console.log('onChange newVal=', newVal);
+                onChange?.(newVal);
+              }
             }}
             selected={optionsCenturies.find((e) => e.value === value?.century)}
           />
@@ -144,7 +147,7 @@ const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
               if (value) {
                 onChange?.({
                   ...value,
-                  year: e.currentTarget.value ? +e.currentTarget.value : null,
+                  year: e ? +e : null,
                 });
               }
             }}
@@ -158,8 +161,7 @@ const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
             if (value)
               onChange?.({
                 ...value,
-                month:
-                  month === null || month === undefined ? null : +`${month}`,
+                month: month ? +month : null,
               });
           }}
           selected={optionsMonths.find((e) => e.value === value?.month)}

@@ -1,4 +1,4 @@
-import { Children, cloneElement, FC, forwardRef, isValidElement } from 'react';
+import { Children, cloneElement, forwardRef, isValidElement } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
 import Input from '../Input';
 import { FormFieldProps } from './types';
@@ -18,10 +18,10 @@ const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
   ) => {
     const { control, setValue } = useFormContext(); // retrieve all hook methods
 
-    const isCheckbox =
-      isValidElement(children) && (children?.type as FC)?.name === 'Checkbox';
-    const isRadio =
-      isValidElement(children) && (children?.type as FC)?.name === 'Radio';
+    // const isCheckbox =
+    //   isValidElement(children) && (children?.type as FC)?.name === 'Checkbox';
+    // const isRadio =
+    //   isValidElement(children) && (children?.type as FC)?.name === 'Radio';
 
     const { field, fieldState } = useController({
       name,
@@ -36,7 +36,6 @@ const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
       onBlur: field.onBlur,
       ref,
       label: props.label,
-      ...(!isCheckbox && !isRadio && { isLegend: true, label: '' }),
       ...props,
     };
 

@@ -9,7 +9,7 @@ import {
 } from '@scripts/helpers';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { useMemo, useState, forwardRef, useCallback } from 'react';
+import { useMemo, useState, forwardRef, useCallback, useEffect } from 'react';
 
 export interface ByteTableRow {
   address: string;
@@ -78,14 +78,16 @@ const formatValue = (value: string | number, format: ByteTableFormat) => {
 
 const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
   ({ addrCol = defaultAddrCol, value, onChange }, ref) => {
-    const data = useMemo(
-      () =>
-        value.map((e, i) => ({
-          address: `R${i}`,
-          value: +e,
-        })),
-      [value],
+    const [data, setData] = useState(() =>
+      value.map((e, i) => ({
+        address: `R${i}`,
+        value: +e,
+      })),
     );
+
+    useEffect(() => {
+      console.log('ByteTable Value changed!', value);
+    }, [value]);
 
     const onChangeRow = useCallback(
       (row: number, newValue: number) => {
@@ -132,11 +134,18 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
               Omit<OptionShape, 'value'> & { value: ByteTableFormat }
             >(formats[0]);
 
-            const mask = useMemo(() => {
-              if (format.value === ByteTableFormat.DEC) return '0000';
-              if (format.value === ByteTableFormat.HEX) return '{0x}0000';
+            const maskProps = useMemo(() => {
+              if (format.value === ByteTableFormat.DEC) return { mask: '0000' };
+              if (format.value === ByteTableFormat.HEX)
+                return {
+                  mask: '{\\0x}####',
+                  definitions: { '#': /[0-9a-f]/gi },
+                  prepare: (s: string) => s.toUpperCase(),
+                };
               if (format.value === ByteTableFormat.BIN)
-                return '0000000000000000';
+                return { mask: '{\\0b}00000000' };
+
+              return { mask: Number };
             }, [format]);
 
             const [cellValue, setCellValue] = useState(`${data[index].value}`);
@@ -144,17 +153,24 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
             return (
               <div css={{ display: 'flex', width: '100%' }}>
                 <Mask
-                  mask={mask}
+                  {...maskProps}
                   value={cellValue}
                   onBlur={() => {
-                    onChangeRow(index, parseValue(cellValue)!);
+                    setTimeout(() => {
+                      onChangeRow(index, parseValue(cellValue)!);
+                    }, 0);
                   }}
                   onAccept={(val) => {
-                    setCellValue(val);
+                    setTimeout(() => {
+                      setCellValue(val);
+                    }, 0);
                   }}
                   lazy={false}
                 />
                 <Select
+                  fieldProps={{
+                    tabIndex: -1,
+                  }}
                   css={{
                     minWidth: scale(20),
                   }}
@@ -162,11 +178,12 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
                   //   borderTopLeftRadius: '0!important',
                   //   borderBottomLeftRadius: '0!important',
                   // }}
-                  selected={format}
+                  value={format.value}
                   onChange={(e) => {
-                    setFormat(
-                      formats.find((f) => f.value === e.selected?.value)!,
-                    );
+                    const newFormat = formats.find((f) => f.value === e)!;
+                    setFormat(newFormat);
+
+                    setCellValue((old) => formatValue(old, newFormat.value));
                   }}
                   options={formats}
                 />
