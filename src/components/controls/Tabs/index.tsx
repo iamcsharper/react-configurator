@@ -38,7 +38,7 @@ export interface TabsProps
   tabListCSS?: CSSObject;
 
   panelFillsHeight?: boolean;
-  forceRender?: boolean;
+  forceRenderTabPanel?: boolean;
 }
 
 export const Tabs: FC<TabsProps> & TabsCompositionProps = ({

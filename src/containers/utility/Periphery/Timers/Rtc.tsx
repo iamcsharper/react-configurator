@@ -4,7 +4,7 @@ import Checkbox from '@components/controls/Checkbox';
 import DateForm from '@components/controls/DateForm';
 import Form from '@components/controls/Form';
 import Select from '@components/controls/NewSelect';
-import Tabs from '@components/controls/Tabs';
+// import Tabs from '@components/controls/Tabs';
 import TimeForm from '@components/controls/TimeForm';
 import { DetailedItemWrapper } from '@components/DetailedItemWrapper';
 import { scale, withValidation } from '@scripts/helpers';
@@ -78,7 +78,6 @@ const RtcSettings = () => {
   const { control } = form;
 
   const isDirty = useMemo(() => !deepEqual(values, rtc), [values, rtc]);
-  console.log('isDirty=', isDirty, 'rtc:', rtc, 'values:', values);
 
   return (
     <Form
@@ -114,7 +113,6 @@ const RtcSettings = () => {
           />
         </Form.Field>
       )}
-      rtcSource: {values.rtcSource}
       <Accordion
         bordered
         css={{ marginTop: scale(2), marginBottom: scale(12) }}
@@ -130,6 +128,7 @@ const RtcSettings = () => {
               </Form.Field>
             </AccordionItem>
             <AccordionItem uuid="rtcRegisters" title="Регистры RTC">
+              {JSON.stringify(values.rtcRegisters)}
               <Controller
                 name="rtcRegisters"
                 control={control}
@@ -237,7 +236,8 @@ const Rtc = () => {
           </Checkbox>
         </DetailedItemWrapper>
       )}
-      <Tabs css={{ marginTop: scale(2), height: '100%' }}>
+      <RtcSettings />
+      {/* <Tabs css={{ marginTop: scale(2), height: '100%' }} forceRenderTabPanel>
         <Tabs.List>
           <Tabs.Tab>Настройки</Tabs.Tab>
           <Tabs.Tab>Прерывания</Tabs.Tab>
@@ -246,7 +246,7 @@ const Rtc = () => {
           <RtcSettings />
         </Tabs.Panel>
         <Tabs.Panel>Interrupts</Tabs.Panel>
-      </Tabs>
+      </Tabs> */}
     </div>
   );
 };

@@ -1,8 +1,5 @@
 import Mask from '@components/controls/Mask';
-import FormSelect, {
-  Select,
-  OptionShape,
-} from '@components/controls/NewSelect';
+import FormSelect, { Select } from '@components/controls/NewSelect';
 import Table from '@components/Table';
 import {
   fastLog2,
@@ -11,12 +8,38 @@ import {
   scale,
 } from '@scripts/helpers';
 
-import { ColumnDef } from '@tanstack/react-table';
-import { useMemo, useState, forwardRef, useCallback, useEffect } from 'react';
+import { CellContext, ColumnDef, RowData } from '@tanstack/react-table';
+import {
+  useMemo,
+  useState,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  MutableRefObject,
+} from 'react';
+import { mergeRefs } from 'react-merge-refs';
 
 export interface ByteTableRow {
   address: string;
   value: number;
+}
+
+export enum ByteTableFormat {
+  BIN = 'BIN',
+  INT = 'INT',
+  UINT = 'UINT',
+  HEX = 'HEX',
+}
+
+type ChangeRowHandler = (row: number, value: number) => void;
+
+declare module '@tanstack/table-core' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface TableMeta<TData extends RowData> {
+    onChangeRowRef: MutableRefObject<ChangeRowHandler>;
+    sharedFormat?: ByteTableFormat;
+  }
 }
 
 export interface ByteTableProps {
@@ -30,14 +53,6 @@ const defaultAddrCol: ColumnDef<ByteTableRow> = {
   header: 'Адрес',
   cell: ({ getValue }) => `${getValue()}`,
 };
-
-export enum ByteTableFormat {
-  BIN = 'bin',
-  INT = 'int',
-  UINT = 'uint',
-  HEX = 'hex',
-}
-
 const parseValue = (value?: string | number) => {
   if (typeof value === 'number') return value;
   if (typeof value !== 'string') return null;
@@ -62,8 +77,6 @@ const formatValue = (value: string | number, format: ByteTableFormat) => {
     return '';
   }
 
-  console.log('formating value:', value, 'parsed=', parsedValue);
-
   if (format === ByteTableFormat.BIN) {
     const nextPower = fastLog2(getNextPowerOfTwo(parsedValue));
     const padLength = Math.min(nextPower, 32);
@@ -82,14 +95,53 @@ const formatValue = (value: string | number, format: ByteTableFormat) => {
   return parsedValue.toString(10);
 };
 
+const useAllFormatsValue = (
+  initialValue: number,
+  initialFormat: ByteTableFormat = ByteTableFormat.INT,
+) => {
+  const [decValue, setDecValue] = useState(initialValue || 0);
+
+  useEffect(() => {
+    setDecValue(initialValue);
+  }, [initialValue]);
+
+  const formats = useMemo(() => {
+    if (!decValue) return {};
+
+    return Object.keys(ByteTableFormat).reduce((prev, cur) => {
+      prev[cur] = formatValue(decValue, cur as never as ByteTableFormat);
+      return prev;
+    }, {} as Record<string, any>);
+  }, [decValue]) as Record<ByteTableFormat, string | undefined>;
+
+  const [format, setFormat] = useState(initialFormat);
+
+  useEffect(() => {
+    setFormat(initialFormat);
+  }, [initialFormat]);
+
+  const formattedValue = formats[format];
+
+  const setValueParsed = useCallback((val?: string | number) => {
+    const result = parseValue(val) || 0;
+    setDecValue(result);
+
+    return result;
+  }, []);
+
+  return {
+    decValue,
+    format,
+    formattedValue,
+    setValue: setValueParsed,
+    setFormat,
+  };
+};
+
 const formats = [
   {
     key: 'Целое',
     value: ByteTableFormat.INT,
-  },
-  {
-    key: 'Целое беззнаковое',
-    value: ByteTableFormat.UINT,
   },
   {
     key: '2-чный',
@@ -100,10 +152,104 @@ const formats = [
     key: '16-ричный',
     value: ByteTableFormat.HEX,
   },
+  {
+    key: 'Целое беззнаковое',
+    value: ByteTableFormat.UINT,
+    disabled: true,
+  },
 ];
 
+const Header = () => (
+  <div css={{ display: 'flex', gap: scale(1), alignItems: 'center' }}>
+    <span>Значение</span>
+  </div>
+);
+
+const Cell = ({
+  getValue,
+  table: {
+    options: { meta },
+  },
+  row: { index },
+}: CellContext<ByteTableRow, unknown>) => {
+  const { onChangeRowRef, sharedFormat } = meta || {};
+  const { format, formattedValue, setValue, setFormat } = useAllFormatsValue(
+    getValue() as number,
+    sharedFormat,
+  );
+
+  if (format === ByteTableFormat.HEX) {
+    console.log('format:', format, 'formattedValue:', formattedValue);
+  }
+
+  const maskProps = useMemo(() => {
+    if (format === ByteTableFormat.INT)
+      return {
+        mask: '000000000000',
+      };
+    if (format === ByteTableFormat.HEX)
+      return {
+        mask: '{\\0x }#### ####',
+        definitions: { '#': /[0-9a-f]/gi },
+        prepare: (s: string) => s.toUpperCase(),
+      };
+    if (format === ByteTableFormat.BIN)
+      return {
+        mask: '{\\0\\b }#### #### #### ####',
+        definitions: { '#': /[0-1]/gi },
+      };
+
+    return { mask: Number };
+  }, [format]);
+
+  const [val, setVal] = useState(formattedValue);
+  useEffect(() => {
+    setVal(formattedValue);
+  }, [formattedValue]);
+
+  return (
+    <div css={{ display: 'flex', width: '100%' }}>
+      <Mask
+        name={`value-${index}`}
+        id={`value-${index}`}
+        {...maskProps}
+        value={val}
+        autoComplete="off"
+        onBlur={(e) => {
+          e.preventDefault();
+          const dec = setValue(val);
+          onChangeRowRef?.current?.(index, dec);
+        }}
+        size="md"
+        onAccept={(newVal) => {
+          setVal(newVal);
+        }}
+      />
+      <FormSelect
+        name={`format-${index}`}
+        id={`format-${index}`}
+        css={{
+          minWidth: scale(20),
+        }}
+        // fieldCSS={{
+        //   borderTopLeftRadius: '0!important',
+        //   borderBottomLeftRadius: '0!important',
+        // }}
+        value={format}
+        onChange={(e) => {
+          const newFormat = formats.find((f) => f.value === e)!;
+          setFormat(newFormat.value);
+        }}
+        options={formats}
+      />
+    </div>
+  );
+};
+
 const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
-  ({ addrCol = defaultAddrCol, value, onChange }, ref) => {
+  ({ addrCol = defaultAddrCol, value, onChange }, outerRef) => {
+    const innerRef = useRef(null);
+    const ref = mergeRefs([outerRef, innerRef]);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [data, _setData] = useState(
       () =>
@@ -132,103 +278,47 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
       [value, onChange],
     );
 
+    const onChangeRowRef = useRef<ChangeRowHandler>(onChangeRow);
+    onChangeRowRef.current = onChangeRow;
+
+    const [sharedFormat, setSharedFormat] =
+      useState<ByteTableFormat | undefined>(undefined);
+
     const columns = useMemo<ColumnDef<ByteTableRow>[]>(
       () => [
         addrCol,
         {
           accessorKey: 'value',
-          // eslint-disable-next-line react/no-unstable-nested-components
-          header: () => (
-            <div css={{ display: 'flex', gap: scale(1), alignItems: 'center' }}>
-              <span>Значение</span>
-              <Select
-                options={formats}
-                css={{ minWidth: scale(20) }}
-                placeholder="Формат"
-                size="sm"
-              />
-            </div>
-          ),
-          // eslint-disable-next-line react/no-unstable-nested-components
-          cell: function Cell({ row: { index } }) {
-            const [format, setFormat] = useState<
-              Omit<OptionShape, 'value'> & { value: ByteTableFormat }
-            >(formats[0]);
-
-            const maskProps = useMemo(() => {
-              if (format.value === ByteTableFormat.INT)
-                return {
-                  mask: '000000000000',
-                };
-              if (format.value === ByteTableFormat.HEX)
-                return {
-                  mask: '#### ####',
-                  definitions: { '#': /[0-9a-f]/gi },
-                  prepare: (s: string) => s.toUpperCase(),
-                };
-              if (format.value === ByteTableFormat.BIN)
-                return { mask: '0000 0000 0000 0000' };
-
-              return { mask: Number };
-            }, [format]);
-
-            const [cellValue, setCellValue] = useState(`${data[index].value}`);
-
-            return (
-              <div css={{ display: 'flex', width: '100%' }}>
-                <Mask
-                  name={`value-${index}`}
-                  id={`value-${index}`}
-                  {...maskProps}
-                  value={cellValue}
-                  autoComplete="off"
-                  onBlur={(e) => {
-                    e.preventDefault();
-                    setTimeout(() => {
-                      onChangeRow(index, parseValue(cellValue)!);
-                    }, 0);
-                  }}
-                  size="md"
-                  onAccept={(val) => {
-                    setCellValue(val);
-                  }}
-                />
-                <FormSelect
-                  name={`format-${index}`}
-                  id={`format-${index}`}
-                  css={{
-                    minWidth: scale(20),
-                  }}
-                  // fieldCSS={{
-                  //   borderTopLeftRadius: '0!important',
-                  //   borderBottomLeftRadius: '0!important',
-                  // }}
-                  value={format.value}
-                  onChange={(e) => {
-                    const newFormat = formats.find((f) => f.value === e)!;
-                    setFormat(newFormat);
-
-                    setTimeout(() => {
-                      setCellValue(formatValue(cellValue, newFormat.value));
-                    }, 10);
-                  }}
-                  options={formats}
-                />
-              </div>
-            );
-          },
+          header: Header,
+          cell: Cell,
         },
       ],
-      [addrCol, data, onChangeRow],
+      [addrCol],
     );
 
     return (
       <div ref={ref}>
+        <Select
+          block
+          options={formats}
+          css={{ minWidth: scale(20) }}
+          placeholder="Формат"
+          size="sm"
+          onChange={(payload) => {
+            setSharedFormat(payload.selected?.value);
+          }}
+        />
         <Table
           columns={columns}
           data={data}
           css={{
             overflow: 'unset',
+          }}
+          options={{
+            meta: {
+              onChangeRowRef,
+              sharedFormat,
+            },
           }}
         />
       </div>

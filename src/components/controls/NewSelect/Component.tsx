@@ -24,7 +24,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
   ) => {
     const props = useMemo(
       () => ({
-        ref,
         Option,
         Field,
         Optgroup,
@@ -32,10 +31,10 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
         Arrow,
         ...restProps,
       }),
-      [Arrow, Field, Optgroup, Option, OptionsList, ref, restProps],
+      [Arrow, Field, Optgroup, Option, OptionsList, restProps],
     );
 
-    return <BaseSelect {...props} />;
+    return <BaseSelect ref={ref} {...props} />;
   },
 );
 

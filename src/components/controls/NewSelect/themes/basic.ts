@@ -29,7 +29,7 @@ export const basicTheme: SelectTheme = {
       },
     };
     return {
-      cursor: isDisabled ? 'default' : 'pointer',
+      cursor: isDisabled ? 'not-allowed' : 'pointer',
       ...extractCSSOption(sized, size),
       ...(isHover && {
         background: colors.invertedHover,
@@ -41,6 +41,9 @@ export const basicTheme: SelectTheme = {
         ...(isHover && {
           color: colors.blue,
         }),
+      }),
+      ...(isDisabled && {
+        background: colors.grey400,
       }),
       border: 'none',
     };
