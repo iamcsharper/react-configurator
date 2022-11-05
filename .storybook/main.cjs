@@ -25,8 +25,8 @@ module.exports = {
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
-    // "storybook-addon-paddings",
-    'storybook-react-i18next',
+    // TODO: causes error on any state change.
+    // 'storybook-react-i18next',
     'storybook-addon-react-router-v6',
   ],
   framework: '@storybook/react',

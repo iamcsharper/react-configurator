@@ -8,6 +8,7 @@ import {
 
 import { Schema } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { FieldError } from 'react-hook-form';
 
 export type MergeElementProps<T extends ElementType, P extends object = {}> =
   Omit<ComponentPropsWithRef<T>, keyof P> & P;
@@ -78,6 +79,14 @@ export type FixedLengthArray<T, L extends number, TObj = [T, ...Array<T>]> =
     [I: number]: T;
     [Symbol.iterator]: () => IterableIterator<T>;
   };
+
+export const formatRHFError = (error?: FieldError) => {
+  if (Array.isArray(error)) {
+    return error.map((e) => e.message).filter(Boolean).join(', ');
+  }
+
+  return error?.message;
+};
 
 export const getNextPowerOfTwo = (value: number): number => {
   let result = value;

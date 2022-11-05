@@ -27,7 +27,7 @@ const Button = <T extends ElementType = 'button'>(
     as,
     external = false,
     disabled = false,
-    rounded = false,
+    rounded = true,
     css,
     ...props
   }: ButtonProps<T>,

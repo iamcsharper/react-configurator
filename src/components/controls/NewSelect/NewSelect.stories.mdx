@@ -1,7 +1,6 @@
-import { ArgsTable, Meta, Props, Story } from '@storybook/addon-docs/blocks';
+import { ArgsTable, Meta, Props, Story } from '@storybook/addon-docs';
 import { useState } from 'react';
-import * as Yup from 'yup';
-import Form from '@controls/Form';
+import Form from '@components/controls/Form';
 import { scale } from '@scripts/helpers';
 import Button from '@components/controls/Button';
 import FormikSelect, { Select as NewSelect } from '.';
@@ -172,10 +171,6 @@ import useSelectClear from './presets/useSelectClear';
   {(args) => (
     <Form
       initialValues={{ selectValue: '', otherField: '' }}
-      validationSchema={Yup.object().shape({
-        selectValue: Yup.string().required('Обязательное поле'),
-        otherField: Yup.string().required('Обязательное поле'),
-      })}
     >
       {({ values }) => (
         <>

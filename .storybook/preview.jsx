@@ -54,7 +54,7 @@ export const parameters = {
 };
 
 export const decorators = [
-  // withRouter(),
+  withRouter,
   (Story) => {
     return (
       <>

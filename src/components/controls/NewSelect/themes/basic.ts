@@ -18,11 +18,15 @@ export const basicTheme: SelectTheme = {
     padding: `${scale(3, true)}px ${scale(2)}px`,
     ...typography('paragraphMedium'),
     ...(isHover && {
-      background: colors.active,
+      background: colors.invertedHover,
+      color: colors.backgroundDark,
     }),
     ...(isSelected && {
       background: colors.black,
-      color: colors.white,
+      color: colors.grey100,
+      ...(isHover && {
+        color: colors.blue,
+      }),
     }),
     border: 'none',
   }),

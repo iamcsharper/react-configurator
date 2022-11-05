@@ -7,10 +7,10 @@ import Select from '@components/controls/NewSelect';
 import Tabs from '@components/controls/Tabs';
 import TimeForm from '@components/controls/TimeForm';
 import { DetailedItemWrapper } from '@components/DetailedItemWrapper';
-import { scale, withValidation } from '@scripts/helpers';
+import { formatRHFError, scale, withValidation } from '@scripts/helpers';
 import typography from '@scripts/typography';
-import { ReactNode, useCallback, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { ReactNode, useMemo } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import deepEqual from 'fast-deep-equal';
 
 import {
@@ -24,6 +24,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@store/index';
 import { colors } from '@scripts/colors';
 import Button from '@components/controls/Button';
+import FormControl from '@components/controls/FormControl';
 
 const DetailedField = ({
   label,
@@ -45,7 +46,7 @@ const AccordionItem = ({
   uuid,
 }: {
   children: ReactNode[] | ReactNode;
-  title: string;
+  title: ReactNode;
   uuid: string;
 }) => (
   <Accordion.Item uuid={uuid}>
@@ -59,54 +60,39 @@ const AccordionItem = ({
 const RtcSettings = () => {
   const dispatch = useDispatch();
   const rtc = useSelector<RootState, RtcState>((state) => state.timers.rtc);
-  const rehydrated = useSelector<RootState, boolean>(
-    // eslint-disable-next-line no-underscore-dangle
-    (state) => state._persist.rehydrated,
-  );
-  const { rtcEnabled, alarmEnabled } = rtc;
 
-  console.log('rehydrated', rehydrated);
+  // TODO: preloader when will be on backend API
+  // const rehydrated = useSelector<RootState, boolean>(
+  //   // eslint-disable-next-line no-underscore-dangle
+  //   (state) => state._persist.rehydrated,
+  // );
+
+  const { rtcEnabled, alarmEnabled } = rtc;
 
   const form = useForm<RtcState>({
     defaultValues: rtc,
     ...withValidation(rtcStateSchema),
   });
 
-  const registersData = useMemo(
-    () =>
-      form.getValues().rtcRegisters.map((e, i) => ({
-        address: `R${i}`,
-        value: e,
-      })),
-    [form],
-  );
-
   const values = form.watch();
-  const { setValue } = form;
-
-  const onChangeRegister = useCallback(
-    (rowIdx: number, value: number) => {
-      const { rtcRegisters } = values;
-      setValue(
-        'rtcRegisters',
-        rtcRegisters.map((e) => {
-          if (e !== rowIdx) return e;
-          return value;
-        }),
-      );
-    },
-    [setValue, values],
-  );
+  const { control } = form;
 
   const isDirty = useMemo(() => !deepEqual(values, rtc), [values, rtc]);
+  // console.log('isDirty=', isDirty, 'rtc:', rtc, 'values:', values);
 
   return (
     <Form
       methods={form}
       onSubmit={(vals) => {
-        console.log(vals);
+        console.error('SAVING VALS: ', vals);
 
-        dispatch(setRtc(vals));
+        dispatch(
+          setRtc({
+            ...vals,
+            rtcEnabled,
+            alarmEnabled,
+          }),
+        );
       }}
       css={{ marginTop: scale(2) }}
     >
@@ -143,19 +129,17 @@ const RtcSettings = () => {
               </Form.Field>
             </AccordionItem>
             <AccordionItem uuid="rtcRegisters" title="Регистры RTC">
-              {/* TODO: Form.Field-ready ByteTable OR <Controller /> */}
-              <ByteTable
-                data={registersData}
-                onChangeRow={onChangeRegister}
-                // onChangeData={(id, value) => {
-                //   TODO: change form data
-                //   dispatch(
-                //     setRtcRegister({
-                //       index: id,
-                //       value,
-                //     }),
-                //   );
-                // }}
+              <Controller
+                name="rtcRegisters"
+                control={control}
+                render={({ fieldState, field }) => (
+                  <FormControl
+                    label="Таблица регистров"
+                    error={JSON.stringify(fieldState.error)}
+                  >
+                    <ByteTable {...field} />
+                  </FormControl>
+                )}
               />
             </AccordionItem>
           </>

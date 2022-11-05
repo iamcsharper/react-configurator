@@ -42,6 +42,7 @@
     "react-accessible-accordion": "^5.0.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.35.0",
+    "react-imask": "^6.4.3",
     "react-lazy-load-image-component": "^1.5.5",
     "react-merge-refs": "^2.0.1",
     "react-popper": "^2.3.0",

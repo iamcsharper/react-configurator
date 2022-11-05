@@ -52,7 +52,10 @@ export const rtcStateSchema: toZod<Omit<RtcState, 'rtcSource'>> = z.object({
   rtcSource: z.nativeEnum(RtcSourceType),
   rtcDate: rtcDateSchema,
   rtcTime: rtcTimeSchema,
-  rtcRegisters: z.number().array().length(16),
+  rtcRegisters: z
+    .number({ invalid_type_error: 'Необходимо число, а не строка' })
+    .array()
+    .length(16),
 });
 
 const initialState: RtcState = {
