@@ -14,8 +14,6 @@ export const Option: FC<OptionProps> = ({
   highlighted = false,
   disabled = false,
   multiple,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  isMobile,
   Checkmark = DefaultCheckMark,
   innerProps,
 }) => {

@@ -3,8 +3,7 @@ import { scale } from '@scripts/helpers';
 import { useFieldCSS } from '@scripts/hooks/useFieldCSS';
 import { forwardRef, useEffect, useMemo, useState } from 'react';
 import Legend from '../Legend';
-import Select from '../Select';
-import { SelectItemProps } from '../Select/types';
+import Select, { OptionShape } from '../NewSelect';
 
 export interface DateFormValues {
   century: number | null;
@@ -48,8 +47,8 @@ const formatMonth = (val?: DateFormValues['month']) =>
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
-  const optionsCenturies = useMemo<SelectItemProps<number | null>[]>(
-    () => [20, 21, 22].map((e) => ({ label: `${e}`, value: e })),
+  const optionsCenturies = useMemo<OptionShape[]>(
+    () => [20, 21, 22].map((e) => ({ key: `${e}`, value: e })),
     [],
   );
 
@@ -58,10 +57,10 @@ const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
   const minYear = ((value?.century || optionsCenturies[1].value!) - 1) * 100;
   const maxYear = (value?.century || optionsCenturies[1].value!) * 100;
 
-  const optionsMonths = useMemo<SelectItemProps<number | null>[]>(
+  const optionsMonths = useMemo<OptionShape[]>(
     () =>
       months.map((month, index) => ({
-        label: month,
+        key: month,
         value: index,
       })),
     [],
@@ -120,24 +119,16 @@ const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
       >
         <div>
           <Select
-            items={optionsCenturies}
+            options={optionsCenturies}
             label="Век"
             onChange={(century) => {
               if (value)
                 onChange?.({
                   ...value,
-                  century:
-                    century === null || century === undefined
-                      ? null
-                      : +`${century}`,
+                  century: century.selected?.value,
                 });
             }}
-            selectedItem={optionsCenturies.find(
-              (e) => e.value === value?.century,
-            )}
-            isSearch
-            applyOnExactLabel
-            emptyValue={null}
+            selected={optionsCenturies.find((e) => e.value === value?.century)}
           />
         </div>
         <Legend label="Год">
@@ -160,7 +151,7 @@ const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
           />
         </Legend>
         <Select
-          items={optionsMonths}
+          options={optionsMonths}
           label="Месяц"
           onChange={(month) => {
             console.log('onChange month:', month);
@@ -171,10 +162,7 @@ const DateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
                   month === null || month === undefined ? null : +`${month}`,
               });
           }}
-          selectedItem={optionsMonths.find((e) => e.value === value?.month)}
-          isSearch
-          applyOnExactLabel
-          emptyValue={null}
+          selected={optionsMonths.find((e) => e.value === value?.month)}
         />
         <Legend label="День">
           {/* TODO: yup validation? */}

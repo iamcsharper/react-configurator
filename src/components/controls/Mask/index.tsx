@@ -111,8 +111,10 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
           value={value}
           placeholder={placeholder}
           {...props}
-          id={htmlFor}
-          className="control"
+          {...({
+            id: htmlFor,
+            className: 'control',
+          } as any)}
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}
           css={{ ...defaultCSS, ...inputCSS }}

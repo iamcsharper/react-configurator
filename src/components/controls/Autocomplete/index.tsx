@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import mergeRefs from 'react-merge-refs';
+import { mergeRefs } from 'react-merge-refs';
 
 import {
     BaseSelect,
@@ -14,11 +14,11 @@ import {
 import { Arrow as DefaultArrow } from '@controls/NewSelect/components/arrow';
 import { ClearableItems } from '@controls/NewSelect/presets/useClearableItems';
 
-import { scale } from '@scripts/gds';
 
+import { scale } from '@scripts/helpers';
 import AutocompleteField from './AutocompleteField';
 import Clear from './Clear';
-import { AutocompleteMobile } from './Mobile';
+
 import { AutocompleteProps } from './types';
 
 export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
@@ -83,8 +83,6 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
                 value,
             ]
         );
-
-        if (isMobile) return <AutocompleteMobile {...props} />;
 
         return <BaseSelect {...props} />;
     }
@@ -195,17 +193,17 @@ export const useAutocomplete = ({
 };
 
 const FormikAutocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
-    ({ multiple = false, field, meta, helpers, onChange, onInput, onBlur, options, fieldProps, ...props }, ref) => {
-        const initialSelectedValues = useMemo(() => {
-            if (multiple) return (Array.isArray(field?.value) ? field?.value : []) || [];
+    ({ multiple = false, onChange, onInput, onBlur, options, fieldProps, ...props }, ref) => {
+        // const initialSelectedValues = useMemo(() => {
+        //     if (multiple) return (Array.isArray(field?.value) ? field?.value : []) || [];
 
-            return field?.value === null ? [] : [field?.value];
-        }, [field?.value, multiple]);
+        //     return field?.value === null ? [] : [field?.value];
+        // }, [field?.value, multiple]);
 
         const { value, setValue, handleInput, handleChange, selectedOptions, filteredOptions } = useAutocomplete({
             multiple,
             options,
-            initialSelectedValues,
+            initialSelectedValues: [],
         });
         const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -225,9 +223,9 @@ const FormikAutocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
 
                     setTimeout(() => {
                         if (!multiple) {
-                            helpers?.setValue(payload.selected?.value);
+                            // helpers?.setValue(payload.selected?.value);
                         } else {
-                            helpers?.setValue(payload.selectedMultiple.map(e => e.value));
+                            // helpers?.setValue(payload.selectedMultiple.map(e => e.value));
                         }
                     }, 1);
 
@@ -236,14 +234,14 @@ const FormikAutocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
                 allowUnselect={multiple}
                 multiple={multiple}
                 onBlur={e => {
-                    field?.onBlur(e);
+                    // field?.onBlur(e);
                     onBlur?.(e);
                 }}
                 inputProps={{
                     ref: mergeRefs([inputRef /* props.inputProps!.ref */]),
                 }}
                 fieldProps={{
-                    meta,
+                    // meta,
                     rightAddons: (
                         <Clear
                             visible={!!value.length}
@@ -258,11 +256,12 @@ const FormikAutocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
                         <ClearableItems
                             selectedMultiple={selectedOptions}
                             setSelectedItems={newSelected => {
+                                console.log(newSelected);
                                 if (!multiple) {
-                                    const newValue = newSelected.length ? newSelected[0].value : '';
-                                    helpers?.setValue(newValue);
+                                    // const newValue = newSelected.length ? newSelected[0].value : '';
+                                    // helpers?.setValue(newValue);
                                 } else {
-                                    helpers?.setValue(newSelected.map(e => e.value));
+                                    // helpers?.setValue(newSelected.map(e => e.value));
                                 }
 
                                 setValue('');

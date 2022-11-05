@@ -7,7 +7,7 @@ import Select from '@components/controls/NewSelect';
 import Tabs from '@components/controls/Tabs';
 import TimeForm from '@components/controls/TimeForm';
 import { DetailedItemWrapper } from '@components/DetailedItemWrapper';
-import { formatRHFError, scale, withValidation } from '@scripts/helpers';
+import { scale, withValidation } from '@scripts/helpers';
 import typography from '@scripts/typography';
 import { ReactNode, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';

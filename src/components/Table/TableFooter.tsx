@@ -1,16 +1,16 @@
 import { FC } from 'react';
 import Pagination from '@components/controls/Pagination';
-import Select from '@components/controls/Select';
+import Select from '@components/controls/NewSelect';
 import { colors } from '@scripts/colors';
 import { scale } from '@scripts/helpers';
 
 const ITEMS_PER_PAGE = [
-  { label: '10', value: 10 },
-  { label: '20', value: 20 },
-  { label: '30', value: 30 },
-  { label: '40', value: 40 },
-  { label: '50', value: 50 },
-  { label: '100', value: 100 },
+  { key: '10', value: 10 },
+  { key: '20', value: 20 },
+  { key: '30', value: 30 },
+  { key: '40', value: 40 },
+  { key: '50', value: 50 },
+  { key: '100', value: 100 },
 ];
 
 type TableFooterProps = {
@@ -51,10 +51,10 @@ export const TableFooter: FC<TableFooterProps> = ({
       <Select
         id="items-per-page"
         name="items-per-page"
-        selectedItem={ITEMS_PER_PAGE.find((i) => i.value === itemsPerPageCount)}
+        selected={ITEMS_PER_PAGE.find((i) => i.value === itemsPerPageCount)}
         onChange={(selected) => setItemsPerPageCount(Number(selected || 0))}
         // placement="top"
-        items={ITEMS_PER_PAGE}
+        options={ITEMS_PER_PAGE}
         css={{ width: scale(16) }}
       />
     </div>

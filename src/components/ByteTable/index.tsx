@@ -1,6 +1,5 @@
 import Mask from '@components/controls/Mask';
-import Select from '@components/controls/Select';
-import { SelectItemProps } from '@components/controls/Select/types';
+import Select, { OptionShape } from '@components/controls/NewSelect';
 import Table from '@components/Table';
 import {
   fastLog2,
@@ -113,16 +112,16 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
             const formats = useMemo(
               () => [
                 {
-                  label: '10-чный',
+                  key: '10-чный',
                   value: ByteTableFormat.DEC,
                 },
                 {
-                  label: '2-чный',
+                  key: '2-чный',
                   value: ByteTableFormat.BIN,
                 },
 
                 {
-                  label: '16-ричный',
+                  key: '16-ричный',
                   value: ByteTableFormat.HEX,
                 },
               ],
@@ -130,7 +129,7 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
             );
 
             const [format, setFormat] = useState<
-              SelectItemProps<ByteTableFormat>
+              Omit<OptionShape, 'value'> & { value: ByteTableFormat }
             >(formats[0]);
 
             const mask = useMemo(() => {
@@ -159,23 +158,24 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
                   css={{
                     minWidth: scale(20),
                   }}
-                  isClearable={false}
-                  fieldCSS={{
-                    borderTopLeftRadius: '0!important',
-                    borderBottomLeftRadius: '0!important',
-                  }}
-                  selectedItem={format}
+                  // fieldCSS={{
+                  //   borderTopLeftRadius: '0!important',
+                  //   borderBottomLeftRadius: '0!important',
+                  // }}
+                  selected={format}
                   onChange={(e) => {
-                    setFormat(formats.find((f) => f.value === e)!);
+                    setFormat(
+                      formats.find((f) => f.value === e.selected?.value)!,
+                    );
                   }}
-                  items={formats}
+                  options={formats}
                 />
               </div>
             );
           },
         },
       ],
-      [addrCol],
+      [addrCol, data, onChangeRow],
     );
 
     return (

@@ -1,8 +1,7 @@
 import { colors } from '@scripts/colors';
 import { scale } from '@scripts/helpers';
 import { forwardRef, useMemo } from 'react';
-import Select from '../Select';
-import { SelectItemProps } from '../Select/types';
+import Select, { OptionShape } from '../NewSelect';
 
 export interface TimeFormValues {
   hours: string | null;
@@ -20,28 +19,28 @@ const getTerm = (val?: string | string | null) =>
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TimeForm = ({ value, onChange }: TimeFormProps, _ref: any) => {
-  const optionsHours = useMemo<SelectItemProps<string | null>[]>(
+  const optionsHours = useMemo<OptionShape[]>(
     () =>
       [...Array(24)].map((_, i) => ({
         value: `${i}`.padStart(2, '0'),
-        label: `${i}`.padStart(2, '0'),
+        key: `${i}`.padStart(2, '0'),
       })),
     [],
   );
-  const optionsMinutes = useMemo<SelectItemProps<string | null>[]>(
+  const optionsMinutes = useMemo<OptionShape[]>(
     () =>
       [...Array(60)].map((_, i) => ({
         value: `${i}`.padStart(2, '0'),
-        label: `${i}`.padStart(2, '0'),
+        key: `${i}`.padStart(2, '0'),
       })),
     [],
   );
 
-  const optionsSeconds = useMemo<SelectItemProps<string | null>[]>(
+  const optionsSeconds = useMemo<OptionShape[]>(
     () =>
       [...Array(60)].map((_, i) => ({
         value: `${i}`.padStart(2, '0'),
-        label: `${i}`.padStart(2, '0'),
+        key: `${i}`.padStart(2, '0'),
       })),
     [],
   );
@@ -71,39 +70,30 @@ const TimeForm = ({ value, onChange }: TimeFormProps, _ref: any) => {
         }}
       >
         <Select
-          items={optionsHours}
+          options={optionsHours}
           label="Часы"
           onChange={(hour) => {
             if (value) onChange?.({ ...value, hours: hour ? `${hour}` : null });
           }}
-          selectedItem={optionsHours.find((e) => e.value === value?.hours)}
-          isSearch
-          applyOnExactLabel
-          emptyValue={null}
+          selected={optionsHours.find((e) => e.value === value?.hours)}
         />
         <Select
-          items={optionsMinutes}
+          options={optionsMinutes}
           label="Минуты"
           onChange={(minute) => {
             if (value)
               onChange?.({ ...value, minutes: minute ? `${minute}` : null });
           }}
-          selectedItem={optionsMinutes.find((e) => e.value === value?.minutes)}
-          isSearch
-          applyOnExactLabel
-          emptyValue={null}
+          selected={optionsMinutes.find((e) => e.value === value?.minutes)}
         />
         <Select
-          items={optionsSeconds}
+          options={optionsSeconds}
           label="Секунды"
           onChange={(second) => {
             if (value)
               onChange?.({ ...value, seconds: second ? `${second}` : null });
           }}
-          selectedItem={optionsSeconds.find((e) => e.value === value?.seconds)}
-          isSearch
-          applyOnExactLabel
-          emptyValue={null}
+          selected={optionsSeconds.find((e) => e.value === value?.seconds)}
         />
       </div>
     </div>

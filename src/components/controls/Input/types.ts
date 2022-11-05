@@ -1,4 +1,4 @@
-import { CSSObject } from '@emotion/core';
+import { CSSObject } from '@emotion/react';
 import { ChangeEvent, InputHTMLAttributes, MouseEvent, ReactNode, Ref } from 'react';
 
 import { FormControlProps } from '../FormControl';
