@@ -77,7 +77,6 @@ export const FormSelect = forwardRef<
         onChange?.(payload.selected?.value);
       }}
       onBlur={(e) => {
-        console.log('select on blur!', e);
         // field?.onBlur(e);
         onBlur?.(e);
       }}

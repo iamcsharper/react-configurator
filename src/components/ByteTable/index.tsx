@@ -1,5 +1,8 @@
 import Mask from '@components/controls/Mask';
-import Select, { OptionShape } from '@components/controls/NewSelect';
+import FormSelect, {
+  Select,
+  OptionShape,
+} from '@components/controls/NewSelect';
 import Table from '@components/Table';
 import {
   fastLog2,
@@ -30,7 +33,8 @@ const defaultAddrCol: ColumnDef<ByteTableRow> = {
 
 export enum ByteTableFormat {
   BIN = 'bin',
-  DEC = 'dec',
+  INT = 'int',
+  UINT = 'uint',
   HEX = 'hex',
 }
 
@@ -58,6 +62,8 @@ const formatValue = (value: string | number, format: ByteTableFormat) => {
     return '';
   }
 
+  console.log('formating value:', value, 'parsed=', parsedValue);
+
   if (format === ByteTableFormat.BIN) {
     const nextPower = fastLog2(getNextPowerOfTwo(parsedValue));
     const padLength = Math.min(nextPower, 32);
@@ -76,24 +82,47 @@ const formatValue = (value: string | number, format: ByteTableFormat) => {
   return parsedValue.toString(10);
 };
 
+const formats = [
+  {
+    key: 'Целое',
+    value: ByteTableFormat.INT,
+  },
+  {
+    key: 'Целое беззнаковое',
+    value: ByteTableFormat.UINT,
+  },
+  {
+    key: '2-чный',
+    value: ByteTableFormat.BIN,
+  },
+
+  {
+    key: '16-ричный',
+    value: ByteTableFormat.HEX,
+  },
+];
+
 const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
   ({ addrCol = defaultAddrCol, value, onChange }, ref) => {
-    const [data, setData] = useState(() =>
-      value.map((e, i) => ({
-        address: `R${i}`,
-        value: +e,
-      })),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [data, _setData] = useState(
+      () =>
+        value?.map((e, i) => ({
+          address: `R${i}`,
+          value: +e,
+        })) || [],
     );
 
     useEffect(() => {
       console.log('ByteTable Value changed!', value);
+      // TODO: setData ?
     }, [value]);
 
     const onChangeRow = useCallback(
       (row: number, newValue: number) => {
         if (!onChange) return;
 
-        const newData = value.map((e, r) => {
+        const newData = (value || []).map((e, r) => {
           if (r === row) return newValue;
           return e;
         });
@@ -108,42 +137,37 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
         addrCol,
         {
           accessorKey: 'value',
-          header: 'Значение',
+          // eslint-disable-next-line react/no-unstable-nested-components
+          header: () => (
+            <div css={{ display: 'flex', gap: scale(1), alignItems: 'center' }}>
+              <span>Значение</span>
+              <Select
+                options={formats}
+                css={{ minWidth: scale(20) }}
+                placeholder="Формат"
+                size="sm"
+              />
+            </div>
+          ),
           // eslint-disable-next-line react/no-unstable-nested-components
           cell: function Cell({ row: { index } }) {
-            const formats = useMemo(
-              () => [
-                {
-                  key: '10-чный',
-                  value: ByteTableFormat.DEC,
-                },
-                {
-                  key: '2-чный',
-                  value: ByteTableFormat.BIN,
-                },
-
-                {
-                  key: '16-ричный',
-                  value: ByteTableFormat.HEX,
-                },
-              ],
-              [],
-            );
-
             const [format, setFormat] = useState<
               Omit<OptionShape, 'value'> & { value: ByteTableFormat }
             >(formats[0]);
 
             const maskProps = useMemo(() => {
-              if (format.value === ByteTableFormat.DEC) return { mask: '0000' };
+              if (format.value === ByteTableFormat.INT)
+                return {
+                  mask: '000000000000',
+                };
               if (format.value === ByteTableFormat.HEX)
                 return {
-                  mask: '{\\0x}####',
+                  mask: '#### ####',
                   definitions: { '#': /[0-9a-f]/gi },
                   prepare: (s: string) => s.toUpperCase(),
                 };
               if (format.value === ByteTableFormat.BIN)
-                return { mask: '{\\0b}00000000' };
+                return { mask: '0000 0000 0000 0000' };
 
               return { mask: Number };
             }, [format]);
@@ -153,24 +177,25 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
             return (
               <div css={{ display: 'flex', width: '100%' }}>
                 <Mask
+                  name={`value-${index}`}
+                  id={`value-${index}`}
                   {...maskProps}
                   value={cellValue}
-                  onBlur={() => {
+                  autoComplete="off"
+                  onBlur={(e) => {
+                    e.preventDefault();
                     setTimeout(() => {
                       onChangeRow(index, parseValue(cellValue)!);
                     }, 0);
                   }}
+                  size="md"
                   onAccept={(val) => {
-                    setTimeout(() => {
-                      setCellValue(val);
-                    }, 0);
+                    setCellValue(val);
                   }}
-                  lazy={false}
                 />
-                <Select
-                  fieldProps={{
-                    tabIndex: -1,
-                  }}
+                <FormSelect
+                  name={`format-${index}`}
+                  id={`format-${index}`}
                   css={{
                     minWidth: scale(20),
                   }}
@@ -183,7 +208,9 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
                     const newFormat = formats.find((f) => f.value === e)!;
                     setFormat(newFormat);
 
-                    setCellValue((old) => formatValue(old, newFormat.value));
+                    setTimeout(() => {
+                      setCellValue(formatValue(cellValue, newFormat.value));
+                    }, 10);
                   }}
                   options={formats}
                 />

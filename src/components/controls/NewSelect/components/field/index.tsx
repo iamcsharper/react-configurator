@@ -42,10 +42,7 @@ export const Field = ({
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const handleFocus = useCallback(
-    () => !disabled && setFocused(true),
-    [disabled],
-  );
+  const handleFocus = useCallback(() => setFocused(true), []);
   const handleBlur = useCallback(() => setFocused(false), []);
 
   const value = valueRenderer({ selected, selectedMultiple });
@@ -67,10 +64,7 @@ export const Field = ({
         outline: 'none!important',
       }}
       onFocus={handleFocus}
-      onBlur={() => {
-        console.log('handling blur on field div wrapper');
-        handleBlur();
-      }}
+      onBlur={handleBlur}
     >
       <FormControl
         block

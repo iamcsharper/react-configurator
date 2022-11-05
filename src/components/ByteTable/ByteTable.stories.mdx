@@ -1,3 +1,4 @@
+import { action } from '@storybook/addon-actions';
 import { useState } from 'react';
 import { Meta, Story } from '@storybook/addon-docs';
 import ByteTable from './index';
@@ -9,11 +10,8 @@ import ByteTable from './index';
 <Story name="Basic" args={{}}>
   {() => {
     const [data, setData] = useState(() => {
-      return [...Array(10).keys()].map((e) => ({
-        address: e,
-        value: 0,
-      }));
+      return [...Array(10).keys()].map(() => 0);
     });
-    return <ByteTable data={data} setData={setData} />;
+    return <ByteTable value={data} onChange={action('change')} />;
   }}
 </Story>
