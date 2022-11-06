@@ -96,6 +96,17 @@ export const basicTheme: ButtonTheme = {
         };
         break;
       }
+      case 'danger': {
+        variantCSS = {
+          borderColor: colors.errorDark,
+          background: colors.negative,
+          color: colors.white,
+          ':hover': {
+            background: colors.errorDark
+          }
+        };
+        break;
+      }
       default:
         break;
     }

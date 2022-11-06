@@ -64,13 +64,11 @@ export type TableProps<D> = {
   defaultVisibleColumns?: string[];
   /** Allow column order */
   allowColumnOrder?: boolean;
-  hoverable?: boolean;
   options?: Partial<TableOptions<D>>;
   children?: ReactNode | ReactNode[];
 };
 
 export type TableRowProps<D> = {
-  hoverable: boolean;
   row: ExtendedRow<D>;
   tooltipContent: TooltipContentProps<D>[];
 } & Pick<TableProps<D>, 'onRowClick' | 'onDoubleClick' | 'onRowContextMenu'>;

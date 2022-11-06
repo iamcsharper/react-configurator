@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { z } from 'zod';
 import { toZod } from 'tozod';
+import { zodStringToNumber } from '@scripts/helpers';
 
 export enum RtcSourceType {
   External = 1,
@@ -57,6 +58,14 @@ export const rtcStateSchema: toZod<Omit<RtcState, 'rtcSource'>> = z.object({
     .array()
     .length(16),
 });
+
+export const rtcRegisterSchema = zodStringToNumber(
+  z
+    .number()
+    .min(0, 'Число должно быть больше 0')
+    .max(2 ** 32 - 1, 'Число должно быть менее 2 ^ 32 - 1')
+    .optional(),
+);
 
 const initialState: RtcState = {
   alarmEnabled: false,

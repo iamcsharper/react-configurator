@@ -35,7 +35,6 @@ const Table = <D,>({
   renderHeader,
   initialSortBy,
   options,
-  hoverable = true,
 }: TableProps<D>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>([]);
@@ -149,7 +148,6 @@ const Table = <D,>({
                     onRowContextMenu={onRowContextMenu}
                     onDoubleClick={onDoubleClick}
                     row={row}
-                    hoverable={hoverable}
                   />
                 </RowProvider>
               ))}

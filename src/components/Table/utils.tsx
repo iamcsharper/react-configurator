@@ -27,13 +27,11 @@ export const StyledCell = styled.td({
   '&:last-of-type': { paddingRight: scale(2) },
 });
 
-export const StyledRow = styled.tr(({ hoverable }: { hoverable: boolean }) => ({
+export const StyledRow = styled.tr(() => ({
   background: colors.white,
-  ...(hoverable && {
-    ':hover': {
-      background: colors.grey100,
-    },
-  }),
+  ':nth-child(even)': {
+    background: '#fafafa',
+  },
   cursor: 'default !important',
 }));
 

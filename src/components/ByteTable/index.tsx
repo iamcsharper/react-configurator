@@ -8,6 +8,8 @@ import {
   scale,
 } from '@scripts/helpers';
 
+import { ZodSchema } from 'zod';
+
 import { CellContext, ColumnDef, RowData } from '@tanstack/react-table';
 import {
   useMemo,
@@ -39,6 +41,7 @@ declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
     onChangeRowRef: MutableRefObject<ChangeRowHandler>;
     sharedFormat?: ByteTableFormat;
+    validationSchema?: ZodSchema;
   }
 }
 
@@ -46,6 +49,7 @@ export interface ByteTableProps {
   addrCol?: ColumnDef<ByteTableRow>;
   value: number[];
   onChange?: (data: number[]) => void;
+  validationSchema?: ZodSchema;
 }
 
 const defaultAddrCol: ColumnDef<ByteTableRow> = {
@@ -172,20 +176,24 @@ const Cell = ({
   },
   row: { index },
 }: CellContext<ByteTableRow, unknown>) => {
-  const { onChangeRowRef, sharedFormat } = meta || {};
+  const { onChangeRowRef, sharedFormat, validationSchema } = meta || {};
   const { format, formattedValue, setValue, setFormat } = useAllFormatsValue(
     getValue() as number,
     sharedFormat,
   );
 
-  if (format === ByteTableFormat.HEX) {
-    console.log('format:', format, 'formattedValue:', formattedValue);
-  }
-
   const maskProps = useMemo(() => {
     if (format === ByteTableFormat.INT)
       return {
-        mask: '000000000000',
+        mask: Number,
+        signed: true,
+        scale: 0,
+      };
+    if (format === ByteTableFormat.UINT)
+      return {
+        mask: Number,
+        signed: false,
+        scale: 0,
       };
     if (format === ByteTableFormat.HEX)
       return {
@@ -207,8 +215,15 @@ const Cell = ({
     setVal(formattedValue);
   }, [formattedValue]);
 
+  const error = useMemo(() => {
+    const parse = validationSchema?.safeParse(val);
+
+    if (!parse || parse.success) return undefined;
+    return parse.error.issues.map((e) => e.message).join('; ');
+  }, [val, validationSchema]);
+
   return (
-    <div css={{ display: 'flex', width: '100%' }}>
+    <div css={{ display: 'flex', width: '100%', alignItems: 'start' }}>
       <Mask
         name={`value-${index}`}
         id={`value-${index}`}
@@ -217,10 +232,14 @@ const Cell = ({
         autoComplete="off"
         onBlur={(e) => {
           e.preventDefault();
-          const dec = setValue(val);
-          onChangeRowRef?.current?.(index, dec);
+
+          if (!error) {
+            const dec = setValue(val);
+            onChangeRowRef?.current?.(index, dec);
+          }
         }}
         size="md"
+        error={error}
         onAccept={(newVal) => {
           setVal(newVal);
         }}
@@ -247,7 +266,10 @@ const Cell = ({
 };
 
 const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
-  ({ addrCol = defaultAddrCol, value, onChange }, outerRef) => {
+  (
+    { addrCol = defaultAddrCol, value, onChange, validationSchema },
+    outerRef,
+  ) => {
     const innerRef = useRef(null);
     const ref = mergeRefs([outerRef, innerRef]);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -318,6 +340,7 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
             meta: {
               onChangeRowRef,
               sharedFormat,
+              validationSchema,
             },
           }}
         />

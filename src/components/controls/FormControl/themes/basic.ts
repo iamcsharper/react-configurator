@@ -257,7 +257,7 @@ export const basicTheme: FormControlTheme = {
       ...typography('paragraphSmall'),
       display: 'block',
       ...extractCSSOption(sized, size),
-      ...(hasError && { color: colors.error }),
+      ...(hasError && { color: colors.errorDark }),
     };
   },
 };

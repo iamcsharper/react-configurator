@@ -4,7 +4,7 @@ import Checkbox from '@components/controls/Checkbox';
 import DateForm from '@components/controls/DateForm';
 import Form from '@components/controls/Form';
 import Select from '@components/controls/NewSelect';
-// import Tabs from '@components/controls/Tabs';
+import Tabs from '@components/controls/Tabs';
 import TimeForm from '@components/controls/TimeForm';
 import { DetailedItemWrapper } from '@components/DetailedItemWrapper';
 import { scale, withValidation } from '@scripts/helpers';
@@ -19,12 +19,15 @@ import {
   setRtcEnabled,
   setAlarmEnabled,
   rtcStateSchema,
+  rtcRegisterSchema,
 } from '@store/timers/rtc';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@store/index';
 import { colors } from '@scripts/colors';
 import Button from '@components/controls/Button';
 import FormControl from '@components/controls/FormControl';
+import { useCallbackPrompt } from '@scripts/hooks/useCallbackPrompt';
+import UnsavedPrompt from '@components/UnsavedPrompt';
 
 // const DetailedField = ({
 //   label,
@@ -79,107 +82,120 @@ const RtcSettings = () => {
 
   const isDirty = useMemo(() => !deepEqual(values, rtc), [values, rtc]);
 
-  return (
-    <Form
-      methods={form}
-      onSubmit={(vals) => {
-        form.setValue('rtcEnabled', rtcEnabled);
-        form.setValue('alarmEnabled', alarmEnabled);
+  const [showPrompt, confirmNavigation, cancelNavigation] =
+    useCallbackPrompt(isDirty);
 
-        dispatch(
-          setRtc({
-            ...vals,
-            rtcEnabled,
-            alarmEnabled,
-          }),
-        );
-      }}
-      css={{ marginTop: scale(2) }}
-    >
-      {rtcEnabled && (
-        <Form.Field name="rtcSource">
-          <Select
-            label="Тактирование от"
-            options={[
-              {
-                key: 'Внешний осциллятор OSC32K',
-                value: 1,
-              },
-              {
-                key: 'Внутренний осциллятор LSI32K',
-                value: 2,
-              },
-            ]}
-          />
-        </Form.Field>
-      )}
-      <Accordion
-        bordered
-        css={{ marginTop: scale(2), marginBottom: scale(12) }}
+  return (
+    <>
+      <Form
+        methods={form}
+        onSubmit={(vals) => {
+          form.setValue('rtcEnabled', rtcEnabled);
+          form.setValue('alarmEnabled', alarmEnabled);
+
+          dispatch(
+            setRtc({
+              ...vals,
+              rtcEnabled,
+              alarmEnabled,
+            }),
+          );
+        }}
+        css={{ marginTop: scale(2) }}
       >
         {rtcEnabled && (
-          <>
-            <AccordionItem uuid="rtcDate" title="Дата и время RTC">
-              <Form.Field name="rtcDate">
-                <DateForm />
-              </Form.Field>
-              <Form.Field name="rtcTime">
-                <TimeForm />
-              </Form.Field>
-            </AccordionItem>
-            <AccordionItem uuid="rtcRegisters" title="Регистры RTC">
-              {JSON.stringify(values.rtcRegisters)}
-              <Controller
-                name="rtcRegisters"
-                control={control}
-                render={({ fieldState, field }) => (
-                  <FormControl
-                    block
-                    label="Таблица регистров"
-                    error={JSON.stringify(fieldState.error)}
-                  >
-                    <ByteTable {...field} />
-                  </FormControl>
-                )}
-              />
-            </AccordionItem>
-          </>
+          <Form.Field name="rtcSource">
+            <Select
+              label="Тактирование от"
+              options={[
+                {
+                  key: 'Внешний осциллятор OSC32K',
+                  value: 1,
+                },
+                {
+                  key: 'Внутренний осциллятор LSI32K',
+                  value: 2,
+                },
+              ]}
+            />
+          </Form.Field>
         )}
-        {alarmEnabled && (
-          <>
-            <AccordionItem uuid="alarm.time" title="Время будильника">
-              todo
-            </AccordionItem>
-            <AccordionItem uuid="alarm.date" title="Дата будильника">
-              {/* <DetailedField
+        <Accordion
+          bordered
+          css={{ marginTop: scale(2), marginBottom: scale(12) }}
+        >
+          {rtcEnabled && (
+            <>
+              <AccordionItem uuid="rtcDate" title="Дата и время RTC">
+                <Form.Field name="rtcDate">
+                  <DateForm />
+                </Form.Field>
+                <Form.Field name="rtcTime">
+                  <TimeForm />
+                </Form.Field>
+              </AccordionItem>
+              <AccordionItem uuid="rtcRegisters" title="Регистры RTC">
+                {JSON.stringify(values.rtcRegisters)}
+                <Controller
+                  name="rtcRegisters"
+                  control={control}
+                  render={({ fieldState, field }) => (
+                    <FormControl
+                      block
+                      label="Таблица регистров"
+                      error={JSON.stringify(fieldState.error)}
+                    >
+                      <ByteTable
+                        {...field}
+                        validationSchema={rtcRegisterSchema}
+                      />
+                    </FormControl>
+                  )}
+                />
+              </AccordionItem>
+            </>
+          )}
+          {alarmEnabled && (
+            <>
+              <AccordionItem uuid="alarm.time" title="Время будильника">
+                todo
+              </AccordionItem>
+              <AccordionItem uuid="alarm.date" title="Дата будильника">
+                {/* <DetailedField
                 description="Число от 0 до 21"
                 label="Век"
                 name="dateCentury"
               /> */}
-              Вообще здесь будет нормальный календарь.
-            </AccordionItem>
-            <AccordionItem uuid="alarm.clockTime" title="Время будильника">
-              todo
-            </AccordionItem>
-          </>
+                Вообще здесь будет нормальный календарь.
+              </AccordionItem>
+              <AccordionItem uuid="alarm.clockTime" title="Время будильника">
+                todo
+              </AccordionItem>
+            </>
+          )}
+        </Accordion>
+        {isDirty && (
+          <div
+            css={{
+              position: 'sticky',
+              bottom: 0,
+              background: colors.white,
+              paddingTop: scale(2),
+              paddingBottom: scale(2),
+            }}
+          >
+            <Button size="sm" type="submit">
+              Сохранить
+            </Button>
+          </div>
         )}
-      </Accordion>
-      {isDirty && (
-        <div
-          css={{
-            position: 'sticky',
-            bottom: 0,
-            background: colors.white,
-            paddingTop: scale(2),
-            paddingBottom: scale(2),
-          }}
-        >
-          <Button size="sm" type="submit">
-            Сохранить
-          </Button>
-        </div>
-      )}
-    </Form>
+      </Form>
+      <UnsavedPrompt
+        isOpen={showPrompt}
+        confirmNavigation={confirmNavigation}
+        cancelNavigation={cancelNavigation}
+      />
+    </>
   );
 };
 
@@ -236,8 +252,7 @@ const Rtc = () => {
           </Checkbox>
         </DetailedItemWrapper>
       )}
-      <RtcSettings />
-      {/* <Tabs css={{ marginTop: scale(2), height: '100%' }} forceRenderTabPanel>
+      <Tabs css={{ marginTop: scale(2), height: '100%' }} forceRenderTabPanel>
         <Tabs.List>
           <Tabs.Tab>Настройки</Tabs.Tab>
           <Tabs.Tab>Прерывания</Tabs.Tab>
@@ -246,7 +261,7 @@ const Rtc = () => {
           <RtcSettings />
         </Tabs.Panel>
         <Tabs.Panel>Interrupts</Tabs.Panel>
-      </Tabs> */}
+      </Tabs>
     </div>
   );
 };

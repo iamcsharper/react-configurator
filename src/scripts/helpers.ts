@@ -6,9 +6,12 @@ import {
   RefCallback,
 } from 'react';
 
-import { Schema } from 'zod';
+import { Schema, z, ZodTypeAny } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FieldError } from 'react-hook-form';
+
+export const zodStringToNumber = (schema: ZodTypeAny) =>
+  z.preprocess((a) => (a ? Number(a as string) : undefined), schema);
 
 export type MergeElementProps<T extends ElementType, P extends object = {}> =
   Omit<ComponentPropsWithRef<T>, keyof P> & P;
@@ -82,7 +85,10 @@ export type FixedLengthArray<T, L extends number, TObj = [T, ...Array<T>]> =
 
 export const formatRHFError = (error?: FieldError) => {
   if (Array.isArray(error)) {
-    return error.map((e) => e.message).filter(Boolean).join(', ');
+    return error
+      .map((e) => e.message)
+      .filter(Boolean)
+      .join(', ');
   }
 
   return error?.message;

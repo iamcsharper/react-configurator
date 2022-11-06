@@ -15,7 +15,6 @@ export const TableRow = <D,>({
   tooltipContent,
   onDoubleClick,
   onRowContextMenu,
-  hoverable,
 }: TableRowProps<D>) => {
   const { visible, setVisible } = useRow();
 
@@ -66,7 +65,6 @@ export const TableRow = <D,>({
     >
       <StyledRow
         key={row.id}
-        hoverable={hoverable}
         onClick={() => {
           if (onRowClick) onRowClick(row.original);
         }}

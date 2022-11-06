@@ -3,7 +3,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useBlocker } from './useBlocker';
 
-export function useCallbackPrompt(when: boolean): (boolean | (() => void))[] {
+export function useCallbackPrompt(
+  when: boolean,
+): [boolean, () => void, () => void] {
   const navigate = useNavigate();
   const location = useLocation();
   const [showPrompt, setShowPrompt] = useState(false);
@@ -16,7 +18,7 @@ export function useCallbackPrompt(when: boolean): (boolean | (() => void))[] {
 
   // handle blocking when user click on another route prompt will be shown
   const handleBlockedNavigation = useCallback(
-    (nextLocation: { location: { pathname: string; }; }) => {
+    (nextLocation: { location: { pathname: string } }) => {
       // in if condition we are checking next location and current location are equals or not
       if (
         !confirmedNavigation &&
