@@ -1,4 +1,4 @@
-import { DetailedItemWrapper } from '@components/DetailedItemWrapper';
+import { DetailsTrigger } from '@components/DetailsTrigger';
 import { scale } from '@scripts/helpers';
 import { useForm } from 'react-hook-form';
 
@@ -19,13 +19,7 @@ const BasicTimer = ({ timerName }: { timerName: string }) => {
       }}
     >
       <h4>Таймер {timerName}</h4>
-      <DetailedItemWrapper
-        id="2"
-        title="Test 2"
-        description="Test 2 description"
-      >
-        <p>TODO</p>
-      </DetailedItemWrapper>
+      <DetailsTrigger title="Test 2" description="Test 2 description" />
     </div>
   );
 };

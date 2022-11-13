@@ -99,6 +99,7 @@ const FormControl = forwardRef<HTMLDivElement, FormControlProps>(
                         htmlFor={htmlFor}
                         css={{
                             ...getCSS('label'),
+                            ...labelCSS
                         }}
                         {...labelProps}
                     >

@@ -63,7 +63,7 @@ const Tooltip: FC<TippyProps> = ({
           placeItems: 'center',
           color: colors?.white,
           borderRadius: scale(1, true),
-          height: scale(9, true),
+          // height: scale(9, true),
           whiteSpace: 'initial',
           overflow: 'hidden',
           '&[data-placement^=right]>div.tippy-arrow': {

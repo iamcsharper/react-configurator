@@ -6,7 +6,7 @@ import Form from '@components/controls/Form';
 import Select from '@components/controls/NewSelect';
 import Tabs from '@components/controls/Tabs';
 import TimeForm from '@components/controls/TimeForm';
-import { DetailedItemWrapper } from '@components/DetailedItemWrapper';
+import { DetailsTrigger } from '@components/DetailsTrigger';
 import { scale, withValidation } from '@scripts/helpers';
 import typography from '@scripts/typography';
 import { ReactNode, useMemo } from 'react';
@@ -128,6 +128,10 @@ const RtcSettings = () => {
             <>
               <AccordionItem uuid="rtcDate" title="Дата и время RTC">
                 <Form.Field name="rtcDate">
+                  <DetailsTrigger
+                    title="Дата RTC"
+                    description="Вы можете задавать дату для срабатывания прерывания. При отсутствии выбора считается за любое значение."
+                  />
                   <DateForm />
                 </Form.Field>
                 <Form.Field name="rtcTime">
@@ -135,14 +139,28 @@ const RtcSettings = () => {
                 </Form.Field>
               </AccordionItem>
               <AccordionItem uuid="rtcRegisters" title="Регистры RTC">
-                {JSON.stringify(values.rtcRegisters)}
+                {/* {JSON.stringify(values.rtcRegisters)} */}
                 <Controller
                   name="rtcRegisters"
                   control={control}
                   render={({ fieldState, field }) => (
                     <FormControl
                       block
-                      label="Таблица регистров"
+                      labelCSS={{
+                        display: 'flex',
+                        width: 'fit-content',
+                        gap: scale(1),
+                        alignItems: 'center',
+                      }}
+                      label={
+                        <>
+                          Таблица регистров
+                          <DetailsTrigger
+                            title="Регистры RTC"
+                            description="Регистры RTC представляют собой 4 байтные значения, записываемые в регистры R0-R15."
+                          />
+                        </>
+                      }
                       error={JSON.stringify(fieldState.error)}
                     >
                       <ByteTable
@@ -222,7 +240,14 @@ const Rtc = () => {
         Настройки RTC
       </h4>
 
-      <DetailedItemWrapper id="0" title="RTC" description="Информация об RTC">
+      <div
+        css={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: scale(1),
+        }}
+      >
         <Checkbox
           name="rtc"
           value="1"
@@ -233,12 +258,16 @@ const Rtc = () => {
         >
           Включить RTC
         </Checkbox>
-      </DetailedItemWrapper>
+        <DetailsTrigger title="RTC" description="Информация об RTC" />
+      </div>
       {rtcEnabled && (
-        <DetailedItemWrapper
-          id="1"
-          title="Будильник"
-          description="Информация о будильнике. Также можно выделять в группы)"
+        <div
+          css={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: scale(1),
+          }}
         >
           <Checkbox
             name="alarm"
@@ -250,7 +279,11 @@ const Rtc = () => {
           >
             Будильник
           </Checkbox>
-        </DetailedItemWrapper>
+          <DetailsTrigger
+            title="Будильник"
+            description="Информация о будильнике. Также можно выделять в группы)"
+          />
+        </div>
       )}
       <Tabs css={{ marginTop: scale(2), height: '100%' }} forceRenderTabPanel>
         <Tabs.List>

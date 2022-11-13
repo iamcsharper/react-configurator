@@ -1,4 +1,4 @@
-import DetailsPane from '@components/DetailsPane';
+// import DetailsPane from '@components/DetailsPane';
 import Timers from '@containers/utility/Periphery/Timers';
 import { DetailsProvider, useDetails } from '@context/details';
 import { Allotment, AllotmentHandle } from 'allotment';
@@ -8,7 +8,7 @@ import { Route, Routes, useParams } from 'react-router-dom';
 
 const SplitPanes = () => {
   const props = useParams();
-  const { setCurrentData, setEnabled } = useDetails();
+  const { setCurrentData } = useDetails();
 
   useEffect(() => {
     setCurrentData(null);
@@ -33,14 +33,7 @@ const SplitPanes = () => {
   }, []);
 
   return (
-    <Allotment
-      vertical
-      onChange={(sizes) => {
-        const isDetailsVisible = !!sizes[1];
-        setEnabled(isDetailsVisible);
-      }}
-      ref={ref}
-    >
+    <Allotment vertical ref={ref}>
       <Allotment.Pane>
         <div
           css={{
@@ -56,9 +49,9 @@ const SplitPanes = () => {
           </Routes>
         </div>
       </Allotment.Pane>
-      <Allotment.Pane maxSize={150} snap>
+      {/* <Allotment.Pane maxSize={150} snap>
         <DetailsPane />
-      </Allotment.Pane>
+      </Allotment.Pane> */}
     </Allotment>
   );
 };
