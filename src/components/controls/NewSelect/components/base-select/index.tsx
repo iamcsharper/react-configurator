@@ -379,7 +379,6 @@ export const BaseSelect = forwardRef(
       }),
       [disabled, hasSelected, open],
     );
-
     return (
       <SelectThemeProvider
         size={size}
@@ -447,7 +446,6 @@ export const BaseSelect = forwardRef(
 
           <Popover
             open={open}
-            withTransition={false}
             anchorElement={fieldRef.current as HTMLElement}
             position={popoverPosition}
             preventFlip={preventFlip}

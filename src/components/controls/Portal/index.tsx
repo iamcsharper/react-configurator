@@ -21,7 +21,7 @@ export const Portal = forwardRef<Element, PortalProps>(
   (
     {
       getPortalContainer = getDefaultPortalContainer,
-      immediateMount = false,
+      immediateMount = true,
       children,
     },
     ref,

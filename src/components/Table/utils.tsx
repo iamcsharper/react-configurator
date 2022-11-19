@@ -29,9 +29,7 @@ export const StyledCell = styled.td({
 
 export const StyledRow = styled.tr(() => ({
   background: colors.white,
-  ':nth-child(even)': {
-    background: '#fafafa',
-  },
+  borderBottom: `1px solid ${colors.grey200}`,
   cursor: 'default !important',
 }));
 

@@ -187,7 +187,7 @@ export const basicTheme: FormControlTheme = {
       marginBottom: scale(1),
       ...extractCSSOption(sized, size),
       ...(hasError && {
-        color: colors.error,
+        color: colors.negative,
       }),
     };
   },
@@ -253,6 +253,7 @@ export const basicTheme: FormControlTheme = {
       lg: { ...typography('paragraphMedium'), marginTop: scale(3, true) },
     };
     return {
+      whiteSpace: 'pre-line',
       marginTop: scale(1),
       ...typography('paragraphSmall'),
       display: 'block',

@@ -1,7 +1,7 @@
 import ByteTable from '@components/ByteTable';
 import Accordion from '@components/controls/Accordion';
 import Checkbox from '@components/controls/Checkbox';
-import DateForm from '@components/controls/DateForm';
+import CronDateForm from '@components/controls/CronDateForm';
 import Form from '@components/controls/Form';
 import Select from '@components/controls/NewSelect';
 import Tabs from '@components/controls/Tabs';
@@ -132,7 +132,7 @@ const RtcSettings = () => {
                     title="Дата RTC"
                     description="Вы можете задавать дату для срабатывания прерывания. При отсутствии выбора считается за любое значение."
                   />
-                  <DateForm />
+                  <CronDateForm />
                 </Form.Field>
                 <Form.Field name="rtcTime">
                   <TimeForm />

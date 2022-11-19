@@ -25,10 +25,19 @@ export interface MaskProps extends Omit<FormFieldProps, 'name'> {
   /** Is show placholder */
   lazy?: boolean;
 
-  error?: string;
+  error?: string | boolean;
 
   /** onChange handler */
   onAccept?: (value: string) => void;
+  dispatch?: (
+    appended: string,
+    dynamicMasked: {
+      compiledMasks: {
+        mask: string;
+      }[];
+      value: string;
+    },
+  ) => void;
 }
 
 const Mask = forwardRef<HTMLInputElement, MaskProps>(

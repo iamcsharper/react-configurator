@@ -63,7 +63,7 @@ export const rtcRegisterSchema = zodStringToNumber(
   z
     .number()
     .min(0, 'Число должно быть больше 0')
-    .max(2 ** 32 - 1, 'Число должно быть менее 2 ^ 32 - 1')
+    .max(2 ** 32 - 1, 'Число должно быть менее 2 ^ 32 - 1\n(4 294 967 295)')
     .optional(),
 );
 

@@ -1,12 +1,7 @@
 import Mask from '@components/controls/Mask';
 import FormSelect, { Select } from '@components/controls/NewSelect';
 import Table from '@components/Table';
-import {
-  fastLog2,
-  getNextPowerOfSixteen,
-  getNextPowerOfTwo,
-  scale,
-} from '@scripts/helpers';
+import { fastLog2, getNextPowerOfTwo, scale } from '@scripts/helpers';
 
 import { ZodSchema } from 'zod';
 
@@ -88,12 +83,9 @@ const formatValue = (value: string | number, format: ByteTableFormat) => {
   }
 
   if (format === ByteTableFormat.HEX) {
-    const nextPower = getNextPowerOfSixteen(parsedValue);
-    const padLength = Math.min(nextPower, 8);
-    return `0x${parsedValue
-      .toString(16)
-      .toUpperCase()
-      .padStart(padLength, '0')}`;
+    // const nextPower = getNextPowerOfSixteen(parsedValue);
+    // const padLength = Math.min(nextPower, 4);
+    return `0x${parsedValue.toString(16).toUpperCase()}`;
   }
 
   return parsedValue.toString(10);
@@ -156,11 +148,6 @@ const formats = [
     key: '16-ричный',
     value: ByteTableFormat.HEX,
   },
-  {
-    key: 'Целое беззнаковое',
-    value: ByteTableFormat.UINT,
-    disabled: true,
-  },
 ];
 
 const Header = () => (
@@ -182,33 +169,23 @@ const Cell = ({
     sharedFormat,
   );
 
-  const maskProps = useMemo(() => {
-    if (format === ByteTableFormat.INT)
-      return {
+  const masks = useMemo(
+    () => [
+      {
         mask: Number,
-        signed: true,
-        scale: 0,
-      };
-    if (format === ByteTableFormat.UINT)
-      return {
-        mask: Number,
-        signed: false,
-        scale: 0,
-      };
-    if (format === ByteTableFormat.HEX)
-      return {
-        mask: '{\\0x }#### ####',
+      },
+      {
+        mask: '{\\0b}#### #### #### ####',
+        definitions: { '#': /[0-1]/gi },
+      },
+      {
+        mask: '{\\0x}#### ####',
         definitions: { '#': /[0-9a-f]/gi },
         prepare: (s: string) => s.toUpperCase(),
-      };
-    if (format === ByteTableFormat.BIN)
-      return {
-        mask: '{\\0\\b }#### #### #### ####',
-        definitions: { '#': /[0-1]/gi },
-      };
-
-    return { mask: Number };
-  }, [format]);
+      },
+    ],
+    [],
+  );
 
   const [val, setVal] = useState(formattedValue);
   useEffect(() => {
@@ -222,26 +199,55 @@ const Cell = ({
     return parse.error.issues.map((e) => e.message).join('; ');
   }, [val, validationSchema]);
 
+  const formatChangeRef = useRef(false);
+
   return (
     <div css={{ display: 'flex', width: '100%', alignItems: 'start' }}>
       <Mask
         name={`value-${index}`}
         id={`value-${index}`}
-        {...maskProps}
+        mask={masks}
         value={val}
         autoComplete="off"
         onBlur={(e) => {
           e.preventDefault();
 
-          if (!error) {
-            const dec = setValue(val);
-            onChangeRowRef?.current?.(index, dec);
-          }
+          setTimeout(() => {
+            if (!error) {
+              const dec = setValue(val);
+              onChangeRowRef?.current?.(index, dec);
+            }
+          }, 0);
         }}
         size="md"
         error={error}
         onAccept={(newVal) => {
+          if (formatChangeRef.current) {
+            formatChangeRef.current = false;
+            return;
+          }
           setVal(newVal);
+        }}
+        dispatch={(appended, dynamicMasked) => {
+          const ignore = formatChangeRef.current;
+          if (formatChangeRef.current) {
+            formatChangeRef.current = false;
+          }
+          const { value } = dynamicMasked;
+          const newVal = value + appended;
+
+          if (newVal.substring(0, 2) === '0b') {
+            if (!ignore) setFormat(ByteTableFormat.BIN);
+            return dynamicMasked.compiledMasks[1];
+          }
+
+          if (newVal.substring(0, 2) === '0x') {
+            if (!ignore) setFormat(ByteTableFormat.HEX);
+            return dynamicMasked.compiledMasks[2];
+          }
+
+          if (!ignore) setFormat(ByteTableFormat.INT);
+          return dynamicMasked.compiledMasks[0];
         }}
       />
       <FormSelect
@@ -257,6 +263,7 @@ const Cell = ({
         value={format}
         onChange={(e) => {
           const newFormat = formats.find((f) => f.value === e)!;
+          formatChangeRef.current = true;
           setFormat(newFormat.value);
         }}
         options={formats}
@@ -321,13 +328,15 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
     return (
       <div ref={ref}>
         <Select
-          block
           options={formats}
-          css={{ minWidth: scale(20) }}
           placeholder="Формат"
-          size="sm"
+          size="md"
           onChange={(payload) => {
             setSharedFormat(payload.selected?.value);
+          }}
+          css={{
+            maxWidth: 'fit-content',
+            marginLeft: 'auto',
           }}
         />
         <Table

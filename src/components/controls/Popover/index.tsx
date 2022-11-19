@@ -169,7 +169,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
       useAnchorWidth,
       offset = [0, 0],
       withArrow = false,
-      withTransition = true,
+      withTransition = false,
       position = 'left',
       preventFlip,
       popperCSS,
@@ -345,7 +345,13 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
         style={{
           zIndex: computedZIndex,
           width: useAnchorWidth ? referenceElement?.offsetWidth : undefined,
+          opacity: 1,
+          transition: 'opacity .01s ease',
+          willChange: 'opacity',
           ...popperStyles.popper,
+          ...(!popperStyles.popper.transform && {
+            opacity: 0,
+          }),
         }}
         data-test-id={dataTestId}
         className={className}

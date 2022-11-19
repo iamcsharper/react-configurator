@@ -109,13 +109,6 @@ export const getNextPowerOfTwo = (value: number): number => {
   return result;
 };
 
-// TODO: opimize to bitwise
-export const getNextPowerOfSixteen = (n: number) => {
-  if (n < 16) return 16;
-  let p = 1;
-  while (p < n) p <<= 4;
-  return p;
-};
 
 export const fastLog2 = (V: number) => {
   let c = V;

@@ -11,20 +11,23 @@ import { SelectSize, SelectTheme } from '../types';
 const { md, xl } = MEDIA_QUERIES;
 
 export const basicTheme: SelectTheme = {
-  arrowButton: {},
+  arrowButton: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   closeButton: {},
   option: ({ isDisabled, isHover, isSelected, size = 'md' }) => {
     const sized: OptionizedCSS<typeof SelectSize> = {
       sm: {
-        ...typography('paragraphSmall'),
+        ...typography('paragraphExtraSmall'),
         padding: `${scale(1)}px ${scale(3, true)}px`,
       },
       md: {
-        ...typography('paragraphMedium'),
+        ...typography('paragraphSmall'),
         padding: `${scale(3, true)}px ${scale(2)}px`,
       },
       lg: {
-        ...typography('paragraphLarge'),
+        ...typography('paragraphMedium'),
         padding: `${scale(3, true)}px ${scale(2)}px`,
       },
     };
@@ -63,6 +66,7 @@ export const basicTheme: SelectTheme = {
     alignItems: 'center',
   },
   field: ({ disabled }) => ({
+    ...typography('paragraphSmall'),
     flexGrow: 1,
     position: 'relative',
     overflow: 'hidden',

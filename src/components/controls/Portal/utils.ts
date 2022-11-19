@@ -3,6 +3,7 @@ import { MutableRefObject, RefObject } from 'react';
 export const PORTAL_CONTAINER_ATTRIBUTE = 'react-portal-container';
 
 function createPortalContainer() {
+  console.log('created Portal container!');
   const portalContainer = document.createElement('div');
 
   portalContainer.setAttribute(PORTAL_CONTAINER_ATTRIBUTE, '');

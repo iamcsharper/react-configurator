@@ -162,9 +162,9 @@ const FormControl = forwardRef<HTMLDivElement, FormControlProps>(
                 {bottomAddons}
 
                 {errorMessage && (
-                    <span css={getCSS('sub')} role="alert">
+                    <div css={getCSS('sub')} role="alert">
                         {errorMessage}
-                    </span>
+                    </div>
                 )}
 
                 {hint && !errorMessage && <span css={getCSS('sub')}>{hint}</span>}

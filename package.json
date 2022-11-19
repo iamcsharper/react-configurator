@@ -30,6 +30,7 @@
     "allotment": "^1.17.0",
     "antd": "^4.23.4",
     "classnames": "^2.3.1",
+    "cron-parser": "^4.7.0",
     "date-fns": "^2.29.3",
     "deepmerge": "^4.2.2",
     "dotenv": "^16.0.2",
