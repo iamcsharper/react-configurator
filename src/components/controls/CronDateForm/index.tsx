@@ -1,7 +1,7 @@
 import { colors } from '@scripts/colors';
-import { scale } from '@scripts/helpers';
+import { parseSafeInt, scale } from '@scripts/helpers';
 import { forwardRef, useEffect, useMemo, useState } from 'react';
-import { parseSafeInt, getClosestDates } from './getClosestDates';
+import { getClosestDates } from './getClosestDates';
 
 import Mask from '../Mask';
 import { Select, OptionShape } from '../NewSelect';
