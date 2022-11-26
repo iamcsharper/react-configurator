@@ -76,7 +76,7 @@ export const rtcRegisterSchema = zodStringToNumber(
     .max(2 ** 32 - 1, 'Число должно быть менее 2 ^ 32 - 1\n(4 294 967 295)'),
 );
 
-const initialState: RtcState = {
+export const rtcInitialState: RtcState = {
   alarmEnabled: false,
   rtcDateTime: {
     day: null as never as number,
@@ -94,7 +94,7 @@ const initialState: RtcState = {
 
 export const rtcSlice = createSlice({
   name: 'rtc',
-  initialState,
+  initialState: rtcInitialState,
   reducers: {
     setRtc: (_, action: PayloadAction<RtcState>) => ({ ...action.payload }),
     setAlarmEnabled: (state, action: PayloadAction<boolean>) => {

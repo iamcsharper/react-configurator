@@ -17,6 +17,8 @@ import {
   useTransition,
 } from 'react';
 import { mergeRefs } from 'react-merge-refs';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRotateBack } from '@fortawesome/free-solid-svg-icons';
 
 export interface ByteTableRow {
   address: string;
@@ -38,12 +40,14 @@ declare module '@tanstack/table-core' {
     onChangeRowRef: MutableRefObject<ChangeRowHandler>;
     sharedFormat?: ByteTableFormat;
     validationSchema?: ZodSchema;
+    defaultValue: number[];
   }
 }
 
 export interface ByteTableProps {
   addrCol?: ColumnDef<ByteTableRow>;
   value: number[];
+  defaultValue: number[];
   onChange?: (data: number[]) => void;
   validationSchema?: ZodSchema;
 }
@@ -103,7 +107,7 @@ const useAllFormatsValue = (
   }, [initialValue]);
 
   const formats = useMemo(() => {
-    if (!decValue) return {};
+    if (decValue === null || decValue === undefined) return {};
 
     return Object.keys(ByteTableFormat).reduce((prev, cur) => {
       prev[cur] = formatValue(decValue, cur as never as ByteTableFormat);
@@ -164,11 +168,10 @@ const Cell = ({
   },
   row: { index },
 }: CellContext<ByteTableRow, unknown>) => {
-  const { onChangeRowRef, sharedFormat, validationSchema } = meta || {};
-  const { format, formattedValue, setValue, setFormat } = useAllFormatsValue(
-    getValue() as number,
-    sharedFormat,
-  );
+  const { onChangeRowRef, sharedFormat, validationSchema, defaultValue } =
+    meta || {};
+  const { decValue, format, formattedValue, setValue, setFormat } =
+    useAllFormatsValue(getValue() as number, sharedFormat);
 
   const masks = useMemo(
     () => [
@@ -204,15 +207,39 @@ const Cell = ({
 
   const [, setTransition] = useTransition();
 
+  const defaultVal = defaultValue?.[index];
+  const isDefaultValue = defaultVal === decValue;
+
+  const maskRef = useRef<any>();
+
+  const onResetDefault = useCallback(() => {
+    setFormat(ByteTableFormat.INT);
+    setVal(`${defaultVal}`);
+
+    setTransition(() => {
+      setValue(defaultVal);
+    });
+
+    if (typeof maskRef.current?.element?.focus === 'function')
+      maskRef.current.element.focus();
+  }, [defaultVal, setFormat, setValue]);
+
   return (
     <div css={{ display: 'flex', width: '100%', alignItems: 'start' }}>
       <Mask
+        ref={maskRef}
         name={`value-${index}`}
         id={`value-${index}`}
         mask={masks}
         value={val}
         autoComplete="off"
-        rightAddons={<span>X</span>}
+        rightAddons={
+          !isDefaultValue && (
+            <button type="button" onClick={onResetDefault}>
+              <FontAwesomeIcon icon={faRotateBack} />
+            </button>
+          )
+        }
         onBlur={(e) => {
           e.preventDefault();
 
@@ -282,7 +309,13 @@ const Cell = ({
 
 const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
   (
-    { addrCol = defaultAddrCol, value, onChange, validationSchema },
+    {
+      addrCol = defaultAddrCol,
+      value,
+      defaultValue,
+      onChange,
+      validationSchema,
+    },
     outerRef,
   ) => {
     const innerRef = useRef(null);
@@ -365,6 +398,7 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
               onChangeRowRef,
               sharedFormat,
               validationSchema,
+              defaultValue,
             },
           }}
         />

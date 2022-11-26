@@ -13,6 +13,7 @@ import { useFormContext, Controller, useForm } from 'react-hook-form';
 import deepEqual from 'fast-deep-equal';
 
 import {
+  rtcInitialState,
   RtcState,
   setRtc,
   setRtcEnabled,
@@ -198,6 +199,7 @@ const RtcSettings = () => {
                     >
                       <ByteTable
                         {...field}
+                        defaultValue={rtcInitialState.rtcRegisters}
                         validationSchema={rtcRegisterSchema}
                       />
                     </FormControl>

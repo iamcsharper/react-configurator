@@ -144,6 +144,13 @@ const DateForm = (
     if (!isTouched) return;
 
     const tryDate = valueToDate(innerValue);
+
+    if (tryDate) {
+      setInnerValue((old) => {
+        old.weekDay = tryDate.getDay();
+        return old;
+      });
+    }
     setSelectedDate(tryDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateHash]);
