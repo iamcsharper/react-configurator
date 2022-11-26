@@ -83,10 +83,25 @@ export type FixedLengthArray<T, L extends number, TObj = [T, ...Array<T>]> =
     [Symbol.iterator]: () => IterableIterator<T>;
   };
 
+export const parseErrors = (error?: FieldError) => {
+  if (Array.isArray(error)) {
+    return error.map((e) => e.message);
+  }
+
+  return error?.message;
+};
+
 export const formatRHFError = (error?: FieldError) => {
   if (Array.isArray(error)) {
     return error
       .map((e) => e.message)
+      .filter(Boolean)
+      .join(', ');
+  }
+
+  if (!error?.message && error) {
+    return Object.values(error as any)
+      .map((e: any) => e?.message)
       .filter(Boolean)
       .join(', ');
   }
@@ -109,7 +124,6 @@ export const getNextPowerOfTwo = (value: number): number => {
   return result;
 };
 
-
 export const fastLog2 = (V: number) => {
   let c = V;
   // eslint-disable-next-line no-plusplus
@@ -120,3 +134,13 @@ export const fastLog2 = (V: number) => {
 export const withValidation = (schema: Schema) => ({
   resolver: zodResolver(schema),
 });
+
+export const parseSafeInt = (value: any) => {
+  const converted =
+    value === '' || value === null || value === undefined ? undefined : value;
+  const val = Number(converted);
+
+  if (Number.isNaN(val)) return null;
+
+  return val;
+};

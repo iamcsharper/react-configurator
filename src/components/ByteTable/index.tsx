@@ -14,6 +14,7 @@ import {
   useEffect,
   useRef,
   MutableRefObject,
+  useTransition,
 } from 'react';
 import { mergeRefs } from 'react-merge-refs';
 
@@ -201,6 +202,8 @@ const Cell = ({
 
   const formatChangeRef = useRef(false);
 
+  const [, setTransition] = useTransition();
+
   return (
     <div css={{ display: 'flex', width: '100%', alignItems: 'start' }}>
       <Mask
@@ -209,6 +212,7 @@ const Cell = ({
         mask={masks}
         value={val}
         autoComplete="off"
+        rightAddons={<span>X</span>}
         onBlur={(e) => {
           e.preventDefault();
 
@@ -227,6 +231,10 @@ const Cell = ({
             return;
           }
           setVal(newVal);
+
+          setTransition(() => {
+            setValue(newVal);
+          });
         }}
         dispatch={(appended, dynamicMasked) => {
           const ignore = formatChangeRef.current;
@@ -310,8 +318,14 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
     const onChangeRowRef = useRef<ChangeRowHandler>(onChangeRow);
     onChangeRowRef.current = onChangeRow;
 
-    const [sharedFormat, setSharedFormat] =
-      useState<ByteTableFormat | undefined>(undefined);
+    const [sharedFormat, setSharedFormat] = useState<
+      ByteTableFormat | undefined
+    >(ByteTableFormat.INT);
+
+    const selectedFormatOption = useMemo(
+      () => formats.filter((e) => e.value === sharedFormat),
+      [sharedFormat],
+    );
 
     const columns = useMemo<ColumnDef<ByteTableRow>[]>(
       () => [
@@ -331,6 +345,7 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
           options={formats}
           placeholder="Формат"
           size="md"
+          selected={selectedFormatOption}
           onChange={(payload) => {
             setSharedFormat(payload.selected?.value);
           }}
@@ -357,5 +372,7 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
     );
   },
 );
+
+ByteTable.displayName = 'ByteTable';
 
 export default ByteTable;

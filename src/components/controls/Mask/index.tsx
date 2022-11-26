@@ -56,6 +56,7 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
       onChange,
       onFocus,
       onBlur,
+      rightAddons,
       readOnly,
       error,
       labelView,
@@ -114,6 +115,7 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
         labelView={labelView}
         className={className}
         block={block}
+        rightAddons={rightAddons}
       >
         <IMaskInput
           ref={mergeRefs([ref, inputRef])}

@@ -7,16 +7,16 @@ import Mask from '../Mask';
 import { Select, OptionShape } from '../NewSelect';
 import Button from '../Button';
 
-export interface DateFormValues {
+export interface CronDateFormValues {
   day: number | null;
   month: number | null; // 0 ... 11, 0 - январь
   year: number | null;
 }
 
-export interface DateFormProps {
+export interface CronDateFormProps {
   // Controlled
-  value?: DateFormValues;
-  onChange?: (value: DateFormValues) => void;
+  value?: CronDateFormValues;
+  onChange?: (value: CronDateFormValues) => void;
 }
 
 const months = [
@@ -35,7 +35,7 @@ const months = [
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CronDateForm = ({ value, onChange }: DateFormProps, _ref?: any) => {
+const CronDateForm = ({ value, onChange }: CronDateFormProps, _ref?: any) => {
   const optionsMonths = useMemo<OptionShape[]>(
     () => [
       {

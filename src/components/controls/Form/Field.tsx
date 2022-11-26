@@ -23,10 +23,17 @@ const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
     // const isRadio =
     //   isValidElement(children) && (children?.type as FC)?.name === 'Radio';
 
-    const { field, fieldState } = useController({
+    const { field, fieldState: fieldStateForm } = useController({
       name,
       control,
     });
+
+    const fieldState = {
+      ...fieldStateForm,
+      error: Array.isArray(fieldStateForm.error)
+        ? fieldStateForm.error[0]
+        : fieldStateForm.error,
+    };
 
     const inputProps = {
       name,
@@ -48,6 +55,8 @@ const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
                 return cloneElement<any>(child, {
                   ...inputProps,
                   ...child.props,
+                  field,
+                  fieldState,
                   onChange(...args: any[]) {
                     if (typeof (child?.props as any)?.onChange === 'function') {
                       (child.props as any).onChange(...args);

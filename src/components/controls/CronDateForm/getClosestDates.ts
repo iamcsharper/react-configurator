@@ -1,3 +1,4 @@
+import { parseSafeInt } from '@scripts/helpers';
 import cronParser from 'cron-parser';
 
 interface DateProps {
@@ -9,16 +10,6 @@ interface DateProps {
 interface getClosestDatesProps extends DateProps {
   length: number;
 }
-
-export const parseSafeInt = (value: any) => {
-  const converted =
-    value === '' || value === null || value === undefined ? undefined : value;
-  const val = Number(converted);
-
-  if (Number.isNaN(val)) return null;
-
-  return val;
-};
 
 const createCronString = ({ day, month }: Pick<DateProps, 'day' | 'month'>) => {
   const cDay = day || '*';

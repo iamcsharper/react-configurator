@@ -1,16 +1,15 @@
 import ByteTable from '@components/ByteTable';
 import Accordion from '@components/controls/Accordion';
 import Checkbox from '@components/controls/Checkbox';
-import CronDateForm from '@components/controls/CronDateForm';
+import DateForm from '@components/controls/DateTimeForm';
 import Form from '@components/controls/Form';
 import Select from '@components/controls/NewSelect';
 import Tabs from '@components/controls/Tabs';
-import TimeForm from '@components/controls/TimeForm';
 import { DetailsTrigger } from '@components/DetailsTrigger';
 import { scale, withValidation } from '@scripts/helpers';
 import typography from '@scripts/typography';
 import { ReactNode, useMemo } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useFormContext, Controller, useForm } from 'react-hook-form';
 import deepEqual from 'fast-deep-equal';
 
 import {
@@ -51,14 +50,51 @@ const AccordionItem = ({
   children: ReactNode[] | ReactNode;
   title: ReactNode;
   uuid: string;
-}) => (
-  <Accordion.Item uuid={uuid}>
-    <Accordion.Heading>
-      <Accordion.Button>{title}</Accordion.Button>
-    </Accordion.Heading>
-    <Accordion.Panel>{children}</Accordion.Panel>
-  </Accordion.Item>
-);
+}) => {
+  const { formState } = useFormContext();
+  const errors = formState.errors?.[uuid];
+  let errorsLength = 0;
+
+  if (Array.isArray(errors)) {
+    errorsLength = errors.length;
+  } else if (typeof errors === 'object') {
+    if (errors.message) {
+      errorsLength = 1;
+    } else {
+      errorsLength = Object.keys(errors).length;
+    }
+  }
+  return (
+    <Accordion.Item uuid={uuid}>
+      <Accordion.Heading>
+        <Accordion.Button>
+          <div css={{ display: 'flex' }}>
+            <span>{title}</span>
+            {!!errorsLength && (
+              <span
+                css={{
+                  marginLeft: 8,
+                  width: 16,
+                  height: 16,
+                  background: colors.negative,
+                  borderRadius: '100%',
+                  color: colors.white,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  ...typography('labelExtraSmall'),
+                }}
+              >
+                {errorsLength}
+              </span>
+            )}
+          </div>
+        </Accordion.Button>
+      </Accordion.Heading>
+      <Accordion.Panel>{children}</Accordion.Panel>
+    </Accordion.Item>
+  );
+};
 
 const RtcSettings = () => {
   const dispatch = useDispatch();
@@ -126,16 +162,13 @@ const RtcSettings = () => {
         >
           {rtcEnabled && (
             <>
-              <AccordionItem uuid="rtcDate" title="Дата и время RTC">
-                <Form.Field name="rtcDate">
+              <AccordionItem uuid="rtcDateTime" title="Дата и время RTC">
+                <Form.Field name="rtcDateTime">
                   <DetailsTrigger
                     title="Дата RTC"
                     description="Вы можете задавать дату для срабатывания прерывания. При отсутствии выбора считается за любое значение."
                   />
-                  <CronDateForm />
-                </Form.Field>
-                <Form.Field name="rtcTime">
-                  <TimeForm />
+                  <DateForm />
                 </Form.Field>
               </AccordionItem>
               <AccordionItem uuid="rtcRegisters" title="Регистры RTC">

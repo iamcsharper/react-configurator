@@ -9,39 +9,50 @@ export enum RtcSourceType {
   Internal = 2,
 }
 
-export interface RtcDate {
-  century: number | null;
-  year: number | null;
-  month: number | null;
-  day: number | null;
+export interface RtcTimeDate {
+  year: number;
+  month: number;
+  day: number;
+  weekDay: number;
+
+  hours: number;
+  minutes: number;
+  seconds: number;
 }
 
-export const rtcDateSchema: toZod<RtcDate> = z.object({
-  century: z.nullable(z.number()),
-  year: z.nullable(z.number()),
-  month: z.nullable(z.number()),
-  day: z.nullable(z.number()),
-});
+export const rtcDateTimeSchema = z
+  .object({
+    year: z.number({ invalid_type_error: 'Год обязательное поле' }),
+    month: z.number({ invalid_type_error: 'Месяц обязательное поле' }),
+    day: z.number({ invalid_type_error: 'Число обязательное поле' }),
+    weekDay: z.number({ invalid_type_error: 'Несуществующая дата' }),
 
-export interface RtcTime {
-  hours: number | null;
-  minutes: number | null;
-  seconds: number | null;
-}
+    hours: z.number({ invalid_type_error: 'Часы обязательное поле' }),
+    minutes: z.number({ invalid_type_error: 'Минуты обязательное поле' }),
+    seconds: z.number({ invalid_type_error: 'Секунды обязательное поле' }),
+  })
+  .superRefine((arg, ctx) => {
+    const { day, month, year } = arg;
 
-export const rtcTimeSchema: toZod<RtcTime> = z.object({
-  hours: z.nullable(z.number()),
-  minutes: z.nullable(z.number()),
-  seconds: z.nullable(z.number()),
-});
+    const dateStr = `${Number(month) + 1}-${day}-${year}`;
+    const tryDate = new Date(dateStr);
+
+    if (tryDate.getMonth() !== month) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.invalid_date,
+        message: 'Дата не существует',
+        fatal: true,
+        path: [],
+      });
+    }
+  }) as never as toZod<RtcTimeDate>;
 
 export interface RtcState {
   rtcEnabled: boolean;
   alarmEnabled: boolean;
 
   rtcSource: RtcSourceType;
-  rtcDate: RtcDate;
-  rtcTime: RtcTime;
+  rtcDateTime: RtcTimeDate;
   rtcRegisters: number[];
 
   // TODO: alarm date and time?
@@ -51,8 +62,7 @@ export const rtcStateSchema: toZod<Omit<RtcState, 'rtcSource'>> = z.object({
   alarmEnabled: z.boolean(),
   rtcEnabled: z.boolean(),
   rtcSource: z.nativeEnum(RtcSourceType),
-  rtcDate: rtcDateSchema,
-  rtcTime: rtcTimeSchema,
+  rtcDateTime: rtcDateTimeSchema,
   rtcRegisters: z
     .number({ invalid_type_error: 'Необходимо число, а не строка' })
     .array()
@@ -63,22 +73,19 @@ export const rtcRegisterSchema = zodStringToNumber(
   z
     .number()
     .min(0, 'Число должно быть больше 0')
-    .max(2 ** 32 - 1, 'Число должно быть менее 2 ^ 32 - 1\n(4 294 967 295)')
-    .optional(),
+    .max(2 ** 32 - 1, 'Число должно быть менее 2 ^ 32 - 1\n(4 294 967 295)'),
 );
 
 const initialState: RtcState = {
   alarmEnabled: false,
-  rtcDate: {
-    century: null,
-    day: null,
-    month: null,
-    year: null,
-  },
-  rtcTime: {
-    hours: null,
-    minutes: null,
-    seconds: null,
+  rtcDateTime: {
+    day: null as never as number,
+    month: null as never as number,
+    year: null as never as number,
+    weekDay: null as never as number,
+    hours: null as never as number,
+    minutes: null as never as number,
+    seconds: null as never as number,
   },
   rtcEnabled: false,
   rtcRegisters: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -100,14 +107,11 @@ export const rtcSlice = createSlice({
         state.alarmEnabled = false;
       }
     },
-    setRtcDate: (state, action: PayloadAction<RtcDate>) => {
-      state.rtcDate = action.payload;
+    setRtcDateTime: (state, action: PayloadAction<RtcTimeDate>) => {
+      state.rtcDateTime = action.payload;
     },
     setRtcSource: (state, action: PayloadAction<RtcSourceType>) => {
       state.rtcSource = action.payload;
-    },
-    setRtcTime: (state, action: PayloadAction<RtcTime>) => {
-      state.rtcTime = action.payload;
     },
     setRtcRegisters: (
       state,
@@ -129,9 +133,8 @@ export const {
   setRtc,
   setAlarmEnabled,
   setRtcEnabled,
-  setRtcDate,
+  setRtcDateTime,
   setRtcSource,
-  setRtcTime,
   setRtcRegisters,
   setRtcRegister,
 } = rtcSlice.actions;

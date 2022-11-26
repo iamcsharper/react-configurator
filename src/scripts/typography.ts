@@ -149,7 +149,7 @@ const Typographies = {
       desktop: {
         fontFamily: 'Calibri',
         fontWeight: 700,
-        fontSize: '0.6875rem',
+        fontSize: '0.75625rem',
         lineHeight: 1.45,
       },
       mobile: {

@@ -23,7 +23,7 @@ export const joinOptions = ({
   selected?: OptionShape;
   selectedMultiple?: OptionShape[];
 }) => {
-  const options = selectedMultiple || (selected ? [selected] : []);
+  const options = selectedMultiple || (selected !== undefined ? [selected] : []);
 
   if (!options.length) return null;
 
