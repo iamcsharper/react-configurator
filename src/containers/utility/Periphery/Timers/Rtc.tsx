@@ -336,7 +336,6 @@ const Rtc = () => {
         </Tabs>
       </PeripheryWrapper>
       <FormSticky
-        defaultValues={rtcInitialState}
         onDefaultReset={() => {
           dispatch(setRtc(rtcInitialState));
           // form.reset(rtcInitialState);

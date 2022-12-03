@@ -9,15 +9,9 @@ import { useFormState } from 'react-hook-form';
 
 export type FormStickyProps = {
   className?: string;
-  defaultValues: any;
 } & Pick<FormResetTooltipProps, 'onDefaultReset'>;
 
-export const FormSticky = ({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  defaultValues,
-  onDefaultReset,
-  className,
-}: FormStickyProps) => {
+export const FormSticky = ({ onDefaultReset, className }: FormStickyProps) => {
   const { isDirty } = useFormState();
 
   return (
