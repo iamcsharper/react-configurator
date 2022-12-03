@@ -1,6 +1,6 @@
 import { colors } from '@scripts/colors';
 import { scale } from '@scripts/helpers';
-import { forwardRef, useEffect, useMemo, useState } from 'react';
+import { useRef, forwardRef, useEffect, useMemo, useState } from 'react';
 
 import { useFormContext } from 'react-hook-form';
 
@@ -57,9 +57,7 @@ const optionsSeconds = [...Array(60)].map((_, i) => ({
   key: `${i}`.padStart(2, '0'),
 }));
 
-const valueToDate = (value: DateTimeFormValues) => {
-  const { day, month, year } = value;
-
+const valueToDate = (year: any, month: any, day: any) => {
   const dateStr = `${Number(month) + 1}-${day}-${year}`;
   const tryDate = new Date(dateStr);
 
@@ -85,28 +83,33 @@ const DateForm = (
   );
 
   const { watch, setValue } = useFormContext();
-  const innerValue = watch(name);
+  const year = watch(`${name}.year`);
+  const month = watch(`${name}.month`);
+  const day = watch(`${name}.day`);
 
-  // const [innerValue, setInnerValue] =
-  //   useState<DateTimeFormValues>(defaultValue);
+  const hours = watch(`${name}.hours`);
+  const minutes = watch(`${name}.minutes`);
+  const seconds = watch(`${name}.seconds`);
+
+  const setValueRef = useRef<typeof setValue>();
+  setValueRef.current = setValue;
+
   const [selectedDate, setSelectedDate] = useState<Date>();
 
   useEffect(() => {
-    const tryDate = valueToDate(innerValue);
+    const tryDate = valueToDate(year, month, day);
 
     if (tryDate) {
-      console.log('tryDate=', tryDate);
-      // old.weekDay = tryDate.getDay();
+      console.log('set date', tryDate);
+      setValueRef.current?.(`${name}.weekDay`, tryDate.getDay());
     }
+
     setSelectedDate(tryDate);
-  }, [innerValue]);
+  }, [day, month, name, year]);
 
   const formattedTime = useMemo(
-    () =>
-      [innerValue.hours, innerValue.minutes, innerValue.seconds]
-        .map(getTerm)
-        .join(':'),
-    [innerValue],
+    () => [hours, minutes, seconds].map(getTerm).join(':'),
+    [hours, minutes, seconds],
   );
 
   const formatted = useMemo(() => {
@@ -173,7 +176,6 @@ const DateForm = (
             const year = date.getFullYear();
             const month = date.getMonth();
             const day = date.getDate();
-            const weekDay = date.getDay();
 
             const hours = date.getHours();
             const minutes = date.getMinutes();
@@ -184,7 +186,6 @@ const DateForm = (
               {
                 day,
                 month,
-                weekDay,
                 year,
                 hours,
                 minutes,

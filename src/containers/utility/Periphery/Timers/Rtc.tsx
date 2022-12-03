@@ -233,11 +233,11 @@ const Rtc = () => {
     ...withValidation(rtcStateSchema),
   });
 
-  console.log('Rtc re-rendered. form=', form.getValues(), 'rtc=', rtc);
-
   const rtcEnabled = form.watch('rtcEnabled');
 
-  const { isDirty, isDefaultDirty } = useIsDirty(form, rtc, rtcInitialState);
+  const { isDirty } = form.formState;
+
+  const { isDefaultDirty } = useIsDirty(form, rtc, rtcInitialState);
   const [showPrompt, confirmNavigation, cancelNavigation] =
     useCallbackPrompt(isDirty);
 
@@ -259,7 +259,9 @@ const Rtc = () => {
               year: +vals.rtcDateTime.year,
             },
           };
-          console.log('submit vals:', newRtc);
+
+          console.log('SUBMIT!!!!', newRtc);
+
           dispatch(setRtc(newRtc));
           form.reset(newRtc);
         }}

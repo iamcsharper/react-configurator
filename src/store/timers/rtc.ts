@@ -32,9 +32,6 @@ export const rtcDateTimeSchema = z
     day: zodStringToNumber(
       z.number({ required_error: ErrorMessages.Required }),
     ),
-    weekDay: zodStringToNumber(
-      z.number({ required_error: ErrorMessages.Required }),
-    ),
     hours: zodStringToNumber(
       z.number({ required_error: ErrorMessages.Required }),
     ),
