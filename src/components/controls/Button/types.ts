@@ -3,7 +3,7 @@ import { SVGRIcon } from '@customTypes/index';
 import { BaseThemeState, StyleDefinition } from '@scripts/theme';
 
 import { MergeElementProps } from '@scripts/helpers';
-import { ElementType, ReactNode } from 'react';
+import { ElementType, FC, ReactNode } from 'react';
 import { CSSObject } from '@emotion/react';
 
 export enum ButtonVariants {
@@ -50,7 +50,7 @@ export interface ButtonBaseProps
   /** Block type. Use 100% of parent width. */
   block?: boolean;
   /** Icon. Accepts SVGR icon or custom JSX. */
-  Icon?: SVGRIcon;
+  Icon?: SVGRIcon | FC<any>;
   FaIcon?: IconDefinition;
   /** Place icon after text. */
   iconAfter?: boolean;

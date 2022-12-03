@@ -372,6 +372,18 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
       [addrCol],
     );
 
+    const tableOptions = useMemo(
+      () => ({
+        meta: {
+          onChangeRowRef,
+          sharedFormat,
+          validationSchema,
+          defaultValue,
+        },
+      }),
+      [defaultValue, sharedFormat, validationSchema],
+    );
+
     return (
       <div ref={ref}>
         <Select
@@ -393,14 +405,7 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
           css={{
             overflow: 'unset',
           }}
-          options={{
-            meta: {
-              onChangeRowRef,
-              sharedFormat,
-              validationSchema,
-              defaultValue,
-            },
-          }}
+          options={tableOptions}
         />
       </div>
     );

@@ -1,19 +1,13 @@
 import { colors } from '@scripts/colors';
-import { parseSafeInt, scale, formatRHFError } from '@scripts/helpers';
-import {
-  forwardRef,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-  useState,
-} from 'react';
+import { scale } from '@scripts/helpers';
+import { forwardRef, useEffect, useMemo, useState } from 'react';
 
-import { ControllerFieldState } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 
 import Mask from '../Mask';
-import { Select, OptionShape } from '../NewSelect';
+import Select, { OptionShape } from '../NewSelect';
 import Button from '../Button';
+import Form from '../Form';
 
 export interface DateTimeFormValues {
   weekDay: number | null;
@@ -27,11 +21,7 @@ export interface DateTimeFormValues {
 }
 
 export interface DateFormProps {
-  value?: DateTimeFormValues;
-  error?: string;
-  fieldState?: ControllerFieldState;
-  defaultValue?: DateTimeFormValues;
-  onChange?: (value: DateTimeFormValues) => void;
+  name: string;
 }
 
 const months = [
@@ -48,17 +38,6 @@ const months = [
   'Ноябрь',
   'Декабрь',
 ];
-
-const INITIAL_VALUES: DateTimeFormValues = {
-  day: null,
-  month: null,
-  year: null,
-  weekDay: null,
-
-  hours: null,
-  minutes: null,
-  seconds: null,
-};
 
 const getTerm = (val: number | null) =>
   val === null ? 'XX' : `${val}`.padStart(2, '0');
@@ -92,13 +71,7 @@ const valueToDate = (value: DateTimeFormValues) => {
 };
 
 const DateForm = (
-  {
-    value,
-    error: propsError,
-    fieldState,
-    defaultValue = INITIAL_VALUES,
-    onChange: onChangeProp,
-  }: DateFormProps,
+  { name }: DateFormProps,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _ref?: any,
 ) => {
@@ -111,56 +84,22 @@ const DateForm = (
     [],
   );
 
-  const [innerValue, setInnerValue] =
-    useState<DateTimeFormValues>(defaultValue);
+  const { watch, setValue } = useFormContext();
+  const innerValue = watch(name);
+
+  // const [innerValue, setInnerValue] =
+  //   useState<DateTimeFormValues>(defaultValue);
   const [selectedDate, setSelectedDate] = useState<Date>();
-  const [isTouched, setTouched] = useState(false);
 
   useEffect(() => {
-    const newVal: DateTimeFormValues = {
-      day: parseSafeInt(value?.day),
-      month: parseSafeInt(value?.month),
-      weekDay: parseSafeInt(value?.weekDay),
-      year: parseSafeInt(value?.year),
-      hours: parseSafeInt(value?.hours),
-      minutes: parseSafeInt(value?.minutes),
-      seconds: parseSafeInt(value?.seconds),
-    };
-    setInnerValue(newVal);
-
-    const tryDate = valueToDate(newVal);
-    setSelectedDate(tryDate);
-  }, [value]);
-
-  const selectedMonth =
-    optionsMonths.find((e) => e.value === innerValue.month) || null;
-
-  const dateHash = useMemo(
-    () => Object.values(innerValue).join('-'),
-    [innerValue],
-  );
-
-  useEffect(() => {
-    if (!isTouched) return;
-
     const tryDate = valueToDate(innerValue);
 
     if (tryDate) {
-      setInnerValue((old) => {
-        old.weekDay = tryDate.getDay();
-        return old;
-      });
+      console.log('tryDate=', tryDate);
+      // old.weekDay = tryDate.getDay();
     }
     setSelectedDate(tryDate);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateHash]);
-
-  const rhfError = useMemo(
-    () => formatRHFError(fieldState?.error),
-    [fieldState?.error],
-  );
-
-  const error = rhfError || propsError;
+  }, [innerValue]);
 
   const formattedTime = useMemo(
     () =>
@@ -180,18 +119,6 @@ const DateForm = (
     return `${dateFormatted} ${formattedTime}`;
   }, [formattedTime, selectedDate]);
 
-  const onChangePropRef = useRef<typeof onChangeProp>();
-  onChangePropRef.current = onChangeProp;
-
-  const currentValueRef = useRef<typeof innerValue>();
-  currentValueRef.current = innerValue;
-
-  const onChange = useCallback(() => {
-    setTimeout(() => {
-      onChangePropRef.current?.(currentValueRef.current!);
-    }, 0);
-  }, []);
-
   return (
     <div>
       <div
@@ -203,7 +130,6 @@ const DateForm = (
       >
         <strong>Выбрана дата:</strong>
         <p>{formatted}</p>
-        {error && <p css={{ color: colors.negative }}>{error}</p>}
       </div>
       <div
         css={{
@@ -212,126 +138,31 @@ const DateForm = (
           gap: scale(1),
         }}
       >
-        <div>
+        <Form.Field label="Год" name={`${name}.year`}>
+          <Mask mask="0000" autoComplete="off" size="md" />
+        </Form.Field>
+        <Form.Field label="Месяц" name={`${name}.month`}>
+          <Select options={optionsMonths} />
+        </Form.Field>
+        <Form.Field label="Число" name={`${name}.day`}>
           <Mask
-            label="Год"
-            mask="0000"
-            value={`${innerValue.year || ''}`}
-            autoComplete="off"
-            onBlur={(e) => {
-              e.preventDefault();
-
-              onChange();
-            }}
-            error={!!error}
-            size="md"
-            onAccept={(newVal) => {
-              setInnerValue((old) => ({
-                ...old,
-                year: parseSafeInt(newVal),
-              }));
-
-              setTouched(true);
-            }}
-          />
-        </div>
-        <Select
-          options={optionsMonths}
-          label="Месяц"
-          onChange={(month) => {
-            setInnerValue((old) => ({
-              ...old,
-              month: parseSafeInt(month?.selected?.value),
-            }));
-
-            setTouched(true);
-
-            onChange();
-          }}
-          error={!!error}
-          selected={selectedMonth}
-        />
-        <div>
-          <Mask
-            label="Число"
             mask={Number}
             min={1}
             max={31}
             lazy={false}
-            value={`${innerValue.day || ''}`}
-            error={!!error}
             autoComplete="off"
-            onBlur={(e) => {
-              e.preventDefault();
-
-              onChange();
-            }}
             size="md"
-            // error={error}
-            onAccept={(newVal) => {
-              setInnerValue((old) => ({
-                ...old,
-                day: parseSafeInt(newVal),
-              }));
-
-              setTouched(true);
-            }}
           />
-        </div>
-        <Select
-          options={optionsHours}
-          label="Часы"
-          onChange={(val) => {
-            setInnerValue((old) => ({
-              ...old,
-              hours: parseSafeInt(val.selected?.value),
-            }));
-
-            setTouched(true);
-
-            onChange();
-          }}
-          error={!!error}
-          selected={
-            optionsHours.find((e) => e.value === innerValue.hours) || null
-          }
-        />
-        <Select
-          options={optionsMinutes}
-          label="Минуты"
-          error={!!error}
-          onChange={(val) => {
-            setInnerValue((old) => ({
-              ...old,
-              minutes: parseSafeInt(val.selected?.value),
-            }));
-
-            setTouched(true);
-
-            onChange();
-          }}
-          selected={
-            optionsMinutes.find((e) => e.value === innerValue.minutes) || null
-          }
-        />
-        <Select
-          options={optionsSeconds}
-          label="Секунды"
-          error={!!error}
-          onChange={(val) => {
-            setInnerValue((old) => ({
-              ...old,
-              seconds: parseSafeInt(val.selected?.value),
-            }));
-
-            setTouched(true);
-
-            onChange();
-          }}
-          selected={
-            optionsSeconds.find((e) => e.value === innerValue.seconds) || null
-          }
-        />
+        </Form.Field>
+        <Form.Field label="Часы" name={`${name}.hours`}>
+          <Select options={optionsHours} />
+        </Form.Field>
+        <Form.Field label="Минуты" name={`${name}.minutes`}>
+          <Select options={optionsMinutes} />
+        </Form.Field>
+        <Form.Field label="Секунды" name={`${name}.seconds`}>
+          <Select options={optionsSeconds} />
+        </Form.Field>
       </div>
       <div css={{ marginTop: scale(1) }}>
         <Button
@@ -348,19 +179,22 @@ const DateForm = (
             const minutes = date.getMinutes();
             const seconds = date.getSeconds();
 
-            setInnerValue({
-              day,
-              month,
-              weekDay,
-              year,
-              hours,
-              minutes,
-              seconds,
-            });
-
-            setTouched(true);
-
-            onChange();
+            setValue(
+              name,
+              {
+                day,
+                month,
+                weekDay,
+                year,
+                hours,
+                minutes,
+                seconds,
+              },
+              {
+                shouldTouch: true,
+                shouldValidate: true,
+              },
+            );
           }}
         >
           Взять дату с компьютера

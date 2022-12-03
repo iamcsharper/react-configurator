@@ -73,6 +73,8 @@ const Tooltip: FC<TippyProps> = ({
             right: -scale(2),
           },
         }),
+
+        '.tippy-content': { padding: `${scale(1)}px ${scale(1)}px` },
         ...(theme === 'light' && {
           background: colors?.white,
           borderRadius: 2,
@@ -90,7 +92,6 @@ const Tooltip: FC<TippyProps> = ({
               borderTopColor: colors?.white,
             },
           },
-          '.tippy-content': { padding: `${scale(1)}px 0` },
         }),
       }}
       className={className}

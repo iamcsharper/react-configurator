@@ -41,7 +41,7 @@ const UnsavedPrompt = ({
           ...typography('labelLarge'),
         }}
       >
-        У вас есть несохраненные данные!!!
+        У вас есть несохраненные данные. Вы уверены, что хотите покинуть раздел?
       </p>
 
       <div css={{ display: 'flex', flexDirection: 'row', gap: scale(2) }}>

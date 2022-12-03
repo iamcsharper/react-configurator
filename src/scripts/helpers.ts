@@ -6,12 +6,9 @@ import {
   RefCallback,
 } from 'react';
 
-import { Schema, z, ZodTypeAny } from 'zod';
+import { Schema } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FieldError } from 'react-hook-form';
-
-export const zodStringToNumber = (schema: ZodTypeAny) =>
-  z.preprocess((a) => (a ? Number(a as string) : undefined), schema);
 
 export type MergeElementProps<T extends ElementType, P extends object = {}> =
   Omit<ComponentPropsWithRef<T>, keyof P> & P;

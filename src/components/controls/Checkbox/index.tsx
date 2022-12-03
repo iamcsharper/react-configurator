@@ -1,10 +1,10 @@
 import { HTMLProps, useMemo, forwardRef, useRef, useEffect } from 'react';
 import { ReactComponent as CheckIcon } from '@icons/small/check.svg';
-import { Controller, useFormContext } from 'react-hook-form';
 import cn from 'classnames';
 import { scale } from '@scripts/helpers';
 import { colors } from '@scripts/colors';
 import { CSSObject } from '@emotion/react';
+import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form';
 
 export interface CheckboxProps extends HTMLProps<HTMLInputElement> {
   /** Active state indeterminate */
@@ -21,32 +21,32 @@ export interface CheckboxProps extends HTMLProps<HTMLInputElement> {
   inputClasses?: string;
   /** Show error flag */
   showError?: boolean;
-  forceControlled?: boolean;
+
+  field?: ControllerRenderProps;
+  fieldState?: ControllerFieldState;
 }
 
 const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   (
     {
       name,
+      field,
+      fieldState,
       value,
       isIndeterminate = false,
       all = false,
       indeterminate,
       children,
       className,
-      checked,
-      forceControlled,
-      // showError,
+      checked: checkedFromProps,
       ...props
     },
     ref,
   ) => {
-    const id = `${name}-${value}`;
     const innerRef = useRef<HTMLInputElement>(null);
-    const formContext = useFormContext();
-    const { control } = formContext || {};
-
     const actualRef = ref || innerRef;
+
+    const id = `${name || field?.name}-${value}`;
 
     useEffect(() => {
       if (!isIndeterminate) return;
@@ -56,6 +56,15 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         actualRef.current.checked = all;
       }
     }, [actualRef, all, indeterminate, isIndeterminate]);
+
+    let checked: boolean | undefined = checkedFromProps;
+    if (field) {
+      if (typeof value === 'string' && Array.isArray(field?.value)) {
+        checked = field?.value?.includes(value);
+      } else if (typeof field?.value === 'boolean') {
+        checked = field.value;
+      }
+    }
 
     const labelCSS = useMemo<CSSObject>(
       () => ({
@@ -135,44 +144,6 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       [],
     );
 
-    if (name && !forceControlled && control) {
-      return (
-        <Controller
-          name={name}
-          control={control}
-          render={({ field, fieldState }) => (
-            <div className={className}>
-              {/* <Legend meta={meta} showError={showError} errorCSS={errorMessageCSS}> */}
-              <input
-                {...props}
-                {...field}
-                id={id}
-                type="checkbox"
-                value={value}
-                css={{ position: 'absolute', clip: 'rect(0, 0, 0, 0)' }}
-              />
-              <label
-                htmlFor={id}
-                css={labelCSS}
-                className={cn({
-                  invalid: fieldState.error,
-                })}
-              >
-                <span className="knob" />
-                <CheckIcon css={iconCSS} />
-                {children}
-              </label>
-              {/* </Legend> */}
-            </div>
-          )}
-        />
-      );
-    }
-
-    // alert('we are here');
-
-    delete props.ref;
-
     return (
       <div className={className}>
         {/* <Legend meta={meta} showError={showError} errorCSS={errorMessageCSS}> */}
@@ -190,7 +161,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           htmlFor={id}
           css={labelCSS}
           className={cn({
-            invalid: false,
+            invalid: !!fieldState?.error?.message,
           })}
         >
           <span className="knob" />
@@ -202,5 +173,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     );
   },
 );
+
+Checkbox.displayName = 'Checkbox';
 
 export default Checkbox;

@@ -2,7 +2,8 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { z } from 'zod';
 import { toZod } from 'tozod';
-import { zodStringToNumber } from '@scripts/helpers';
+import { zodStringToNumber } from '@scripts/validations';
+import { ErrorMessages } from '@scripts/constants';
 
 export enum RtcSourceType {
   External = 1,
@@ -22,17 +23,32 @@ export interface RtcTimeDate {
 
 export const rtcDateTimeSchema = z
   .object({
-    year: z.number({ invalid_type_error: 'Год обязательное поле' }),
-    month: z.number({ invalid_type_error: 'Месяц обязательное поле' }),
-    day: z.number({ invalid_type_error: 'Число обязательное поле' }),
-    weekDay: z.number({ invalid_type_error: 'Несуществующая дата' }),
-
-    hours: z.number({ invalid_type_error: 'Часы обязательное поле' }),
-    minutes: z.number({ invalid_type_error: 'Минуты обязательное поле' }),
-    seconds: z.number({ invalid_type_error: 'Секунды обязательное поле' }),
+    year: zodStringToNumber(
+      z.number({ required_error: ErrorMessages.Required }),
+    ),
+    month: zodStringToNumber(
+      z.number({ required_error: ErrorMessages.Required }),
+    ),
+    day: zodStringToNumber(
+      z.number({ required_error: ErrorMessages.Required }),
+    ),
+    weekDay: zodStringToNumber(
+      z.number({ required_error: ErrorMessages.Required }),
+    ),
+    hours: zodStringToNumber(
+      z.number({ required_error: ErrorMessages.Required }),
+    ),
+    minutes: zodStringToNumber(
+      z.number({ required_error: ErrorMessages.Required }),
+    ),
+    seconds: zodStringToNumber(
+      z.number({ required_error: ErrorMessages.Required }),
+    ),
   })
   .superRefine((arg, ctx) => {
     const { day, month, year } = arg;
+
+    // console.log('superRefining!', day, month, year);
 
     const dateStr = `${Number(month) + 1}-${day}-${year}`;
     const tryDate = new Date(dateStr);

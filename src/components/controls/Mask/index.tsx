@@ -14,8 +14,9 @@ import { FormFieldProps } from '@controls/Form/types';
 import { useInputCSS } from '@scripts/hooks/useInputCSS';
 
 import FormControl from '@controls/FormControl';
+import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form';
 
-export interface MaskProps extends Omit<FormFieldProps, 'name'> {
+export interface MaskProps extends Omit<FormFieldProps, 'name' | 'onChange'> {
   /** Input name */
   name?: string;
   /** Mask for input */
@@ -26,8 +27,10 @@ export interface MaskProps extends Omit<FormFieldProps, 'name'> {
   lazy?: boolean;
 
   error?: string | boolean;
+  field?: ControllerRenderProps;
+  fieldState?: ControllerFieldState;
 
-  /** onChange handler */
+  onChange?: (value: string) => void;
   onAccept?: (value: string) => void;
   dispatch?: (
     appended: string,
@@ -44,6 +47,10 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
   (
     {
       name,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      field,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      fieldState,
       mask,
       className,
       placeholderChar = '_',
@@ -62,7 +69,7 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
       labelView,
       inputCSS,
       block = true,
-      value,
+      value: valueFromProps,
       ...props
     },
     ref,
@@ -71,7 +78,8 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
     const htmlFor = props.id || id;
     const defaultCSS = useInputCSS();
 
-    const filled = Boolean(value);
+    const filled = Boolean(valueFromProps);
+    const value = `${valueFromProps}`;
 
     const inputRef = useRef<HTMLInputElement>(null);
     const [focused, setFocused] = useState(false);
@@ -133,8 +141,8 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
           css={{ ...defaultCSS, ...inputCSS }}
           lazy={lazy}
           placeholderChar={placeholderChar}
-          onAccept={(val: any, _, e: any) => {
-            if (onChange) onChange(e, { value: val });
+          onAccept={(val: any) => {
+            if (onChange) onChange(val);
             if (onAccept) onAccept(val);
           }}
           // unmask
