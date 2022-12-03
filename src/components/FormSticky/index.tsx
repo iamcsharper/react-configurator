@@ -5,18 +5,20 @@ import {
 } from '@components/FormResetTooltip';
 import { colors, shadows } from '@scripts/colors';
 import { scale } from '@scripts/helpers';
+import { useFormState } from 'react-hook-form';
 
-export interface FormStickyProps extends FormResetTooltipProps {
+export type FormStickyProps = {
   className?: string;
-}
+  defaultValues: any;
+} & Pick<FormResetTooltipProps, 'onDefaultReset'>;
 
 export const FormSticky = ({
-  isDirty,
-  isDefaultDirty,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  defaultValues,
   onDefaultReset,
   className,
 }: FormStickyProps) => {
-  if (!isDefaultDirty && !isDirty) return null;
+  const { isDirty } = useFormState();
 
   return (
     <div
@@ -39,7 +41,7 @@ export const FormSticky = ({
       )}
       <FormResetTooltip
         isDirty={isDirty}
-        isDefaultDirty={isDefaultDirty}
+        isDefaultDirty={isDirty}
         onDefaultReset={onDefaultReset}
       />
     </div>

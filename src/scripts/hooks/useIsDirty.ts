@@ -4,30 +4,20 @@ import deepEqual from 'fast-deep-equal';
 
 export const useIsDirty = (
   form: UseFormReturn<any, any>,
-  initialValues: any,
   defaultValues: any,
 ) => {
   const values = form.watch();
-
-  const isDirty = useMemo(
-    () => !deepEqual(values, initialValues),
-    [values, initialValues],
-  );
-
-  if (isDirty) {
-    console.debug('[useIsDirty] values=', values, 'initial=', initialValues);
-  }
 
   const isDefaultDirty = useMemo(
     () => !deepEqual(values, defaultValues),
     [defaultValues, values],
   );
 
-  return { isDirty, isDefaultDirty };
+  return {  isDefaultDirty };
 };
 
-export const useIsDirtyInContext = (initialValues: any, defaultValues: any) => {
+export const useIsDirtyInContext = (defaultValues: any) => {
   const form = useFormContext();
 
-  return useIsDirty(form, initialValues, defaultValues);
+  return useIsDirty(form, defaultValues);
 };

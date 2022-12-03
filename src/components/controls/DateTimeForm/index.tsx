@@ -93,12 +93,9 @@ const DateForm = (
   const minutes = watch(`${name}.minutes`);
   const seconds = watch(`${name}.seconds`);
 
-  const hash = watch(name);
-
   const tryDate = useMemo(
     () => valueToDate(year, month, day),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hash],
+    [year, month, day],
   );
 
   const weekDay = tryDate?.getDay();
@@ -117,15 +114,13 @@ const DateForm = (
     [hours, minutes, seconds],
   );
 
-  const formatted = useMemo(() => {
+  const formattedDate = useMemo(() => {
     if (!tryDate) return '';
 
-    const dateFormatted = tryDate.toLocaleString('ru-RU', {
+    return tryDate.toLocaleString('ru-RU', {
       dateStyle: 'full',
     });
-
-    return `${dateFormatted} ${formattedTime}`;
-  }, [formattedTime, tryDate]);
+  }, [tryDate]);
 
   return (
     <div>
@@ -137,7 +132,9 @@ const DateForm = (
         }}
       >
         <strong>Выбрана дата:</strong>
-        <p>{formatted}</p>
+        <p>
+          {formattedDate}, {formattedTime}
+        </p>
       </div>
       <div
         css={{

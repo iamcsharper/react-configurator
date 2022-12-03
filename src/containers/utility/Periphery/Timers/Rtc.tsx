@@ -6,11 +6,14 @@ import Form from '@components/controls/Form';
 import Select from '@components/controls/NewSelect';
 import Tabs from '@components/controls/Tabs';
 import { DetailsTrigger } from '@components/DetailsTrigger';
-import { scale, withValidation } from '@scripts/helpers';
+import { scale } from '@scripts/helpers';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import typography from '@scripts/typography';
-import { ReactNode, useCallback } from 'react';
+import { ReactNode, useMemo, useCallback, useEffect, useRef } from 'react';
 import {
   useFormContext,
+  useWatch,
   Controller,
   useForm,
   ControllerRenderProps,
@@ -30,10 +33,8 @@ import { RootState } from '@store/index';
 import { colors } from '@scripts/colors';
 
 import FormControl from '@components/controls/FormControl';
-import { useCallbackPrompt } from '@scripts/hooks/useCallbackPrompt';
-import UnsavedPrompt from '@components/UnsavedPrompt';
+import FormUnsavedPrompt from '@components/UnsavedPrompt';
 import { FormSticky } from '@components/FormSticky';
-import { useIsDirty } from '@scripts/hooks/useIsDirty';
 import { PeripheryWrapper } from '@components/PeripheryWrapper';
 
 const AccordionItem = ({
@@ -90,9 +91,28 @@ const AccordionItem = ({
   );
 };
 
+const ByteTableLabel = () => (
+  <>
+    Таблица регистров
+    <DetailsTrigger
+      title="Регистры RTC"
+      description="Регистры RTC представляют собой 4 байтные значения, записываемые в регистры R0-R15."
+    />
+  </>
+);
+
+const byteTableLabelCSS = {
+  display: 'flex',
+  width: 'fit-content',
+  gap: scale(1),
+  alignItems: 'center',
+};
+
 const RegisterByteTable = () => {
   const form = useFormContext();
   const { control } = form;
+
+  const label = useMemo(() => <ByteTableLabel />, []);
 
   const renderControlledByteTable = useCallback(
     ({
@@ -104,21 +124,8 @@ const RegisterByteTable = () => {
     }) => (
       <FormControl
         block
-        labelCSS={{
-          display: 'flex',
-          width: 'fit-content',
-          gap: scale(1),
-          alignItems: 'center',
-        }}
-        label={
-          <>
-            Таблица регистров
-            <DetailsTrigger
-              title="Регистры RTC"
-              description="Регистры RTC представляют собой 4 байтные значения, записываемые в регистры R0-R15."
-            />
-          </>
-        }
+        labelCSS={byteTableLabelCSS}
+        label={label}
         error={JSON.stringify(fieldState.error)}
       >
         <ByteTable
@@ -128,7 +135,7 @@ const RegisterByteTable = () => {
         />
       </FormControl>
     ),
-    [],
+    [label],
   );
 
   return (
@@ -141,10 +148,9 @@ const RegisterByteTable = () => {
 };
 
 const RtcSettings = () => {
-  const form = useFormContext();
-
-  const rtcEnabled = form.watch('rtcEnabled');
-  const alarmEnabled = form.watch('alarmEnabled');
+  const [rtcEnabled, alarmEnabled] = useWatch({
+    name: ['rtcEnabled', 'alarmEnabled'],
+  });
 
   // TODO: preloader when will be on backend API
   // const rehydrated = useSelector<RootState, boolean>(
@@ -208,26 +214,76 @@ const RtcSettings = () => {
           </>
         )}
       </Accordion>
+
+      <FormUnsavedPrompt />
     </>
   );
 };
 
-const Rtc = () => {
-  const dispatch = useDispatch();
-  const rtc = useSelector<RootState, RtcState>((state) => state.timers.rtc);
-
-  const form = useForm<RtcState>({
-    defaultValues: rtc,
-    ...withValidation(rtcStateSchema),
-  });
+const CommonSettings = () => {
+  const form = useFormContext();
 
   const rtcEnabled = form.watch('rtcEnabled');
 
-  const { isDirty } = form.formState;
+  return (
+    <>
+      <div
+        css={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: scale(1),
+        }}
+      >
+        <Form.Field name="rtcEnabled">
+          <Checkbox>Включить RTC</Checkbox>
+        </Form.Field>
+        <DetailsTrigger title="RTC" description="Информация об RTC" />
+      </div>
+      {rtcEnabled && (
+        <div
+          css={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: scale(1),
+          }}
+        >
+          <Form.Field name="alarmEnabled">
+            <Checkbox>Включить будильник</Checkbox>
+          </Form.Field>
+          <DetailsTrigger
+            title="Будильник"
+            description="Информация о будильнике. Также можно выделять в группы)"
+          />
+        </div>
+      )}
+    </>
+  );
+};
 
-  const { isDefaultDirty } = useIsDirty(form, rtc, rtcInitialState);
-  const [showPrompt, confirmNavigation, cancelNavigation] =
-    useCallbackPrompt(isDirty);
+const RtcForm = ({ children }: { children: ReactNode }) => {
+  const dispatch = useDispatch();
+  const rtc = useSelector<RootState, RtcState>((state) => state.timers.rtc);
+  const form = useForm<RtcState>({
+    defaultValues: rtc,
+    mode: 'all',
+    resolver: zodResolver(rtcStateSchema),
+  });
+
+  const prevs = useRef<any>({});
+
+  useEffect(() => {
+    if (prevs.current.dispatch !== dispatch) console.log('dispatch change');
+    if (prevs.current.rtc !== rtc) console.log('rtc change');
+    if (prevs.current.form !== form) console.log('form change');
+
+    prevs.current = {
+      dispatch,
+      rtc,
+      form,
+    };
+  }, [dispatch, rtc, form]);
 
   return (
     <div
@@ -255,68 +311,42 @@ const Rtc = () => {
           justifyContent: 'space-between',
         }}
       >
-        <PeripheryWrapper title="Настройки RTC">
-          <div
-            css={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: scale(1),
-            }}
-          >
-            <Form.Field name="rtcEnabled">
-              <Checkbox>Включить RTC</Checkbox>
-            </Form.Field>
-            <DetailsTrigger title="RTC" description="Информация об RTC" />
-          </div>
-          {rtcEnabled && (
-            <div
-              css={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: scale(1),
-              }}
-            >
-              <Form.Field name="alarmEnabled">
-                <Checkbox>Включить будильник</Checkbox>
-              </Form.Field>
-              <DetailsTrigger
-                title="Будильник"
-                description="Информация о будильнике. Также можно выделять в группы)"
-              />
-            </div>
-          )}
-          <Tabs css={{ marginTop: scale(2) }} forceRenderTabPanel>
-            <Tabs.List>
-              <Tabs.Tab>Настройки</Tabs.Tab>
-              <Tabs.Tab>Прерывания</Tabs.Tab>
-            </Tabs.List>
-            <Tabs.Panel>
-              <RtcSettings />
-            </Tabs.Panel>
-            <Tabs.Panel>Interrupts</Tabs.Panel>
-          </Tabs>
-        </PeripheryWrapper>
-        <FormSticky
-          isDirty={isDirty}
-          isDefaultDirty={isDefaultDirty}
-          onDefaultReset={() => {
-            dispatch(setRtc(rtcInitialState));
-            form.reset(rtcInitialState);
-          }}
-          css={{
-            padding: scale(2),
-            justifyContent: 'end',
-          }}
-        />
+        {children}
       </Form>
-      <UnsavedPrompt
-        isOpen={showPrompt}
-        confirmNavigation={confirmNavigation}
-        cancelNavigation={cancelNavigation}
-      />
     </div>
+  );
+};
+
+const Rtc = () => {
+  const dispatch = useDispatch();
+
+  return (
+    <RtcForm>
+      <PeripheryWrapper title="Настройки RTC">
+        <CommonSettings />
+        <Tabs css={{ marginTop: scale(2) }} forceRenderTabPanel>
+          <Tabs.List>
+            <Tabs.Tab>Настройки</Tabs.Tab>
+            <Tabs.Tab>Прерывания</Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel>
+            <RtcSettings />
+          </Tabs.Panel>
+          <Tabs.Panel>Interrupts</Tabs.Panel>
+        </Tabs>
+      </PeripheryWrapper>
+      <FormSticky
+        defaultValues={rtcInitialState}
+        onDefaultReset={() => {
+          dispatch(setRtc(rtcInitialState));
+          // form.reset(rtcInitialState);
+        }}
+        css={{
+          padding: scale(2),
+          justifyContent: 'end',
+        }}
+      />
+    </RtcForm>
   );
 };
 

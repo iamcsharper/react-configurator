@@ -4,9 +4,12 @@ import Button from '@components/controls/Button';
 import { colors } from '@scripts/colors';
 import { scale } from '@scripts/helpers';
 import typography from '@scripts/typography';
+import { useCallbackPrompt } from '@scripts/hooks/useCallbackPrompt';
+
+import { useFormState } from 'react-hook-form';
 
 // TODO: Modal https://github.com/core-ds/core-components/tree/c0780faf90e1e2991acd38a0e67383f15ac30427/packages/modal
-const UnsavedPrompt = ({
+export const UnsavedPrompt = ({
   isOpen,
   cancelNavigation,
   confirmNavigation,
@@ -54,4 +57,19 @@ const UnsavedPrompt = ({
     </div>
   ) : null;
 
-export default UnsavedPrompt;
+const FormUnsavedPrompt = () => {
+  const { isDirty } = useFormState();
+
+  const [showPrompt, confirmNavigation, cancelNavigation] =
+    useCallbackPrompt(isDirty);
+
+  return (
+    <UnsavedPrompt
+      isOpen={showPrompt}
+      cancelNavigation={cancelNavigation}
+      confirmNavigation={confirmNavigation}
+    />
+  );
+};
+
+export default FormUnsavedPrompt;

@@ -7,6 +7,7 @@ import { ZodSchema } from 'zod';
 
 import { CellContext, ColumnDef, RowData } from '@tanstack/react-table';
 import {
+  memo,
   useMemo,
   useState,
   forwardRef,
@@ -414,4 +415,4 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
 
 ByteTable.displayName = 'ByteTable';
 
-export default ByteTable;
+export default memo(ByteTable);
