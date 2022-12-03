@@ -6,8 +6,8 @@ import { zodStringToNumber } from '@scripts/validations';
 import { ErrorMessages } from '@scripts/constants';
 
 export enum RtcSourceType {
-  External = 1,
-  Internal = 2,
+  External = 'internal',
+  Internal = 'external',
 }
 
 export interface RtcTimeDate {
@@ -29,6 +29,7 @@ export const rtcDateTimeSchema = z
     month: zodStringToNumber(
       z.number({ required_error: ErrorMessages.Required }),
     ),
+    weekDay: z.number().optional(),
     day: zodStringToNumber(
       z.number({ required_error: ErrorMessages.Required }),
     ),

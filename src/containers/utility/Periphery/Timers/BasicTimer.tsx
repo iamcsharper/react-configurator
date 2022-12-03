@@ -19,7 +19,9 @@ const BasicTimer = ({ timerName }: { timerName: string }) => {
       }}
     >
       <h4>Таймер {timerName}</h4>
-      <DetailsTrigger title="Test 2" description="Test 2 description" />
+      <div css={{ display: 'flex' }}>
+        <DetailsTrigger title="Test 2" description="Test 2 description" />
+      </div>
     </div>
   );
 };

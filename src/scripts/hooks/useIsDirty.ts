@@ -15,7 +15,7 @@ export const useIsDirty = (
   );
 
   if (isDirty) {
-    console.log('[useIsDirty] values=', values, 'initial=', initialValues);
+    console.debug('[useIsDirty] values=', values, 'initial=', initialValues);
   }
 
   const isDefaultDirty = useMemo(

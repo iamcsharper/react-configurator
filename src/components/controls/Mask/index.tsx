@@ -30,6 +30,8 @@ export interface MaskProps extends Omit<FormFieldProps, 'name' | 'onChange'> {
   field?: ControllerRenderProps;
   fieldState?: ControllerFieldState;
 
+  transformValue?: (val: string) => any;
+
   onChange?: (value: string) => void;
   onAccept?: (value: string) => void;
   dispatch?: (
@@ -43,10 +45,13 @@ export interface MaskProps extends Omit<FormFieldProps, 'name' | 'onChange'> {
   ) => void;
 }
 
+const noopTransform = (val: string) => val;
+
 const Mask = forwardRef<HTMLInputElement, MaskProps>(
   (
     {
       name,
+      transformValue = noopTransform,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       field,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -142,8 +147,10 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
           lazy={lazy}
           placeholderChar={placeholderChar}
           onAccept={(val: any) => {
-            if (onChange) onChange(val);
-            if (onAccept) onAccept(val);
+            const transformed = transformValue(val);
+
+            if (onChange) onChange(transformed);
+            if (onAccept) onAccept(transformed);
           }}
           // unmask
           autofix={false}

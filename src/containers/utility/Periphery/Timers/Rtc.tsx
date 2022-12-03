@@ -23,6 +23,7 @@ import {
   setRtc,
   rtcStateSchema,
   rtcRegisterSchema,
+  RtcSourceType,
 } from '@store/timers/rtc';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@store/index';
@@ -33,20 +34,7 @@ import { useCallbackPrompt } from '@scripts/hooks/useCallbackPrompt';
 import UnsavedPrompt from '@components/UnsavedPrompt';
 import { FormSticky } from '@components/FormSticky';
 import { useIsDirty } from '@scripts/hooks/useIsDirty';
-
-// const DetailedField = ({
-//   label,
-//   name,
-//   description,
-// }: {
-//   label: string;
-//   name: string;
-//   description: string;
-// }) => (
-//   <DetailedItemWrapper id={name} title={label} description={description}>
-//     <Form.Field name={name} label={label} />
-//   </DetailedItemWrapper>
-// );
+import { PeripheryWrapper } from '@components/PeripheryWrapper';
 
 const AccordionItem = ({
   children,
@@ -173,11 +161,11 @@ const RtcSettings = () => {
             options={[
               {
                 key: 'Внешний осциллятор OSC32K',
-                value: 1,
+                value: RtcSourceType.External,
               },
               {
                 key: 'Внутренний осциллятор LSI32K',
-                value: 2,
+                value: RtcSourceType.Internal,
               },
             ]}
           />
@@ -251,19 +239,10 @@ const Rtc = () => {
       <Form
         methods={form}
         onSubmit={(vals) => {
-          const newRtc = {
-            ...vals,
-            rtcDateTime: {
-              ...vals.rtcDateTime,
-              day: +vals.rtcDateTime.day,
-              year: +vals.rtcDateTime.year,
-            },
-          };
+          console.log('SUBMIT!!!!', vals);
 
-          console.log('SUBMIT!!!!', newRtc);
-
-          dispatch(setRtc(newRtc));
-          form.reset(newRtc);
+          dispatch(setRtc(vals));
+          form.reset(vals);
         }}
         onReset={() => {
           dispatch(setRtc(form.getValues()));
@@ -276,16 +255,7 @@ const Rtc = () => {
           justifyContent: 'space-between',
         }}
       >
-        <div
-          css={{
-            padding: scale(2),
-            height: '100%',
-          }}
-        >
-          <h4 css={{ marginBottom: scale(2), ...typography('h4') }}>
-            Настройки RTC
-          </h4>
-
+        <PeripheryWrapper title="Настройки RTC">
           <div
             css={{
               display: 'flex',
@@ -327,7 +297,7 @@ const Rtc = () => {
             </Tabs.Panel>
             <Tabs.Panel>Interrupts</Tabs.Panel>
           </Tabs>
-        </div>
+        </PeripheryWrapper>
         <FormSticky
           isDirty={isDirty}
           isDefaultDirty={isDefaultDirty}

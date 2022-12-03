@@ -1,6 +1,6 @@
 import { colors } from '@scripts/colors';
-import { scale } from '@scripts/helpers';
-import { useRef, forwardRef, useEffect, useMemo, useState } from 'react';
+import { parseSafeInt, scale } from '@scripts/helpers';
+import { forwardRef, useEffect, useMemo } from 'react';
 
 import { useFormContext } from 'react-hook-form';
 
@@ -58,7 +58,9 @@ const optionsSeconds = [...Array(60)].map((_, i) => ({
 }));
 
 const valueToDate = (year: any, month: any, day: any) => {
-  const dateStr = `${Number(month) + 1}-${day}-${year}`;
+  const monthStr = `${Number(month) + 1}`.padStart(2, '0');
+  const dayStr = `${day}`.padStart(2, '0');
+  const dateStr = `${monthStr}-${dayStr}-${year}`;
   const tryDate = new Date(dateStr);
 
   if (tryDate.getMonth() !== month) {
@@ -91,21 +93,24 @@ const DateForm = (
   const minutes = watch(`${name}.minutes`);
   const seconds = watch(`${name}.seconds`);
 
-  const setValueRef = useRef<typeof setValue>();
-  setValueRef.current = setValue;
+  const hash = watch(name);
 
-  const [selectedDate, setSelectedDate] = useState<Date>();
+  const tryDate = useMemo(
+    () => valueToDate(year, month, day),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hash],
+  );
+
+  const weekDay = tryDate?.getDay();
 
   useEffect(() => {
-    const tryDate = valueToDate(year, month, day);
-
-    if (tryDate) {
-      console.log('set date', tryDate);
-      setValueRef.current?.(`${name}.weekDay`, tryDate.getDay());
+    if (weekDay !== undefined) {
+      setValue(`${name}.weekDay`, weekDay, {
+        shouldTouch: true,
+        shouldValidate: true,
+      });
     }
-
-    setSelectedDate(tryDate);
-  }, [day, month, name, year]);
+  }, [name, setValue, weekDay]);
 
   const formattedTime = useMemo(
     () => [hours, minutes, seconds].map(getTerm).join(':'),
@@ -113,14 +118,14 @@ const DateForm = (
   );
 
   const formatted = useMemo(() => {
-    if (!selectedDate) return '';
+    if (!tryDate) return '';
 
-    const dateFormatted = selectedDate.toLocaleString('ru-RU', {
+    const dateFormatted = tryDate.toLocaleString('ru-RU', {
       dateStyle: 'full',
     });
 
     return `${dateFormatted} ${formattedTime}`;
-  }, [formattedTime, selectedDate]);
+  }, [formattedTime, tryDate]);
 
   return (
     <div>
@@ -142,7 +147,12 @@ const DateForm = (
         }}
       >
         <Form.Field label="Год" name={`${name}.year`}>
-          <Mask mask="0000" autoComplete="off" size="md" />
+          <Mask
+            mask="0000"
+            autoComplete="off"
+            size="md"
+            transformValue={parseSafeInt}
+          />
         </Form.Field>
         <Form.Field label="Месяц" name={`${name}.month`}>
           <Select options={optionsMonths} />
@@ -155,6 +165,7 @@ const DateForm = (
             lazy={false}
             autoComplete="off"
             size="md"
+            transformValue={parseSafeInt}
           />
         </Form.Field>
         <Form.Field label="Часы" name={`${name}.hours`}>
@@ -181,12 +192,15 @@ const DateForm = (
             const minutes = date.getMinutes();
             const seconds = date.getSeconds();
 
+            const weekDay = valueToDate(year, month, day);
+
             setValue(
               name,
               {
                 day,
                 month,
                 year,
+                weekDay: weekDay?.getDay(),
                 hours,
                 minutes,
                 seconds,
