@@ -1,7 +1,7 @@
 import Mask from '@components/controls/Mask';
 import FormSelect, { Select } from '@components/controls/NewSelect';
 import Table from '@components/Table';
-import { fastLog2, getNextPowerOfTwo, scale } from '@scripts/helpers';
+import { scale } from '@scripts/helpers';
 
 import { ZodSchema } from 'zod';
 
@@ -20,17 +20,11 @@ import {
 import { mergeRefs } from 'react-merge-refs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRotateBack } from '@fortawesome/free-solid-svg-icons';
+import { ByteTableFormat, formats, useAllFormatsValue } from './formats';
 
 export interface ByteTableRow {
   address: string;
   value: number;
-}
-
-export enum ByteTableFormat {
-  BIN = 'BIN',
-  INT = 'INT',
-  UINT = 'UINT',
-  HEX = 'HEX',
 }
 
 type ChangeRowHandler = (row: number, value: number) => void;
@@ -58,103 +52,6 @@ const defaultAddrCol: ColumnDef<ByteTableRow> = {
   header: 'Адрес',
   cell: ({ getValue }) => `${getValue()}`,
 };
-const parseValue = (value?: string | number) => {
-  if (typeof value === 'number') return value;
-  if (typeof value !== 'string') return null;
-
-  if (value.startsWith('0x')) {
-    // hex
-    return parseInt(value.replace('0x', ''), 16);
-  }
-
-  if (value.startsWith('0b')) {
-    return parseInt(value.replace('0b', ''), 2);
-  }
-
-  return parseInt(value, 10);
-};
-
-const formatValue = (value: string | number, format: ByteTableFormat) => {
-  const parsedValue = parseValue(value);
-
-  if (parsedValue === null) {
-    console.error('error parseing value:', value);
-    return '';
-  }
-
-  if (format === ByteTableFormat.BIN) {
-    const nextPower = fastLog2(getNextPowerOfTwo(parsedValue));
-    const padLength = Math.min(nextPower, 32);
-    return `0b${parsedValue.toString(2).padStart(padLength, '0')}`;
-  }
-
-  if (format === ByteTableFormat.HEX) {
-    // const nextPower = getNextPowerOfSixteen(parsedValue);
-    // const padLength = Math.min(nextPower, 4);
-    return `0x${parsedValue.toString(16).toUpperCase()}`;
-  }
-
-  return parsedValue.toString(10);
-};
-
-const useAllFormatsValue = (
-  initialValue: number,
-  initialFormat: ByteTableFormat = ByteTableFormat.INT,
-) => {
-  const [decValue, setDecValue] = useState(initialValue || 0);
-
-  useEffect(() => {
-    setDecValue(initialValue);
-  }, [initialValue]);
-
-  const formats = useMemo(() => {
-    if (decValue === null || decValue === undefined) return {};
-
-    return Object.keys(ByteTableFormat).reduce((prev, cur) => {
-      prev[cur] = formatValue(decValue, cur as never as ByteTableFormat);
-      return prev;
-    }, {} as Record<string, any>);
-  }, [decValue]) as Record<ByteTableFormat, string | undefined>;
-
-  const [format, setFormat] = useState(initialFormat);
-
-  useEffect(() => {
-    setFormat(initialFormat);
-  }, [initialFormat]);
-
-  const formattedValue = formats[format];
-
-  const setValueParsed = useCallback((val?: string | number) => {
-    const result = parseValue(val) || 0;
-    setDecValue(result);
-
-    return result;
-  }, []);
-
-  return {
-    decValue,
-    format,
-    formattedValue,
-    setValue: setValueParsed,
-    setFormat,
-  };
-};
-
-const formats = [
-  {
-    key: 'Целое',
-    value: ByteTableFormat.INT,
-  },
-  {
-    key: '2-чный',
-    value: ByteTableFormat.BIN,
-  },
-
-  {
-    key: '16-ричный',
-    value: ByteTableFormat.HEX,
-  },
-];
 
 const Header = () => (
   <div css={{ display: 'flex', gap: scale(1), alignItems: 'center' }}>
@@ -194,6 +91,7 @@ const Cell = ({
 
   const [val, setVal] = useState(formattedValue);
   useEffect(() => {
+    console.log('[ByteTable] formattedValue changed. setVal=', formattedValue);
     setVal(formattedValue);
   }, [formattedValue]);
 
@@ -253,11 +151,13 @@ const Cell = ({
         }}
         size="md"
         error={error}
-        onAccept={(newVal) => {
+        onAccept={(newVal, ...other) => {
           if (formatChangeRef.current) {
             formatChangeRef.current = false;
             return;
           }
+
+          console.log('[ByteTable] onAccept setVal=', newVal, 'other', other);
           setVal(newVal);
 
           setTransition(() => {
@@ -271,6 +171,8 @@ const Cell = ({
           }
           const { value } = dynamicMasked;
           const newVal = value + appended;
+
+          console.log('[dispatch] newVal=', newVal);
 
           if (newVal.substring(0, 2) === '0b') {
             if (!ignore) setFormat(ByteTableFormat.BIN);

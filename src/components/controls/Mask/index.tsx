@@ -115,7 +115,7 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
       [onBlur],
     );
 
-    console.log('mask', name, 'rendering with value:', value, 'props=', props);
+    // console.log('mask', name, 'rendering with value:', value, 'props=', props);
 
     return (
       <FormControl
