@@ -267,7 +267,8 @@ const RtcForm = ({ children }: { children: ReactNode }) => {
   const rtc = useSelector<RootState, RtcState>((state) => state.timers.rtc);
   const form = useForm<RtcState>({
     defaultValues: rtc,
-    mode: 'onTouched',
+    mode: 'all',
+    reValidateMode: 'onChange',
     resolver: zodResolver(rtcStateSchema),
   });
 

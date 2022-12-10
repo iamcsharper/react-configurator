@@ -116,7 +116,9 @@ const DateForm = (
   }, [name, setValue, weekDay]);
 
   useEffect(() => {
-    trigger(name);
+    trigger(name, {
+      shouldFocus: false
+    });
   }, [name, trigger, tryDate]);
 
   const formattedTime = useMemo(
