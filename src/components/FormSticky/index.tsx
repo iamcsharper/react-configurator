@@ -12,7 +12,7 @@ export type FormStickyProps = {
 } & Pick<FormResetTooltipProps, 'onDefaultReset'>;
 
 export const FormSticky = ({ onDefaultReset, className }: FormStickyProps) => {
-  const { isDirty } = useFormState();
+  const { isDirty, isValid } = useFormState();
 
   return (
     <div
@@ -29,7 +29,12 @@ export const FormSticky = ({ onDefaultReset, className }: FormStickyProps) => {
       className={className}
     >
       {isDirty && (
-        <Button size="sm" type="submit">
+        <Button
+          size="sm"
+          type="submit"
+          disabled={!isValid}
+          title={isValid ? undefined : 'Исправьте ошибки'}
+        >
           Сохранить
         </Button>
       )}

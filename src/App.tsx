@@ -22,6 +22,7 @@ function App() {
         selectedIndex={tab}
         onSelect={(index) => setTab(index)}
         css={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+        panelCSS={{ paddingTop: 0 }}
         panelFillsHeight
       >
         <Tabs.List horizontalScroll>

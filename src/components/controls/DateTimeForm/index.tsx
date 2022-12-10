@@ -84,7 +84,13 @@ const DateForm = (
     [],
   );
 
-  const { watch, setValue } = useFormContext();
+  const {
+    watch,
+    setValue,
+    trigger,
+    formState: { errors },
+  } = useFormContext();
+  const dateError = errors?.[name];
   const year = watch(`${name}.year`);
   const month = watch(`${name}.month`);
   const day = watch(`${name}.day`);
@@ -109,6 +115,10 @@ const DateForm = (
     }
   }, [name, setValue, weekDay]);
 
+  useEffect(() => {
+    trigger(name);
+  }, [name, trigger, tryDate]);
+
   const formattedTime = useMemo(
     () => [hours, minutes, seconds].map(getTerm).join(':'),
     [hours, minutes, seconds],
@@ -132,9 +142,15 @@ const DateForm = (
         }}
       >
         <strong>Выбрана дата:</strong>
-        <p>
-          {formattedDate}, {formattedTime}
-        </p>
+        {dateError ? (
+          <p css={{ color: colors.errorDark }}>
+            {dateError?.message?.toString()}
+          </p>
+        ) : (
+          <p>
+            {formattedDate}, {formattedTime}
+          </p>
+        )}
       </div>
       <div
         css={{
@@ -151,15 +167,22 @@ const DateForm = (
             transformValue={parseSafeInt}
           />
         </Form.Field>
-        <Form.Field label="Месяц" name={`${name}.month`}>
+        <Form.Field
+          label="Месяц"
+          name={`${name}.month`}
+          {...(dateError?.message && { error: true })}
+        >
           <Select options={optionsMonths} />
         </Form.Field>
-        <Form.Field label="Число" name={`${name}.day`}>
+        <Form.Field
+          label="Число"
+          name={`${name}.day`}
+          {...(dateError?.message && { error: true })}
+        >
           <Mask
             mask={Number}
             min={1}
             max={31}
-            lazy={false}
             autoComplete="off"
             size="md"
             transformValue={parseSafeInt}

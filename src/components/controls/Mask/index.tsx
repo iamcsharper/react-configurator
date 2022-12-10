@@ -59,7 +59,7 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
       mask,
       className,
       placeholderChar = '_',
-      lazy = true,
+      lazy = false,
       theme = 'basic',
       size = 'lg',
       label,
@@ -115,6 +115,8 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
       [onBlur],
     );
 
+    console.log('mask', name, 'rendering with value:', value, 'props=', props);
+
     return (
       <FormControl
         label={label}
@@ -131,12 +133,12 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
         rightAddons={rightAddons}
       >
         <IMaskInput
+          {...props}
           ref={mergeRefs([ref, inputRef])}
           name={name}
           mask={mask}
           value={value}
           placeholder={placeholder}
-          {...props}
           {...({
             id: htmlFor,
             className: 'control',

@@ -73,7 +73,7 @@ export const basicTheme: ButtonTheme = {
             background: colors.primaryPressed,
           },
           ':disabled': {
-            background: colors.grey400,
+            background: `${colors.grey400}!important`,
           },
         };
         break;
