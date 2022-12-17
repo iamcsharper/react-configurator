@@ -16,6 +16,7 @@ import { RootState } from './store';
 // https://redux.js.org/usage/configuring-your-store
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+// @ts-ignore
 const ErrorFallback = ({ error, resetErrorBoundary }: any) => (
     <ErrorBoundaryAlert message={error.message} description="Oops something went wrong" />
     // <div role="alert">
