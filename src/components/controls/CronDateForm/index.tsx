@@ -1,202 +1,130 @@
+import { forwardRef, useEffect, useMemo, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
+
+import {
+    months,
+    optionsHoursNullable,
+    optionsMinutesNullable,
+    optionsSecondsNullable,
+    weekDaysOptions,
+} from '@controls/DateTimeForm/utils';
+import Form from '@controls/Form';
+import Mask from '@controls/Mask';
+import Select, { OptionShape } from '@controls/NewSelect';
+
 import { colors } from '@scripts/colors';
 import { parseSafeInt, scale } from '@scripts/helpers';
-import { forwardRef, useEffect, useMemo, useState } from 'react';
+
 import { getClosestDates } from './getClosestDates';
 
-import Mask from '../Mask';
-import { Select, OptionShape } from '../NewSelect';
-import Button from '../Button';
-
 export interface CronDateFormValues {
-  day: number | null;
-  month: number | null; // 0 ... 11, 0 - январь
-  year: number | null;
+    century: number | null;
+    year: number | null;
+    month: number | null; // 0 ... 11, 0 - январь
+    day: number | null;
+    weekDay: number | null;
+    hours: number | null;
+    minutes: number | null;
+    seconds: number | null;
 }
 
 export interface CronDateFormProps {
-  // Controlled
-  value?: CronDateFormValues;
-  onChange?: (value: CronDateFormValues) => void;
+    name: string;
 }
 
-const months = [
-  'Январь',
-  'Февраль',
-  'Март',
-  'Апрель',
-  'Май',
-  'Июнь',
-  'Июль',
-  'Август',
-  'Сентябрь',
-  'Октябрь',
-  'Ноябрь',
-  'Декабрь',
-];
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CronDateForm = ({ value, onChange }: CronDateFormProps, _ref?: any) => {
-  const optionsMonths = useMemo<OptionShape[]>(
-    () => [
-      {
-        key: 'Любой',
-        content: 'Любой',
-        value: '',
-      },
-      ...months.map((month, index) => ({
-        key: month,
-        value: index,
-      })),
-    ],
-    [],
-  );
+const CronDateForm = ({ name }: CronDateFormProps, _ref?: any) => {
+    const optionsMonths = useMemo<OptionShape[]>(
+        () => [
+            {
+                key: 'Любой',
+                value: null,
+            },
+            ...months.map((month, index) => ({
+                key: month,
+                value: index,
+            })),
+        ],
+        []
+    );
 
-  const [year, setYear] = useState(`${value?.year || ''}`);
-  const [day, setDay] = useState(`${value?.day || ''}`);
+    const {
+        watch,
+        formState: { errors },
+    } = useFormContext();
+    const dateError = errors?.[name];
+    const year = watch(`${name}.year`);
+    const month = watch(`${name}.month`);
+    const day = watch(`${name}.day`);
 
-  useEffect(() => {
-    setYear(`${value?.year}`);
-  }, [value?.year]);
+    const [closestDate, setClosestDate] = useState('...');
 
-  useEffect(() => {
-    setDay(`${value?.day}`);
-  }, [value?.day]);
+    useEffect(() => {
+        const dates = getClosestDates({ day, month, year, length: 4 });
 
-  const selectedMonth =
-    optionsMonths.find((e) => e.value === value?.month) || null;
+        const closestDates = dates.map(e => e.toLocaleDateString()).join(', ');
 
-  const month = selectedMonth?.value;
+        setTimeout(() => {
+            setClosestDate(closestDates);
+        }, 0);
+    }, [day, month, year]);
 
-  const [closestDate, setClosestDate] = useState('...');
-
-  useEffect(() => {
-    const dates = getClosestDates({ day, month, year, length: 4 });
-
-    const closestDates = dates.map((e) => e.toLocaleDateString()).join(', ');
-
-    setTimeout(() => {
-      setClosestDate(closestDates);
-    }, 0);
-  }, [day, month, year]);
-
-  const error = !closestDate.length; // TODO: from zod
-
-  return (
-    <div>
-      <div
-        css={{
-          border: `1px solid ${colors?.autofill}`,
-          padding: scale(1),
-          marginBottom: scale(1),
-        }}
-      >
-        <strong>Даты ближайшего повторения:</strong>
-        <div
-          css={{
-            marginTop: scale(1),
-          }}
-        >
-          {closestDate || 'N/A'}
-        </div>
-      </div>
-      <div
-        css={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: scale(1),
-        }}
-      >
+    return (
         <div>
-          <Mask
-            label="Год"
-            mask="0000"
-            value={year}
-            autoComplete="off"
-            onBlur={(e) => {
-              e.preventDefault();
-
-              if (!error) {
-                onChange?.({
-                  ...value!,
-                  year: parseSafeInt(e.target.value),
-                });
-              }
-            }}
-            size="md"
-            error={error}
-            onAccept={(newVal) => {
-              setYear(newVal);
-            }}
-          />
+            <div
+                css={{
+                    border: `1px solid ${colors?.autofill}`,
+                    padding: scale(1),
+                    marginBottom: scale(1),
+                }}
+            >
+                <strong>Даты ближайшего повторения:</strong>
+                {dateError ? (
+                    <p css={{ color: colors.errorDark }}>{dateError?.message?.toString()}</p>
+                ) : (
+                    <p
+                        css={{
+                            marginTop: scale(1),
+                        }}
+                    >
+                        {closestDate || 'N/A'}
+                    </p>
+                )}
+            </div>
+            <div
+                css={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: scale(1),
+                }}
+            >
+                <Form.Field label="Век" name={`${name}.century`}>
+                    <Mask mask={Number} min={0} max={99} autoComplete="off" size="md" transformValue={parseSafeInt} />
+                </Form.Field>
+                <Form.Field label="Год" name={`${name}.year`}>
+                    <Mask mask="0000" autoComplete="off" size="md" transformValue={parseSafeInt} />
+                </Form.Field>
+                <Form.Field label="Месяц" name={`${name}.month`}>
+                    <Select options={optionsMonths} />
+                </Form.Field>
+                <Form.Field label="Число" name={`${name}.day`}>
+                    <Mask mask={Number} min={1} max={31} autoComplete="off" size="md" transformValue={parseSafeInt} />
+                </Form.Field>
+                <Form.Field label="День недели" name={`${name}.weekDay`}>
+                    <Select options={weekDaysOptions} />
+                </Form.Field>
+                <Form.Field label="Часы" name={`${name}.hours`}>
+                    <Select options={optionsHoursNullable} />
+                </Form.Field>
+                <Form.Field label="Минуты" name={`${name}.minutes`}>
+                    <Select options={optionsMinutesNullable} />
+                </Form.Field>
+                <Form.Field label="Секунды" name={`${name}.seconds`}>
+                    <Select options={optionsSecondsNullable} />
+                </Form.Field>
+            </div>
         </div>
-        <Select
-          options={optionsMonths}
-          label="Месяц"
-          error={error}
-          onChange={(month) => {
-            if (value) {
-              onChange?.({
-                ...value,
-                month: month?.selected?.value,
-              });
-            }
-          }}
-          selected={selectedMonth}
-        />
-        <div>
-          <Mask
-            label="Число"
-            mask={Number}
-            min={1}
-            error={error}
-            max={31}
-            lazy={false}
-            value={day}
-            autoComplete="off"
-            onBlur={(e) => {
-              e.preventDefault();
-
-              if (!error) {
-                onChange?.({
-                  ...value!,
-                  day: parseSafeInt(e.target.value),
-                });
-              }
-            }}
-            size="md"
-            // error={error}
-            onAccept={(newVal) => {
-              setDay(newVal);
-            }}
-          />
-        </div>
-      </div>
-      {onChange && (
-        <div css={{ marginTop: scale(1) }}>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => {
-              const date = new Date();
-              const month = date.getMonth();
-              const year = date.getFullYear();
-              const day = date.getDate();
-
-              console.log('day:', day, 'month:', month, 'year:', year);
-
-              onChange({
-                day,
-                month,
-                year,
-              });
-            }}
-          >
-            Взять дату с компьютера
-          </Button>
-        </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default forwardRef(CronDateForm);

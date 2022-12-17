@@ -14,8 +14,8 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.10.4",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
     "@fortawesome/fontawesome-svg-core": "^6.2.0",
     "@fortawesome/free-brands-svg-icons": "^6.2.0",
     "@fortawesome/free-regular-svg-icons": "^6.2.0",
@@ -42,6 +42,7 @@
     "react": "^18.2.0",
     "react-accessible-accordion": "^5.0.0",
     "react-dom": "^18.2.0",
+    "react-error-boundary": "^3.1.4",
     "react-hook-form": "^7.35.0",
     "react-imask": "^6.4.3",
     "react-lazy-load-image-component": "^1.5.5",
@@ -75,6 +76,7 @@
     "@storybook/mdx2-csf": "^0.0.3",
     "@storybook/react": "^6.5.12",
     "@storybook/testing-library": "^0.0.13",
+    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@types/deepmerge": "^2.2.0",
     "@types/node": "^18.7.18",
     "@types/react": "^18.0.24",
@@ -98,8 +100,8 @@
     "storybook-addon-paddings": "^4.3.0",
     "storybook-addon-react-router-v6": "^0.2.1",
     "storybook-react-i18next": "^1.1.2",
-    "typescript": "^4.6.4",
-    "vite": "^3.1.0",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.1",
     "vite-plugin-environment": "^1.1.2",
     "vite-tsconfig-paths": "^3.5.0"
   }

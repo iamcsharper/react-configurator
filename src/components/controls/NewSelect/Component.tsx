@@ -11,81 +11,83 @@ import { BaseSelectProps, OptionShape } from './types';
 export type SelectProps = BaseSelectProps & {};
 
 export const Select = forwardRef<HTMLDivElement, SelectProps>(
-  (
-    {
-      Arrow = DefaultArrow,
-      Field = DefaultField,
-      OptionsList = DefaultOptionsList,
-      Optgroup = DefaultOptgroup,
-      Option = DefaultOption,
-      ...restProps
-    },
-    ref,
-  ) => {
-    const props = useMemo(
-      () => ({
-        Option,
-        Field,
-        Optgroup,
-        OptionsList,
-        Arrow,
-        ...restProps,
-      }),
-      [Arrow, Field, Optgroup, Option, OptionsList, restProps],
-    );
+    (
+        {
+            Arrow = DefaultArrow,
+            Field = DefaultField,
+            OptionsList = DefaultOptionsList,
+            Optgroup = DefaultOptgroup,
+            Option = DefaultOption,
+            ...restProps
+        },
+        ref
+    ) => {
+        const props = useMemo(
+            () => ({
+                Option,
+                Field,
+                Optgroup,
+                OptionsList,
+                Arrow,
+                ...restProps,
+            }),
+            [Arrow, Field, Optgroup, Option, OptionsList, restProps]
+        );
 
-    return <BaseSelect ref={ref} {...props} />;
-  },
+        return <BaseSelect ref={ref} {...props} />;
+    }
 );
 
 Select.displayName = 'Select';
 
 export const FormSelect = forwardRef<
-  HTMLDivElement,
-  Omit<SelectProps, 'onChange'> & {
-    value?: any;
-    onChange?: (valueOrValues: string | string[]) => void;
-  }
+    HTMLDivElement,
+    Omit<SelectProps, 'onChange'> & {
+        value?: any;
+        onChange?: (valueOrValues: string | string[]) => void;
+    }
 >(({ name, multiple, options, onChange, onBlur, value, ...props }, ref) => {
-  const selectedValues = useMemo(() => {
-    if (multiple) return (Array.isArray(value) ? value : []) || [];
+    const selectedValues = useMemo(() => {
+        if (multiple) return (Array.isArray(value) ? value : []) || [];
 
-    return value === null ? [] : [value];
-  }, [value, multiple]);
+        return value === undefined ? [] : [value];
+    }, [value, multiple]);
 
-  const selectedOptions = useMemo(
-    () =>
-      options.filter((e) => {
-        if ('value' in e) return selectedValues.includes(e.value);
-        return false;
-      }) as OptionShape[],
-    [options, selectedValues],
-  );
+    if (name === 'alarmDateTime.month') console.log(value, 'selectedValues=', selectedValues, 'options=', options);
 
-  return (
-    <Select
-      ref={ref}
-      name={name}
-      options={options}
-      {...props}
-      multiple={multiple}
-      selected={selectedOptions}
-      onChange={(payload) => {
-        // TODO: возможно архитектурный косяк. то что Form.Field опускает onChange, не позволит в будущем внутри Form.Field на компонент накинуть onChange.
-        // точнее, позволит, но мы туда только value запишем, а могли бы initiator и прочее
-        onChange?.(payload.selected?.value);
-      }}
-      onBlur={(e) => {
-        // field?.onBlur(e);
-        onBlur?.(e);
-      }}
-      fieldProps={
-        {
-          // meta,
-        }
-      }
-    />
-  );
+    const selectedOptions = useMemo(
+        () =>
+            options.filter(e => {
+                if ('value' in e) return selectedValues.includes(e.value);
+                return false;
+            }) as OptionShape[],
+        [options, selectedValues]
+    );
+
+    return (
+        <Select
+            ref={ref}
+            name={name}
+            options={options}
+            {...props}
+            multiple={multiple}
+            selected={selectedOptions}
+            onChange={payload => {
+                // TODO: возможно архитектурный косяк. то что Form.Field опускает onChange, не позволит в будущем внутри Form.Field на компонент накинуть onChange.
+                // точнее, позволит, но мы туда только value запишем, а могли бы initiator и прочее
+                onChange?.(payload.selected?.value);
+            }}
+            onBlur={e => {
+                // field?.onBlur(e);
+                onBlur?.(e);
+            }}
+            fieldProps={
+                {
+                    // meta,
+                }
+            }
+        />
+    );
 });
 
 FormSelect.displayName = 'FormSelect';
