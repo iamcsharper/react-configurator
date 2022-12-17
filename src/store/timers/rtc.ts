@@ -23,7 +23,6 @@ export interface RtcTimeDate {
 }
 
 export interface AlarmTimeDate {
-    century: number | null;
     year: number | null;
     month: number | null;
     day: number | null;
@@ -37,7 +36,6 @@ export const alarmDateTimeSchema = z.object({
     year: zodStringToNumber(z.number().nullable(), { fallbackValue: null }),
     month: zodStringToNumber(z.number().nullable(), { fallbackValue: null }),
     weekDay: z.number().nullable(),
-    century: z.number().nullable(),
     day: zodStringToNumber(z.number().nullable(), { fallbackValue: null }),
     hours: zodStringToNumber(z.number().nullable(), { fallbackValue: null }),
     minutes: zodStringToNumber(z.number().nullable(), { fallbackValue: null }),
@@ -111,7 +109,6 @@ export const rtcInitialState: RtcState = {
         seconds: null as never as number,
     },
     alarmDateTime: {
-        century: null,
         year: null,
         day: null,
         hours: null,
