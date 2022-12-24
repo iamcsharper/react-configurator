@@ -1,10 +1,12 @@
 // import DetailsPane from '@components/DetailsPane';
-import Timers from '@containers/utility/Periphery/Timers';
-import { DetailsProvider, useDetails } from '@context/details';
 import { Allotment, AllotmentHandle } from 'allotment';
 import { useEffect, useRef } from 'react';
-
 import { Route, Routes, useParams } from 'react-router-dom';
+
+import { DetailsProvider, useDetails } from '@context/details';
+
+import Analog from '@containers/utility/Periphery/Analog';
+import Timers from '@containers/utility/Periphery/Timers';
 
 const SplitPanes = () => {
   const props = useParams();
@@ -44,6 +46,7 @@ const SplitPanes = () => {
           }}
         >
           <Routes>
+            <Route path="analog/*" element={<Analog />} />
             <Route path="timers/*" element={<Timers />} />
             <Route path="*" element={<p>Work in progress</p>} />
           </Routes>

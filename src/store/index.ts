@@ -1,15 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
-import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
-import thunk from 'redux-thunk';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
+import storage from 'redux-persist/lib/storage';
+import thunk from 'redux-thunk';
 
-import timersReducer from './timers';
+import analogReducer from './analog';
 import apiStorage from './apiStorage';
+import timersReducer from './timers';
 
 const rootReducer = combineReducers({
   timers: timersReducer,
+  analog: analogReducer,
 });
 
 export type RootReducer = ReturnType<typeof rootReducer>;
@@ -26,7 +28,7 @@ const persistedReducer = persistReducer<RootReducer>(
     }),
     stateReconciler: autoMergeLevel2,
   },
-  rootReducer,
+  rootReducer
 );
 
 const store = configureStore({

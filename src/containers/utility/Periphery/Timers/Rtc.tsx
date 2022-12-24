@@ -13,9 +13,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import ByteTable from '@components/ByteTable';
 import { DetailsTrigger } from '@components/DetailsTrigger';
 import { FormSticky } from '@components/FormSticky';
+import PageAccordion from '@components/PageAccordion';
 import { PeripheryWrapper } from '@components/PeripheryWrapper';
 import FormUnsavedPrompt from '@components/UnsavedPrompt';
-import Accordion from '@components/controls/Accordion';
 import Checkbox from '@components/controls/Checkbox';
 import CronDateForm from '@components/controls/CronDateForm';
 import DateForm from '@components/controls/DateTimeForm';
@@ -27,63 +27,7 @@ import Tabs from '@components/controls/Tabs';
 import { RootState } from '@store/index';
 import { RtcSourceType, RtcState, rtcInitialState, rtcRegisterSchema, rtcStateSchema, setRtc } from '@store/timers/rtc';
 
-import { colors } from '@scripts/colors';
 import { scale } from '@scripts/helpers';
-import typography from '@scripts/typography';
-
-const AccordionItem = ({
-  children,
-  title,
-  uuid,
-}: {
-  children: ReactNode[] | ReactNode;
-  title: ReactNode;
-  uuid: string;
-}) => {
-  const { formState } = useFormContext();
-  const errors = formState.errors?.[uuid];
-  let errorsLength = 0;
-
-  if (Array.isArray(errors)) {
-    errorsLength = errors.length;
-  } else if (typeof errors === 'object') {
-    if (errors.message) {
-      errorsLength = 1;
-    } else {
-      errorsLength = Object.keys(errors).length;
-    }
-  }
-  return (
-    <Accordion.Item uuid={uuid}>
-      <Accordion.Heading>
-        <Accordion.Button>
-          <div css={{ display: 'flex' }}>
-            <span>{title}</span>
-            {!!errorsLength && (
-              <span
-                css={{
-                  marginLeft: 8,
-                  width: 16,
-                  height: 16,
-                  background: colors.negative,
-                  borderRadius: '100%',
-                  color: colors.white,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  ...typography('labelExtraSmall'),
-                }}
-              >
-                {errorsLength}
-              </span>
-            )}
-          </div>
-        </Accordion.Button>
-      </Accordion.Heading>
-      <Accordion.Panel>{children}</Accordion.Panel>
-    </Accordion.Item>
-  );
-};
 
 const ByteTableLabel = () => (
   <>
@@ -150,31 +94,31 @@ const RtcSettings = () => {
           />
         </Form.Field>
       )}
-      <Accordion bordered css={{ marginTop: scale(2), marginBottom: scale(12) }}>
+      <PageAccordion css={{ marginTop: scale(2), marginBottom: scale(12) }}>
         {rtcEnabled && (
           <>
-            <AccordionItem uuid="rtcDateTime" title="Дата и время RTC">
+            <PageAccordion.Item uuid="rtcDateTime" title="Дата и время RTC">
               <DetailsTrigger
                 title="Дата RTC"
                 description="Вы можете задавать дату для срабатывания прерывания. Срабатывает один раз."
               />
               <DateForm name="rtcDateTime" />
-            </AccordionItem>
-            <AccordionItem uuid="rtcRegisters" title="Регистры RTC">
+            </PageAccordion.Item>
+            <PageAccordion.Item uuid="rtcRegisters" title="Регистры RTC">
               <RegisterByteTable />
-            </AccordionItem>
+            </PageAccordion.Item>
           </>
         )}
         {alarmEnabled && (
-          <AccordionItem uuid="alarmDateTime" title="Дата и время будильника">
+          <PageAccordion.Item uuid="alarmDateTime" title="Дата и время будильника">
             <DetailsTrigger
               title="Дата и время будильника"
               description="Вы можете задавать поля: век, год, месяц, день недели, день, часы, минуты и секунды. Сравнение происходит независимо по каждому из полей."
             />
             <CronDateForm name="alarmDateTime" />
-          </AccordionItem>
+          </PageAccordion.Item>
         )}
-      </Accordion>
+      </PageAccordion>
 
       <FormUnsavedPrompt />
     </>
