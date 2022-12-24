@@ -1,20 +1,22 @@
+import { faRotateBack } from '@fortawesome/free-solid-svg-icons';
 import React, { ReactNode } from 'react';
 
 import Button from '@components/controls/Button';
 import Tooltip from '@components/controls/Tooltip';
-import { scale } from '@scripts/helpers';
 
-import { faRotateBack } from '@fortawesome/free-solid-svg-icons';
+import { scale } from '@scripts/helpers';
 
 export interface FormResetTooltipProps {
   isDirty: boolean;
   isDefaultDirty: boolean;
   onDefaultReset: () => void;
+  onReset: () => void;
   children?: ReactNode | ReactNode[];
 }
 
 export const FormResetTooltip = ({
   children,
+  onReset,
   onDefaultReset,
   isDirty,
   isDefaultDirty,
@@ -26,15 +28,10 @@ export const FormResetTooltip = ({
       theme="light"
       content={
         <div css={{ display: 'flex', flexDirection: 'column', gap: scale(1) }}>
-          <Button type="reset" size="sm">
+          <Button type="button" size="sm" onClick={onReset}>
             Сбросить до предыдущих значений
           </Button>
-          <Button
-            type="button"
-            size="sm"
-            onClick={onDefaultReset}
-            FaIcon={faRotateBack}
-          >
+          <Button type="button" size="sm" onClick={onDefaultReset} FaIcon={faRotateBack}>
             Сбросить по-умолчанию
           </Button>
         </div>
@@ -52,13 +49,7 @@ export const FormResetTooltip = ({
       </div>
     </Tooltip>
   ) : (
-    <Button
-      type="button"
-      size="sm"
-      variant="danger"
-      FaIcon={faRotateBack}
-      onClick={onDefaultReset}
-    >
+    <Button type="button" size="sm" variant="danger" FaIcon={faRotateBack} onClick={onDefaultReset}>
       Сбросить по-умолчанию
     </Button>
   );

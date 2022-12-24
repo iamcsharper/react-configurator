@@ -1,25 +1,26 @@
-import Mask from '@components/controls/Mask';
-import FormSelect, { Select } from '@components/controls/NewSelect';
-import Table from '@components/Table';
-import { scale } from '@scripts/helpers';
-
-import { ZodSchema } from 'zod';
-
+import { faRotateBack } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CellContext, ColumnDef, RowData } from '@tanstack/react-table';
 import {
-  memo,
-  useMemo,
-  useState,
+  MutableRefObject,
   forwardRef,
+  memo,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
-  MutableRefObject,
+  useState,
   useTransition,
 } from 'react';
 import { mergeRefs } from 'react-merge-refs';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRotateBack } from '@fortawesome/free-solid-svg-icons';
+import { ZodSchema } from 'zod';
+
+import Table from '@components/Table';
+import Mask from '@components/controls/Mask';
+import FormSelect, { Select } from '@components/controls/NewSelect';
+
+import { scale } from '@scripts/helpers';
+
 import { ByteTableFormat, formats, useAllFormatsValue } from './formats';
 
 export interface ByteTableRow {
@@ -66,10 +67,11 @@ const Cell = ({
   },
   row: { index },
 }: CellContext<ByteTableRow, unknown>) => {
-  const { onChangeRowRef, sharedFormat, validationSchema, defaultValue } =
-    meta || {};
-  const { decValue, format, formattedValue, setValue, setFormat } =
-    useAllFormatsValue(getValue() as number, sharedFormat);
+  const { onChangeRowRef, sharedFormat, validationSchema, defaultValue } = meta || {};
+  const { decValue, format, formattedValue, setValue, setFormat } = useAllFormatsValue(
+    getValue() as number,
+    sharedFormat
+  );
 
   const masks = useMemo(
     () => [
@@ -86,20 +88,21 @@ const Cell = ({
         prepare: (s: string) => s.toUpperCase(),
       },
     ],
-    [],
+    []
   );
 
+  const [isFilled, setFilled] = useState(false);
   const [val, setVal] = useState(formattedValue);
   useEffect(() => {
-    console.log('[ByteTable] formattedValue changed. setVal=', formattedValue);
+    if (!isFilled) return;
     setVal(formattedValue);
-  }, [formattedValue]);
+  }, [formattedValue, isFilled]);
 
   const error = useMemo(() => {
     const parse = validationSchema?.safeParse(val);
 
     if (!parse || parse.success) return undefined;
-    return parse.error.issues.map((e) => e.message).join('; ');
+    return parse.error.issues.map(e => e.message).join('; ');
   }, [val, validationSchema]);
 
   const formatChangeRef = useRef(false);
@@ -119,8 +122,7 @@ const Cell = ({
       setValue(defaultVal);
     });
 
-    if (typeof maskRef.current?.element?.focus === 'function')
-      maskRef.current.element.focus();
+    if (typeof maskRef.current?.element?.focus === 'function') maskRef.current.element.focus();
   }, [defaultVal, setFormat, setValue]);
 
   return (
@@ -133,13 +135,13 @@ const Cell = ({
         value={val}
         autoComplete="off"
         rightAddons={
-          !isDefaultValue && (
+          (!isDefaultValue || !isFilled) && (
             <button type="button" onClick={onResetDefault}>
               <FontAwesomeIcon icon={faRotateBack} />
             </button>
           )
         }
-        onBlur={(e) => {
+        onBlur={e => {
           e.preventDefault();
 
           setTimeout(() => {
@@ -158,9 +160,13 @@ const Cell = ({
           }
 
           console.log('[ByteTable] onAccept setVal=', newVal, 'other', other);
+          setFilled(newVal !== '');
           setVal(newVal);
 
           setTransition(() => {
+            if (newVal.startsWith('0b') && newVal.length === 2) return;
+            if (newVal.startsWith('0x') && newVal.length === 2) return;
+
             setValue(newVal);
           });
         }}
@@ -172,19 +178,17 @@ const Cell = ({
           const { value } = dynamicMasked;
           const newVal = value + appended;
 
-          console.log('[dispatch] newVal=', newVal);
-
           if (newVal.substring(0, 2) === '0b') {
-            if (!ignore) setFormat(ByteTableFormat.BIN);
+            if (!ignore && newVal.length > 2) setFormat(ByteTableFormat.BIN);
             return dynamicMasked.compiledMasks[1];
           }
 
           if (newVal.substring(0, 2) === '0x') {
-            if (!ignore) setFormat(ByteTableFormat.HEX);
+            if (!ignore && newVal.length > 2) setFormat(ByteTableFormat.HEX);
             return dynamicMasked.compiledMasks[2];
           }
 
-          if (!ignore) setFormat(ByteTableFormat.INT);
+          if (!ignore && newVal.length) setFormat(ByteTableFormat.INT);
           return dynamicMasked.compiledMasks[0];
         }}
       />
@@ -199,8 +203,8 @@ const Cell = ({
         //   borderBottomLeftRadius: '0!important',
         // }}
         value={format}
-        onChange={(e) => {
-          const newFormat = formats.find((f) => f.value === e)!;
+        onChange={e => {
+          const newFormat = formats.find(f => f.value === e)!;
           formatChangeRef.current = true;
           setFormat(newFormat.value);
         }}
@@ -211,16 +215,7 @@ const Cell = ({
 };
 
 const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
-  (
-    {
-      addrCol = defaultAddrCol,
-      value,
-      defaultValue,
-      onChange,
-      validationSchema,
-    },
-    outerRef,
-  ) => {
+  ({ addrCol = defaultAddrCol, value, defaultValue, onChange, validationSchema }, outerRef) => {
     const innerRef = useRef(null);
     const ref = mergeRefs([outerRef, innerRef]);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -229,7 +224,7 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
         value?.map((e, i) => ({
           address: `R${i}`,
           value: +e,
-        })) || [],
+        })) || []
     );
 
     useEffect(() => {
@@ -248,20 +243,15 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
 
         onChange(newData);
       },
-      [value, onChange],
+      [value, onChange]
     );
 
     const onChangeRowRef = useRef<ChangeRowHandler>(onChangeRow);
     onChangeRowRef.current = onChangeRow;
 
-    const [sharedFormat, setSharedFormat] = useState<
-      ByteTableFormat | undefined
-    >(ByteTableFormat.INT);
+    const [sharedFormat, setSharedFormat] = useState<ByteTableFormat | undefined>(ByteTableFormat.INT);
 
-    const selectedFormatOption = useMemo(
-      () => formats.filter((e) => e.value === sharedFormat),
-      [sharedFormat],
-    );
+    const selectedFormatOption = useMemo(() => formats.filter(e => e.value === sharedFormat), [sharedFormat]);
 
     const columns = useMemo<ColumnDef<ByteTableRow>[]>(
       () => [
@@ -272,7 +262,7 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
           cell: Cell,
         },
       ],
-      [addrCol],
+      [addrCol]
     );
 
     const tableOptions = useMemo(
@@ -284,7 +274,7 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
           defaultValue,
         },
       }),
-      [defaultValue, sharedFormat, validationSchema],
+      [defaultValue, sharedFormat, validationSchema]
     );
 
     return (
@@ -294,7 +284,7 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
           placeholder="Формат"
           size="md"
           selected={selectedFormatOption}
-          onChange={(payload) => {
+          onChange={payload => {
             setSharedFormat(payload.selected?.value);
           }}
           css={{
@@ -312,7 +302,7 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
         />
       </div>
     );
-  },
+  }
 );
 
 ByteTable.displayName = 'ByteTable';

@@ -107,7 +107,7 @@ export const formatRHFError = (error?: FieldError) => {
 };
 
 export const getNextPowerOfTwo = (value: number): number => {
-  let result = value;
+  let result = value + 1;
   // eslint-disable-next-line no-plusplus
   result--;
   result |= result >> 1;

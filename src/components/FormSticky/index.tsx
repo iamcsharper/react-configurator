@@ -1,18 +1,20 @@
+import { useFormState } from 'react-hook-form';
+
+import { FormResetTooltip, FormResetTooltipProps } from '@components/FormResetTooltip';
 import Button from '@components/controls/Button';
-import {
-  FormResetTooltip,
-  FormResetTooltipProps,
-} from '@components/FormResetTooltip';
+
 import { colors, shadows } from '@scripts/colors';
 import { scale } from '@scripts/helpers';
-import { useFormState } from 'react-hook-form';
+import typography from '@scripts/typography';
 
 export type FormStickyProps = {
   className?: string;
-} & Pick<FormResetTooltipProps, 'onDefaultReset'>;
+} & Pick<FormResetTooltipProps, 'onDefaultReset' | 'onReset'>;
 
-export const FormSticky = ({ onDefaultReset, className }: FormStickyProps) => {
-  const { isDirty, isValid } = useFormState();
+export const FormSticky = ({ onDefaultReset, onReset, className }: FormStickyProps) => {
+  const { isDirty, errors } = useFormState();
+
+  const isValid = Object.keys(errors).length === 0;
 
   return (
     <div
@@ -23,26 +25,29 @@ export const FormSticky = ({ onDefaultReset, className }: FormStickyProps) => {
         paddingTop: scale(2),
         paddingBottom: scale(2),
         display: 'flex',
+        alignItems: 'baseline',
         gap: scale(2),
         boxShadow: shadows.newSliderItemShadow,
       }}
       className={className}
     >
-      {isDirty && (
-        <Button
-          size="sm"
-          type="submit"
-          disabled={!isValid}
-          title={isValid ? undefined : 'Исправьте ошибки'}
+      {isDirty && !isValid && (
+        <span
+          css={{
+            ...typography('labelSmall'),
+            color: colors?.errorDark,
+          }}
         >
+          Исправьте ошибки для сохранения
+        </span>
+      )}
+
+      {isDirty && (
+        <Button size="sm" type="submit" disabled={!isValid}>
           Сохранить
         </Button>
       )}
-      <FormResetTooltip
-        isDirty={isDirty}
-        isDefaultDirty={isDirty}
-        onDefaultReset={onDefaultReset}
-      />
+      <FormResetTooltip onReset={onReset} isDirty={isDirty} isDefaultDirty={isDirty} onDefaultReset={onDefaultReset} />
     </div>
   );
 };

@@ -1,20 +1,12 @@
-import {
-  FocusEvent,
-  forwardRef,
-  useCallback,
-  useId,
-  useRef,
-  useState,
-} from 'react';
+import { FocusEvent, forwardRef, useCallback, useId, useRef, useState } from 'react';
+import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form';
 import { IMaskInput } from 'react-imask';
 import { mergeRefs } from 'react-merge-refs';
 
 import { FormFieldProps } from '@controls/Form/types';
+import FormControl from '@controls/FormControl';
 
 import { useInputCSS } from '@scripts/hooks/useInputCSS';
-
-import FormControl from '@controls/FormControl';
-import { ControllerFieldState, ControllerRenderProps } from 'react-hook-form';
 
 export interface MaskProps extends Omit<FormFieldProps, 'name' | 'onChange'> {
   /** Input name */
@@ -41,7 +33,7 @@ export interface MaskProps extends Omit<FormFieldProps, 'name' | 'onChange'> {
         mask: string;
       }[];
       value: string;
-    },
+    }
   ) => void;
 }
 
@@ -77,7 +69,7 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
       value: valueFromProps,
       ...props
     },
-    ref,
+    ref
   ) => {
     const id = useId();
     const htmlFor = props.id || id;
@@ -99,7 +91,7 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
           onFocus(event);
         }
       },
-      [onFocus, readOnly],
+      [onFocus, readOnly]
     );
 
     const handleInputBlur = useCallback(
@@ -112,10 +104,8 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
           }
         }, 0);
       },
-      [onBlur],
+      [onBlur]
     );
-
-    // console.log('mask', name, 'rendering with value:', value, 'props=', props);
 
     return (
       <FormControl
@@ -160,7 +150,7 @@ const Mask = forwardRef<HTMLInputElement, MaskProps>(
         />
       </FormControl>
     );
-  },
+  }
 );
 
 Mask.displayName = 'Mask';

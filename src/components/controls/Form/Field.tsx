@@ -1,21 +1,11 @@
 import { Children, cloneElement, forwardRef, isValidElement } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
+
 import Input from '../Input';
 import { FormFieldProps } from './types';
 
 const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
-  (
-    {
-      name,
-      children,
-      size = 'md',
-      className,
-      wrapperCSS,
-      block = true,
-      ...props
-    },
-    ref,
-  ) => {
+  ({ name, children, size = 'md', className, wrapperCSS, block = true, ...props }, ref) => {
     const { control, setValue } = useFormContext(); // retrieve all hook methods
 
     // const isCheckbox =
@@ -30,9 +20,7 @@ const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
 
     const fieldState = {
       ...fieldStateForm,
-      error: Array.isArray(fieldStateForm.error)
-        ? fieldStateForm.error[0]
-        : fieldStateForm.error,
+      error: Array.isArray(fieldStateForm.error) ? fieldStateForm.error[0] : fieldStateForm.error,
     };
 
     const inputProps = {
@@ -50,7 +38,7 @@ const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
       <div css={{ width: '100%' }} className={className}>
         {children ? (
           <>
-            {Children.map(children, (child) => {
+            {Children.map(children, child => {
               if (isValidElement(child)) {
                 return cloneElement<any>(child, {
                   ...inputProps,
@@ -78,7 +66,7 @@ const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
         )}
       </div>
     );
-  },
+  }
 );
 
 export default FormField;

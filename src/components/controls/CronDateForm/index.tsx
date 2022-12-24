@@ -2,7 +2,6 @@ import { forwardRef, useEffect, useMemo, useState, useTransition } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import {
-  months,
   optionsHoursNullable,
   optionsMinutesNullable,
   optionsSecondsNullable,
@@ -13,7 +12,9 @@ import Mask from '@controls/Mask';
 import Select, { OptionShape } from '@controls/NewSelect';
 
 import { colors } from '@scripts/colors';
+import { months } from '@scripts/constants';
 import { parseSafeInt, scale } from '@scripts/helpers';
+import { usePrevious } from '@scripts/hooks/usePrevious';
 
 import { getClosestDates } from './getClosestDates';
 
@@ -50,11 +51,23 @@ const CronDateForm = ({ name }: CronDateFormProps, _ref?: any) => {
   const {
     watch,
     formState: { errors },
+    trigger,
   } = useFormContext();
   const dateError = errors?.[name];
+
   const year = watch(`${name}.year`);
   const month = watch(`${name}.month`);
   const day = watch(`${name}.day`);
+  const weekDay = watch(`${name}.weekDay`);
+
+  const revalidateHash = `${year}${weekDay}`;
+  const prevHash = usePrevious(revalidateHash);
+
+  useEffect(() => {
+    if (revalidateHash === prevHash) return;
+
+    trigger(name, { shouldFocus: false });
+  }, [name, prevHash, revalidateHash, trigger]);
 
   const [closestDate, setClosestDate] = useState('...');
   const [, startTransition] = useTransition();

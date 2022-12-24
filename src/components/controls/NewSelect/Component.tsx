@@ -53,8 +53,6 @@ export const FormSelect = forwardRef<
         return value === undefined ? [] : [value];
     }, [value, multiple]);
 
-    if (name === 'alarmDateTime.month') console.log(value, 'selectedValues=', selectedValues, 'options=', options);
-
     const selectedOptions = useMemo(
         () =>
             options.filter(e => {

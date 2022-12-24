@@ -1,9 +1,13 @@
 import { jsx } from '@emotion/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useThemeCSS } from '@scripts/theme';
 import { ElementType, Ref, forwardRef, useMemo } from 'react';
-import { ButtonProps, ButtonStateFull } from './types';
+
+import { useThemeCSS } from '@scripts/theme';
+
 import { buttonThemes } from './themes/index';
+import { ButtonProps, ButtonStateFull } from './types';
+
+export * from './types';
 
 /**
  * Button component.
@@ -31,7 +35,7 @@ const Button = <T extends ElementType = 'button'>(
     css,
     ...props
   }: ButtonProps<T>,
-  ref: Ref<HTMLButtonElement>,
+  ref: Ref<HTMLButtonElement>
 ) => {
   const hasChildren = !!children;
   const state = useMemo<ButtonStateFull>(
@@ -45,7 +49,7 @@ const Button = <T extends ElementType = 'button'>(
       iconAfter,
       rounded,
     }),
-    [block, disabled, hasChildren, hidden, iconAfter, size, variant, rounded],
+    [block, disabled, hasChildren, hidden, iconAfter, size, variant, rounded]
   );
 
   const { button: totalCSS, icon: iconCSS } = useThemeCSS(theme, state);
@@ -73,7 +77,7 @@ const Button = <T extends ElementType = 'button'>(
       {icon && !iconAfter && icon}
       {hidden ? '' : children}
       {icon && iconAfter && icon}
-    </>,
+    </>
   );
 };
 

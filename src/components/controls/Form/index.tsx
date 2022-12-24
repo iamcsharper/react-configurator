@@ -1,10 +1,13 @@
-import { FC, HTMLProps, ReactNode, KeyboardEvent, useCallback } from 'react';
+import { FC, HTMLProps, KeyboardEvent, ReactNode, useCallback } from 'react';
 import { FormProvider, UseFormReturn } from 'react-hook-form';
+
 import FormField from './Field';
+import FormReset, { FormResetProps } from './Reset';
 import { FormFieldProps } from './types';
 
-export interface FormCompositionProps {
+export interface FormCompositionProps<T> {
   Field: FC<FormFieldProps>;
+  Reset: FC<FormResetProps<T>>;
 }
 
 export interface FormProps<T extends Record<string, any>>
@@ -27,21 +30,21 @@ const Form = <T extends Record<string, any>>({
   onReset,
   isSubmitOnEnter = false,
   ...props
-}: FormProps<T> & Partial<FormCompositionProps>) => {
+}: FormProps<T> & Partial<FormCompositionProps<T>>) => {
   const reset: typeof methods.reset = useCallback(
     (newValues, keepStateOptions) => {
       methods.reset(newValues, keepStateOptions);
       const values = methods.getValues();
       if (onReset) onReset(values);
     },
-    [methods, onReset],
+    [methods, onReset]
   );
 
   return (
     <FormProvider {...methods} reset={reset}>
       <form
         onSubmit={methods.handleSubmit(onSubmit)}
-        onKeyDown={isSubmitOnEnter ? undefined : (e) => checkKeyDown(e)}
+        onKeyDown={isSubmitOnEnter ? undefined : e => checkKeyDown(e)}
         {...props}
       >
         {children}
@@ -51,5 +54,6 @@ const Form = <T extends Record<string, any>>({
 };
 
 Form.Field = FormField;
+Form.Reset = FormReset;
 
 export default Form;

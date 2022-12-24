@@ -221,6 +221,8 @@ const FormikAutocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
                 onChange={payload => {
                     handleChange(payload);
 
+                    console.log('payload:', payload);
+
                     setTimeout(() => {
                         if (!multiple) {
                             // helpers?.setValue(payload.selected?.value);
@@ -256,7 +258,8 @@ const FormikAutocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
                         <ClearableItems
                             selectedMultiple={selectedOptions}
                             setSelectedItems={newSelected => {
-                                console.log(newSelected);
+                                console.log('newSelected:', newSelected);
+
                                 if (!multiple) {
                                     // const newValue = newSelected.length ? newSelected[0].value : '';
                                     // helpers?.setValue(newValue);

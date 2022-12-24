@@ -1,5 +1,4 @@
-import { fastLog2, getNextPowerOfTwo } from '@scripts/helpers';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export enum ByteTableFormat {
   BIN = 'BIN',
@@ -12,16 +11,18 @@ const parseValue = (value?: string | number) => {
   if (typeof value === 'number') return value;
   if (typeof value !== 'string') return null;
 
-  if (value.startsWith('0x')) {
+  const strippedValue = value.replace(/\s/g, '').trim();
+
+  if (strippedValue.startsWith('0x')) {
     // hex
-    return parseInt(value.replace('0x', ''), 16);
+    return parseInt(strippedValue.replace('0x', ''), 16);
   }
 
-  if (value.startsWith('0b')) {
-    return parseInt(value.replace('0b', ''), 2);
+  if (strippedValue.startsWith('0b')) {
+    return parseInt(strippedValue.replace('0b', ''), 2);
   }
 
-  return parseInt(value, 10);
+  return parseInt(strippedValue, 10);
 };
 
 const formatValue = (value: string | number, format: ByteTableFormat) => {
@@ -33,9 +34,7 @@ const formatValue = (value: string | number, format: ByteTableFormat) => {
   }
 
   if (format === ByteTableFormat.BIN) {
-    const nextPower = fastLog2(getNextPowerOfTwo(parsedValue));
-    const padLength = Math.min(nextPower, 32);
-    return `0b${parsedValue.toString(2).padStart(padLength, '0')}`;
+    return `0b${parsedValue.toString(2)}`;
   }
 
   if (format === ByteTableFormat.HEX) {
@@ -63,10 +62,7 @@ export const formats = [
   },
 ];
 
-export const useAllFormatsValue = (
-  initialValue: number,
-  initialFormat: ByteTableFormat = ByteTableFormat.INT,
-) => {
+export const useAllFormatsValue = (initialValue: number, initialFormat: ByteTableFormat = ByteTableFormat.INT) => {
   const [decValue, setDecValue] = useState(initialValue || 0);
   const currentDecValue = useRef<number>(initialValue || 0);
   const [format, setFormat] = useState(initialFormat);
@@ -81,6 +77,7 @@ export const useAllFormatsValue = (
   }, [initialFormat]);
 
   const formattedValue = formatValue(currentDecValue.current, format);
+  const getFormattedValue = () => formatValue(currentDecValue.current, format);
 
   const setValue = useCallback((val?: string | number) => {
     const result = parseValue(val) || 0;
@@ -96,6 +93,7 @@ export const useAllFormatsValue = (
     decValue,
     format,
     formattedValue,
+    getFormattedValue,
     setValue,
     setFormat,
   };

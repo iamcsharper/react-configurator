@@ -16,8 +16,6 @@ const createCronString = ({ day, month }: Pick<DateProps, 'day' | 'month'>) => {
   const cMonth = month === null ? '*' : month + 1;
   const cronString = `0 0 ${cDay} ${cMonth} *`;
 
-  console.log(cronString);
-
   return cronString;
 };
 

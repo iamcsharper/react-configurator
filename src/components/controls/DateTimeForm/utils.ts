@@ -1,19 +1,5 @@
-export const months = [
-  'Январь',
-  'Февраль',
-  'Март',
-  'Апрель',
-  'Май',
-  'Июнь',
-  'Июль',
-  'Август',
-  'Сентябрь',
-  'Октябрь',
-  'Ноябрь',
-  'Декабрь',
-];
+import { months, weekDays } from '@scripts/constants';
 
-export const weekDays = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 export const weekDaysOptions = weekDays.map((option, index) => ({
   key: option,
   value: index,
@@ -26,6 +12,11 @@ export const getTerm = (val: number | null) => (val === null ? 'XX' : `${val}`.p
 export const optionsHours = [...Array(24)].map((_, i) => ({
   value: i,
   key: getTerm(i),
+}));
+
+export const optionsDays = [...Array(31)].map((_, i) => ({
+  value: i + 1,
+  key: getTerm(i + 1),
 }));
 
 export const optionsHoursNullable = [{ value: null, key: 'Любой' }, ...optionsHours];
