@@ -66,6 +66,7 @@ export const BaseSelect = forwardRef(
       allowUnselect = false,
       disabled = false,
       closeOnSelect = !multiple,
+      // @ts-ignore
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       circularNavigation = false,
       defaultOpen = false,
