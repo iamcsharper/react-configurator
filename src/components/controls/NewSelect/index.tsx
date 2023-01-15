@@ -1,4 +1,5 @@
-import { FormSelect } from './Component';
+/* eslint-disable import/no-cycle */
+import { FormSelect as Select } from './Component';
 
 export * from './Component';
 export * from './components';
@@ -6,4 +7,4 @@ export * from './components';
 export * from './types';
 export * from './utils';
 
-export default FormSelect;
+export default Select;

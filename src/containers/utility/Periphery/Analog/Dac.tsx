@@ -9,20 +9,21 @@ import { PeripheryWrapper } from '@components/PeripheryWrapper';
 import FormUnsavedPrompt from '@components/UnsavedPrompt';
 import Checkbox from '@components/controls/Checkbox';
 import Form from '@components/controls/Form';
+import Mask from '@components/controls/Mask';
 import Select from '@components/controls/NewSelect';
 import Tabs from '@components/controls/Tabs';
 
-import { AdcChannel, AdcState, VRef, adcInitialState, adcStateSchema, setAdc } from '@store/analog/adc';
+import { DacChannel, DacState, VRef, dacInitialState, dacStateSchema, setDac } from '@store/analog/dac';
 import { RootState } from '@store/index';
 
 import { scale } from '@scripts/helpers';
 
-const AdcSettings = () => {
-  const [adcEnabled] = useWatch({
+const DacSettings = () => {
+  const [dacEnabled] = useWatch({
     name: ['enabled'],
   });
 
-  if (!adcEnabled) return null;
+  if (!dacEnabled) return null;
 
   return (
     <>
@@ -31,13 +32,13 @@ const AdcSettings = () => {
           label={
             <div css={{ display: 'flex', gap: scale(1) }}>
               <span>Канал</span>
-              <DetailsTrigger title="Канал АЦП" description="Информация о канале. TODO" />
+              <DetailsTrigger title="Канал ЦАП" description="Информация о канале. TODO" />
             </div>
           }
-          options={Object.keys(AdcChannel).map(name => ({ key: name, value: (AdcChannel as any)[name] }))}
+          options={Object.keys(DacChannel).map(name => ({ key: name, value: (DacChannel as any)[name] }))}
         />
       </Form.Field>
-      <Form.Field name="vRef">
+      <Form.Field name="vRef" css={{ marginBottom: scale(2) }}>
         <Select
           label={
             <div css={{ display: 'flex', gap: scale(1) }}>
@@ -64,6 +65,17 @@ const AdcSettings = () => {
           ]}
         />
       </Form.Field>
+      <Form.Field name="divider" label="Делитель">
+        <Mask
+          mask={[
+            {
+              mask: '{\\0x}#### ####',
+              definitions: { '#': /[0-9a-f]/gi },
+              prepare: (s: string) => s.toUpperCase(),
+            },
+          ]}
+        />
+      </Form.Field>
       <FormUnsavedPrompt />
     </>
   );
@@ -79,19 +91,22 @@ const CommonSettings = () => (
     }}
   >
     <Form.Field name="enabled">
-      <Checkbox>Включить ADC</Checkbox>
+      <Checkbox>Включить DAC</Checkbox>
     </Form.Field>
-    <DetailsTrigger title="ADC" description="Информация об ADC" />
+    <DetailsTrigger title="DAC" description="Информация об DAC" />
   </div>
 );
 
-const AdcForm = ({ children }: { children: ReactNode }) => {
+
+
+const DacForm = ({ children }: { children: ReactNode }) => {
   const dispatch = useDispatch();
-  const adc = useSelector<RootState, AdcState>(state => state.analog.adc);
-  const form = useForm<AdcState>({
-    defaultValues: adc,
+  const dac = useSelector<RootState, DacState>(state => state.analog.dac);
+  const form = useForm<DacState>({
+    defaultValues: dac,
     mode: 'all',
-    resolver: zodResolver(adcStateSchema),
+    resolver: zodResolver(dacStateSchema),
+    shouldFocusError: false,
   });
 
   return (
@@ -104,11 +119,11 @@ const AdcForm = ({ children }: { children: ReactNode }) => {
       <Form
         methods={form}
         onSubmit={vals => {
-          dispatch(setAdc(vals));
+          dispatch(setDac(vals));
           form.reset(vals);
         }}
         onReset={() => {
-          dispatch(setAdc(form.getValues()));
+          dispatch(setDac(form.getValues()));
           form.reset();
         }}
         css={{
@@ -124,19 +139,19 @@ const AdcForm = ({ children }: { children: ReactNode }) => {
   );
 };
 
-const AdcInner = () => {
+const DacInner = () => {
   const formContext = useFormContext();
-  const adc = useSelector<RootState, AdcState>(state => state.analog.adc);
+  const dac = useSelector<RootState, DacState>(state => state.analog.dac);
 
   const dispatch = useDispatch();
   return (
     <FormSticky
       onDefaultReset={() => {
-        dispatch(setAdc(adcInitialState));
-        formContext.reset(adcInitialState);
+        dispatch(setDac(dacInitialState));
+        formContext.reset(dacInitialState);
       }}
       onReset={() => {
-        formContext.reset(adc);
+        formContext.reset(dac);
       }}
       css={{
         padding: scale(2),
@@ -146,9 +161,9 @@ const AdcInner = () => {
   );
 };
 
-const Adc = () => (
-  <AdcForm>
-    <PeripheryWrapper title="Настройки ADC">
+const Dac = () => (
+  <DacForm>
+    <PeripheryWrapper title="Настройки DAC">
       <CommonSettings />
       <Tabs css={{ marginTop: scale(2) }} forceRenderTabPanel>
         <Tabs.List>
@@ -156,13 +171,13 @@ const Adc = () => (
           <Tabs.Tab>Прерывания</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel>
-          <AdcSettings />
+          <DacSettings />
         </Tabs.Panel>
         <Tabs.Panel>Interrupts</Tabs.Panel>
       </Tabs>
     </PeripheryWrapper>
-    <AdcInner />
-  </AdcForm>
+    <DacInner />
+  </DacForm>
 );
 
-export default Adc;
+export default Dac;

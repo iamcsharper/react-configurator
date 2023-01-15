@@ -1,20 +1,16 @@
-import { CSSObject } from '@emotion/react';
-
 import { colors, shadows } from '@scripts/colors';
 import { scale } from '@scripts/helpers';
-import { MEDIA_QUERIES } from '@scripts/media';
 import { OptionizedCSS, extractCSSOption } from '@scripts/theme';
 import typography from '@scripts/typography';
 
 import { SelectSize, SelectTheme } from '../types';
-
-const { md, xl } = MEDIA_QUERIES;
 
 export const basicTheme: SelectTheme = {
   arrowButton: {
     display: 'flex',
     alignItems: 'center',
   },
+  optionListWrapper: {},
   closeButton: {},
   option: ({ isDisabled, isHover, isSelected, size = 'md' }) => {
     const sized: OptionizedCSS<typeof SelectSize> = {

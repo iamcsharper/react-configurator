@@ -1,36 +1,65 @@
 import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer';
-import {
-  UseMultipleSelectionProps,
-  UseMultipleSelectionState,
-  useCombobox,
-  useMultipleSelection,
-} from 'downshift';
-import {
-  FocusEvent,
-  KeyboardEvent,
-  MouseEvent,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import { UseMultipleSelectionProps, UseMultipleSelectionState, useCombobox, useMultipleSelection } from 'downshift';
+import { FocusEvent, KeyboardEvent, MouseEvent, forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
 import { mergeRefs } from 'react-merge-refs';
 
 import Popover from '@controls/Popover';
 
 import { useIsomorphicLayoutEffect } from '@scripts/hooks/useIsomorphicLayoutEffect';
 
-import { BaseSelectProps, OptionShape, SelectState } from '../../types';
-import { processOptions } from '../../utils';
 import { SelectThemeProvider } from '../../context';
 import { selectThemes } from '../../themes';
+import { BaseSelectProps, OptionShape, SelectState } from '../../types';
+import { processOptions } from '../../utils';
+
+const oldHTMLFocus = HTMLElement.prototype.focus;
+
+const interruptFocusMap = new WeakMap<HTMLElement, true>();
+const interruptFocus = (element: HTMLElement) => {
+  interruptFocusMap.set(element, true);
+};
+const uninterruptFocus = (element: HTMLElement) => {
+  interruptFocusMap.delete(element);
+};
+
+HTMLElement.prototype.focus = function onFocus(...args) {
+  let initiator = 'unknown place';
+  try {
+    throw new Error();
+  } catch (e: any) {
+    if (typeof e.stack === 'string') {
+      let isFirst = true;
+      // eslint-disable-next-line no-restricted-syntax
+      for (const line of e.stack.split('\n')) {
+        const matches = line.match(/^\s+at\s+(.*)/);
+        if (matches) {
+          if (!isFirst) {
+            // first line - current function
+            // second line - caller (what we are looking for)
+            // eslint-disable-next-line prefer-destructuring
+            initiator = matches[1];
+            break;
+          }
+          isFirst = false;
+        }
+      }
+    }
+  }
+
+  if (interruptFocusMap.has(this)) {
+    console.log('interrupting focus of', this, 'args=', args, 'initiator=', initiator);
+    return;
+  }
+
+  // your custom code
+  oldHTMLFocus.apply(this, args);
+};
 
 export const BaseSelect = forwardRef(
   (
     {
       className,
-      // TODO: css object
+      fieldCSS,
       options,
       autocomplete = false,
       multiple = false,
@@ -50,7 +79,6 @@ export const BaseSelect = forwardRef(
       hint,
       block,
       label,
-      labelView,
       placeholder,
       fieldProps = {},
       optionsListProps = {},
@@ -68,33 +96,35 @@ export const BaseSelect = forwardRef(
       Option = () => null,
       updatePopover,
       zIndexPopover,
-      showEmptyOptionsList = false,
       visibleOptions,
       theme: themeName = 'basic',
       variant = 'primary',
       size = 'md',
+      wrap = false,
+      labelView,
+      hideSelectedOptions,
+      showEmptyOptionsList = hideSelectedOptions,
+      emitChangeOnClick,
     }: BaseSelectProps,
-    ref,
+    ref
   ) => {
-    const theme =
-      typeof themeName === 'string' ? selectThemes[themeName] : themeName;
+    const theme = typeof themeName === 'string' ? selectThemes[themeName] : themeName;
 
     const rootRef = useRef<HTMLDivElement>(null);
     const fieldRef = useRef<HTMLInputElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
     const initiatorRef = useRef<OptionShape | null>(null);
 
-    const itemToString = (option: OptionShape | null) =>
-      option ? option.key : '';
+    const itemToString = (option: OptionShape | null) => (option ? option.key : '');
 
-    const { flatOptions, selectedOptions } = useMemo(
+    const { flatOptions, selectedOptions, unselectedOptions } = useMemo(
       () => processOptions(options, selected),
-      [options, selected],
+      [options, selected]
     );
 
     const useMultipleSelectionProps: UseMultipleSelectionProps<OptionShape> = {
       itemToString,
-      onSelectedItemsChange: (changes) => {
+      onSelectedItemsChange: changes => {
         if (onChange) {
           const { selectedItems = [] } = changes;
 
@@ -111,11 +141,7 @@ export const BaseSelect = forwardRef(
       stateReducer: (state, actionAndChanges) => {
         const { type, changes } = actionAndChanges;
 
-        if (
-          !allowUnselect &&
-          type ===
-            useMultipleSelection.stateChangeTypes.DropdownKeyDownBackspace
-        ) {
+        if (!allowUnselect && type === useMultipleSelection.stateChangeTypes.DropdownKeyDownBackspace) {
           return state;
         }
 
@@ -127,13 +153,20 @@ export const BaseSelect = forwardRef(
       useMultipleSelectionProps.selectedItems = selectedOptions;
     }
 
-    const {
-      selectedItems,
-      addSelectedItem,
-      setSelectedItems,
-      removeSelectedItem,
-      getDropdownProps,
-    } = useMultipleSelection(useMultipleSelectionProps);
+    const { selectedItems, addSelectedItem, setSelectedItems, removeSelectedItem, getDropdownProps } =
+      useMultipleSelection(useMultipleSelectionProps);
+
+    const optionsToRender = useMemo(
+      () => (hideSelectedOptions && Array.isArray(selected) ? unselectedOptions : options),
+      [hideSelectedOptions, options, selected, unselectedOptions]
+    );
+
+    const flatOptionsToRender = useMemo(
+      () => (hideSelectedOptions && Array.isArray(selected) ? unselectedOptions : flatOptions),
+      [flatOptions, hideSelectedOptions, selected, unselectedOptions]
+    );
+
+    const defaultHighlightedIndex = selectedItems.length === 0 ? -1 : undefined;
 
     const {
       isOpen: open,
@@ -149,10 +182,10 @@ export const BaseSelect = forwardRef(
       id,
       isOpen: openProp,
       circularNavigation,
-      items: flatOptions,
+      items: flatOptionsToRender,
       itemToString,
-      defaultHighlightedIndex: selectedItems.length === 0 ? -1 : undefined,
-      onIsOpenChange: (changes) => {
+      defaultHighlightedIndex,
+      onIsOpenChange: changes => {
         if (onOpen) {
           /**
            *  Вызываем обработчик асинхронно.
@@ -189,8 +222,7 @@ export const BaseSelect = forwardRef(
 
             if (selectedItem && !selectedItem.disabled) {
               const alreadySelected = selectedItems.includes(selectedItem);
-              const allowRemove =
-                allowUnselect || (multiple && selectedItems.length > 1);
+              const allowRemove = allowUnselect || (multiple && selectedItems.length > 1);
 
               if (alreadySelected && allowRemove) {
                 removeSelectedItem(selectedItem);
@@ -203,16 +235,17 @@ export const BaseSelect = forwardRef(
                   setSelectedItems([selectedItem]);
                 }
               }
+
+              if (alreadySelected && !multiple && emitChangeOnClick) {
+                setSelectedItems([selectedItem]);
+              }
             }
 
             return {
               ...changes,
               isOpen: !closeOnSelect,
               // при closeOnSelect === false - сохраняем подсвеченный индекс
-              highlightedIndex:
-                state.isOpen && !closeOnSelect
-                  ? state.highlightedIndex
-                  : changes.highlightedIndex,
+              highlightedIndex: state.isOpen && !closeOnSelect ? state.highlightedIndex : changes.highlightedIndex,
             };
           default:
             return changes;
@@ -220,16 +253,13 @@ export const BaseSelect = forwardRef(
       },
     });
 
-    const menuProps = (
-      getMenuProps as (options: object, additional: object) => any
-    )({ ref: listRef }, { suppressRefError: true });
-    const inputProps = getInputProps(
-      getDropdownProps({ ref: mergeRefs([ref, fieldRef]) }),
+    const menuProps = (getMenuProps as (options: object, additional: object) => any)(
+      { ref: listRef },
+      { suppressRefError: true }
     );
+    const inputProps = getInputProps(getDropdownProps({ ref: mergeRefs([ref, fieldRef]) }));
 
-    const handleFieldFocus = (
-      event: FocusEvent<HTMLDivElement | HTMLInputElement>,
-    ) => {
+    const handleFieldFocus = (event: FocusEvent<HTMLDivElement | HTMLInputElement>) => {
       if (onFocus) onFocus(event);
 
       if (autocomplete && !open) {
@@ -237,11 +267,9 @@ export const BaseSelect = forwardRef(
       }
     };
 
-    const handleFieldBlur = (
-      event: FocusEvent<HTMLDivElement | HTMLInputElement>,
-    ) => {
+    const handleFieldBlur = (event: FocusEvent<HTMLDivElement | HTMLInputElement>) => {
       const isNextFocusInsideList = listRef.current?.contains(
-        (event.relatedTarget || document.activeElement) as HTMLElement,
+        (event.relatedTarget || document.activeElement) as HTMLElement
       );
 
       if (!isNextFocusInsideList) {
@@ -251,15 +279,9 @@ export const BaseSelect = forwardRef(
       }
     };
 
-    const handleFieldKeyDown = (
-      event: KeyboardEvent<HTMLDivElement | HTMLInputElement>,
-    ) => {
+    const handleFieldKeyDown = (event: KeyboardEvent<HTMLDivElement | HTMLInputElement>) => {
       inputProps.onKeyDown(event);
-      if (
-        autocomplete &&
-        !open &&
-        (event.key.length === 1 || event.key === 'Backspace')
-      ) {
+      if (autocomplete && !open && (event.key.length === 1 || event.key === 'Backspace')) {
         // Для автокомплита - открываем меню при начале ввода
         openMenu();
       }
@@ -277,10 +299,7 @@ export const BaseSelect = forwardRef(
     };
 
     const handleFieldClick = (event: MouseEvent) => {
-      if (
-        autocomplete &&
-        (event.target as HTMLElement).tagName.toUpperCase() === 'INPUT'
-      ) {
+      if (autocomplete && (event.target as HTMLElement).tagName.toUpperCase() === 'INPUT') {
         openMenu();
       } else {
         toggleMenu();
@@ -307,7 +326,7 @@ export const BaseSelect = forwardRef(
           // TODO: optionCSS from props
         },
       }),
-      [getItemProps, highlightedIndex, multiple, optionProps, selectedItems],
+      [getItemProps, highlightedIndex, multiple, optionProps, selectedItems]
     );
 
     useEffect(() => {
@@ -325,9 +344,7 @@ export const BaseSelect = forwardRef(
       if (listRef.current) {
         const widthAttr = optionsListWidth === 'field' ? 'width' : 'minWidth';
 
-        const optionsListMinWidth = rootRef.current
-          ? rootRef.current.getBoundingClientRect().width
-          : 0;
+        const optionsListMinWidth = rootRef.current ? rootRef.current.getBoundingClientRect().width : 0;
 
         listRef.current.setAttribute('style', '');
         listRef.current.style[widthAttr] = `${optionsListMinWidth}px`;
@@ -346,28 +363,14 @@ export const BaseSelect = forwardRef(
       };
     }, [calcOptionsListWidth, open, optionsListWidth]);
 
-    useIsomorphicLayoutEffect(calcOptionsListWidth, [
-      open,
-      optionsListWidth,
-      options,
-      selectedItems,
-    ]);
+    useIsomorphicLayoutEffect(calcOptionsListWidth, [open, optionsListWidth, options, selectedItems]);
 
     const renderValue = useCallback(
-      () =>
-        selectedItems.map((option) => (
-          <input
-            type="hidden"
-            name={name}
-            value={option.key}
-            key={option.key}
-          />
-        )),
-      [selectedItems, name],
+      () => selectedItems.map(option => <input type="hidden" name={name} value={option.key} key={option.key} />),
+      [selectedItems, name]
     );
 
-    const needRenderOptionsList =
-      flatOptions.length > 0 || showEmptyOptionsList;
+    const needRenderOptionsList = flatOptionsToRender.length > 0 || showEmptyOptionsList;
 
     const hasSelected = !!selectedItems.length;
     const state = useMemo<SelectState>(
@@ -377,15 +380,35 @@ export const BaseSelect = forwardRef(
         isSearch: false,
         disabled,
       }),
-      [disabled, hasSelected, open],
+      [disabled, hasSelected, open]
     );
+
+    const stupidThingThatGainsFocusRef = useRef<HTMLElement>(null);
+
+    // TODO: improve logic to allow focus from parent component.
+    // probable need to keep track of number of destroys OR
+    useEffect(() => {
+      const { current } = stupidThingThatGainsFocusRef;
+      if (current) {
+        interruptFocus(current);
+      }
+
+      return () => {
+        if (current) uninterruptFocus(current);
+
+        // setTimeout(() => {
+        //   stupidThingThatGainsFocusRef.current?.blur();
+        // }, 1);
+
+        if (stupidThingThatGainsFocusRef.current) {
+          // stupidThingThatGainsFocusRef.current.blur();
+          interruptFocus(stupidThingThatGainsFocusRef.current);
+        }
+      };
+    }, []);
+
     return (
-      <SelectThemeProvider
-        size={size}
-        theme={theme}
-        variant={variant}
-        state={state}
-      >
+      <SelectThemeProvider size={size} theme={theme} variant={variant} state={state}>
         <div
           css={{
             maxWidth: '100%',
@@ -411,6 +434,7 @@ export const BaseSelect = forwardRef(
             open={open}
             disabled={disabled}
             size={size}
+            wrap={wrap}
             autocomplete={autocomplete}
             placeholder={placeholder}
             label={label}
@@ -420,24 +444,17 @@ export const BaseSelect = forwardRef(
             error={error}
             hint={hint}
             valueRenderer={valueRenderer}
-            // className={fieldClassName}
-            css={
-              {
-                // TODO: fieldCSS
-              }
-            }
+            css={fieldCSS}
             innerProps={{
               onBlur: handleFieldBlur,
               onFocus: disabled ? undefined : handleFieldFocus,
               onClick: disabled ? undefined : handleFieldClick,
               tabIndex: disabled ? -1 : 0,
-              ref: inputProps.ref,
+              ref: mergeRefs([stupidThingThatGainsFocusRef, inputProps.ref]),
               id: inputProps.id,
               'aria-labelledby': inputProps['aria-labelledby'],
               'aria-controls': inputProps['aria-controls'],
-              'aria-autocomplete': autocomplete
-                ? inputProps['aria-autocomplete']
-                : undefined,
+              'aria-autocomplete': autocomplete ? inputProps['aria-autocomplete'] : undefined,
             }}
             {...fieldProps}
           />
@@ -463,11 +480,11 @@ export const BaseSelect = forwardRef(
                 <OptionsList
                   {...optionsListProps}
                   optionsListWidth={optionsListWidth}
-                  flatOptions={flatOptions}
+                  flatOptions={flatOptionsToRender}
                   highlightedIndex={highlightedIndex}
                   open={open}
                   size={size}
-                  options={options}
+                  options={optionsToRender}
                   Optgroup={Optgroup}
                   Option={Option}
                   selectedItems={selectedItems}
@@ -483,7 +500,7 @@ export const BaseSelect = forwardRef(
         </div>
       </SelectThemeProvider>
     );
-  },
+  }
 );
 
 BaseSelect.displayName = 'BaseSelect';

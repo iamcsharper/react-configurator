@@ -1,6 +1,5 @@
 /* eslint-disable no-use-before-define */
-import { CSSObject } from '@emotion/react';
-
+import type { CSSObject } from '@emotion/react';
 import {
   AriaAttributes,
   FC,
@@ -13,14 +12,12 @@ import {
   SVGProps,
 } from 'react';
 
-import { PopoverProps } from '@controls/Popover';
+import type { PopoverProps } from '@controls/Popover';
 
-import {
-  BaseThemeState,
-  StyleDefinition,
-  ValueOrFunction,
-} from '@scripts/theme';
+import { BaseThemeState, StyleDefinition, ValueOrFunction } from '@scripts/theme';
 
+import type { FormControlProps } from '../FormControl/types';
+// eslint-disable-next-line import/no-cycle
 import { selectThemes } from './themes';
 
 export enum SelectSize {
@@ -40,18 +37,14 @@ export interface SelectState {
   disabled: boolean;
 }
 
-export type SelectThemeState = BaseThemeState<
-  typeof SelectVariant,
-  typeof SelectSize,
-  never
-> &
-  SelectState;
+export type SelectThemeState = BaseThemeState<typeof SelectVariant, typeof SelectSize, never> & SelectState;
 
 enum SelectParts {
   optionList,
   arrowButton,
   closeButton,
   optgroup,
+  optionListWrapper,
 }
 
 export type SelectTheme = ValueOrFunction<
@@ -62,6 +55,7 @@ export type SelectTheme = ValueOrFunction<
         isSelected: boolean;
         isHover: boolean;
         isDisabled: boolean;
+        isPreloader: boolean;
       }
     >;
   },
@@ -94,6 +88,9 @@ export type OptionShape = {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value?: any;
+
+  // Опция-прелоадер
+  isPreloader?: boolean;
 };
 
 export type GroupShape = {
@@ -116,10 +113,7 @@ export type BaseSelectChangePayload = {
 };
 
 export type BaseSelectProps = Partial<
-  Omit<
-    BaseThemeState<typeof SelectVariant, typeof SelectSize, SelectTheme>,
-    'theme'
-  >
+  Omit<BaseThemeState<typeof SelectVariant, typeof SelectSize, SelectTheme>, 'theme'>
 > &
   Partial<
     Omit<
@@ -135,9 +129,19 @@ export type BaseSelectProps = Partial<
     className?: string;
 
     /**
-     * Дополнительный класс для поля
+     * Скрывать выбранные опции
      */
-    fieldClassName?: string;
+    hideSelectedOptions?: boolean;
+
+    /**
+     * Вызывать onChange даже когда уже выбрано
+     */
+    emitChangeOnClick?: boolean;
+
+    /**
+     * Дополнительный стиль для поля
+     */
+    fieldCSS?: CSSObject;
 
     /**
      * Дополнительный класс выпадающего меню
@@ -174,13 +178,10 @@ export type BaseSelectProps = Partial<
      */
     name?: string;
 
-    //   TODO: form stuff
-    //   /** Formik field object (inner) */
-    //   field?: FieldInputProps<any>;
-    //   /** Formik meta object (inner) */
-    //   meta?: FieldMetaProps<any>;
-    //   /** Formik helpers object (inner) */
-    //   helpers?: FieldHelperProps<any>;
+    /**
+     * Разрешить растягивать компонент по вертикали чтобы уместить field
+     */
+    wrap?: boolean;
 
     /**
      * Управление возможностью выбора значения
@@ -219,7 +220,7 @@ export type BaseSelectProps = Partial<
     label?: ReactNode;
 
     /**
-     * Вид лейбла внутри / снаружи
+     * Вид лейбла внутри / снаружи. В некоторых дизайнах делают два вида лейблов
      */
     labelView?: 'inner' | 'outer';
 
@@ -378,7 +379,8 @@ export type BaseSelectProps = Partial<
 
 export type FieldProps = {
   id?: string;
-  rightAddons?: ReactNode | ReactNode[];
+  rightAddons?: FormControlProps['rightAddons'];
+  rightAddonsCSS?: FormControlProps['rightAddonsCSS'];
 
   /**
    * Дополнительный класс
@@ -430,15 +432,13 @@ export type FieldProps = {
    */
   label?: ReactNode;
 
+  wrap?: boolean;
+  labelView?: 'inner' | 'outer';
+
   /**
    * Пропы лейбла из downshift
    */
   labelProps?: HTMLProps<HTMLLabelElement>;
-
-  /**
-   * Вид лейбла внутри / снаружи
-   */
-  labelView?: 'inner' | 'outer';
 
   /**
    * Плейсхолдер поля

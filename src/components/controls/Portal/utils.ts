@@ -3,7 +3,6 @@ import { MutableRefObject, RefObject } from 'react';
 export const PORTAL_CONTAINER_ATTRIBUTE = 'react-portal-container';
 
 function createPortalContainer() {
-  console.log('created Portal container!');
   const portalContainer = document.createElement('div');
 
   portalContainer.setAttribute(PORTAL_CONTAINER_ATTRIBUTE, '');
@@ -14,12 +13,11 @@ function createPortalContainer() {
 }
 
 export const getDefaultPortalContainer = (): Element =>
-  document.querySelector(`[${PORTAL_CONTAINER_ATTRIBUTE}]`) ||
-  createPortalContainer();
+  document.querySelector(`[${PORTAL_CONTAINER_ATTRIBUTE}]`) || createPortalContainer();
 
 export function setRef<T>(
   ref: RefObject<T> | ((instance: T | null) => void) | null | undefined,
-  value: T | null,
+  value: T | null
 ): void {
   if (typeof ref === 'function') {
     ref(value);

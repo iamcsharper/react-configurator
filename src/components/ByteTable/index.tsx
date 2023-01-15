@@ -17,7 +17,7 @@ import { ZodSchema } from 'zod';
 
 import Table from '@components/Table';
 import Mask from '@components/controls/Mask';
-import FormSelect, { Select } from '@components/controls/NewSelect';
+import FormSelect, { SimpleSelect } from '@components/controls/NewSelect';
 
 import { scale } from '@scripts/helpers';
 
@@ -279,7 +279,7 @@ const ByteTable = forwardRef<HTMLDivElement, ByteTableProps>(
 
     return (
       <div ref={ref}>
-        <Select
+        <SimpleSelect
           options={formats}
           placeholder="Формат"
           size="md"

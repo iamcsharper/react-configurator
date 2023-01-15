@@ -10,6 +10,7 @@ import {
 import { shadows } from '@scripts/colors';
 
 import Button from '@components/controls/Button';
+
 import { OptionsList as DefaultOptionsList } from '../../components';
 import { OptionShape, OptionsListProps } from '../../types';
 import { SELECT_ALL_VALUE } from './index';
@@ -36,7 +37,7 @@ export const OptionsListWithApply = forwardRef(
       visibleOptions = 5,
       ...restProps
     }: OptionsListWithApplyProps,
-    ref,
+    ref
   ) => {
     const footerRef = useRef<HTMLDivElement>(null);
 
@@ -54,7 +55,7 @@ export const OptionsListWithApply = forwardRef(
           selected,
         };
       },
-      [defaultGetOptionProps, flatOptions.length, selectedDraft],
+      [defaultGetOptionProps, flatOptions.length, selectedDraft]
     );
 
     const handleApply = useCallback(() => {
@@ -122,7 +123,7 @@ export const OptionsListWithApply = forwardRef(
         }
       />
     );
-  },
+  }
 );
 
 OptionsListWithApply.displayName = 'OptionsListWithApply';

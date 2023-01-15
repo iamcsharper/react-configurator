@@ -1,21 +1,31 @@
-import { MouseEvent, Ref, useCallback, useRef } from 'react';
+import { MouseEvent, Ref, useCallback, useMemo, useRef } from 'react';
 import { mergeRefs } from 'react-merge-refs';
 
-import DefaultInput from '../Input';
+import DefaultInput from '@controls/Input';
+
 import { AutocompleteFieldProps } from './types';
 
+const EMPTY_OBJ = {};
+
 const AutocompleteField = ({
-  label,
-  labelView = 'inner',
-  Input = DefaultInput,
   Arrow,
+  name,
+  error,
+  label,
+  size,
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  labelProps,
+  Input = DefaultInput,
   value,
   hint,
   disabled,
   readOnly,
   onInput,
-  inputProps = {},
+  inputProps = EMPTY_OBJ,
+  bottomAddons,
   innerProps,
+  rightAddons,
   className,
 }: AutocompleteFieldProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -32,34 +42,41 @@ const AutocompleteField = ({
         inputRef.current.focus();
       }
     },
-    [onClick],
+    [onClick]
+  );
+
+  const inputPropsMerged = useMemo(
+    () => ({
+      ...inputProps,
+      ...innerProps,
+    }),
+    [innerProps, inputProps]
   );
 
   return (
     <Input
-      {...inputProps}
-      {...innerProps}
-      wrapperRef={mergeRefs([
-        innerProps.ref as Ref<HTMLElement>,
-        inputProps.wrapperRef as Ref<HTMLElement>,
-      ])}
-      className={className}
+      {...inputPropsMerged}
+      wrapperRef={mergeRefs([innerProps.ref as Ref<HTMLElement>, inputProps.wrapperRef as Ref<HTMLElement>])}
       ref={mergeRefs([inputRef, inputProps.ref as Ref<HTMLElement>])}
+      name={name}
       disabled={disabled}
       readOnly={readOnly}
       block
       label={label}
-      labelView={labelView}
+      size={size}
+      error={error}
       hint={hint}
       onChange={onInput}
       onClick={inputDisabled ? undefined : handleClick}
       onFocus={inputDisabled ? undefined : onFocus}
       autoComplete="off"
       value={value}
+      className={`control ${className}`}
+      bottomAddons={bottomAddons}
       rightAddons={
-        (Arrow || inputProps.rightAddons) && (
+        (rightAddons || Arrow) && (
           <>
-            {inputProps.rightAddons}
+            {rightAddons}
             {Arrow}
           </>
         )
@@ -67,5 +84,7 @@ const AutocompleteField = ({
     />
   );
 };
+
+AutocompleteField.displayName = 'AutocompleteField';
 
 export default AutocompleteField;

@@ -8,7 +8,7 @@ export const CRC_DB = {
     init: '0xFFFFFFFF',
     refIn: true,
     refOut: true,
-    xorOut: '0x1',
+    xorOut: '0xFFFFFFFF',
     check: '0xCBF43926',
   },
   'CRC-32/BZIP2': {
@@ -16,7 +16,7 @@ export const CRC_DB = {
     init: '0xFFFFFFFF',
     refIn: false,
     refOut: false,
-    xorOut: '0x1',
+    xorOut: '0xFFFFFFFF',
     check: '0xFC891918',
   },
   'CRC-32C': {
@@ -24,7 +24,7 @@ export const CRC_DB = {
     init: '0xFFFFFFFF',
     refIn: true,
     refOut: true,
-    xorOut: '0x1',
+    xorOut: '0xFFFFFFFF',
     check: '0xE3069283',
   },
   'CRC-32D': {
@@ -32,7 +32,7 @@ export const CRC_DB = {
     init: '0xFFFFFFFF',
     refIn: true,
     refOut: true,
-    xorOut: '0x1',
+    xorOut: '0xFFFFFFFF',
     check: '0x87315576',
   },
   'CRC-32/MPEG-2': {
@@ -40,7 +40,7 @@ export const CRC_DB = {
     init: '0xFFFFFFFF',
     refIn: false,
     refOut: false,
-    xorOut: '0x0',
+    xorOut: '0x00000000',
     check: '0x376E6E7',
   },
   'CRC-32/POSIX': {
@@ -48,7 +48,7 @@ export const CRC_DB = {
     init: '0x0',
     refIn: false,
     refOut: false,
-    xorOut: '0x1',
+    xorOut: '0xFFFFFFFF',
     check: '0x765E7680',
   },
   'CRC-32Q': {
@@ -56,7 +56,7 @@ export const CRC_DB = {
     init: '0x0',
     refIn: false,
     refOut: false,
-    xorOut: '0x0',
+    xorOut: '0x00000000',
     check: '0x3010BF7F',
   },
   'CRC-32/JAMCRC': {
@@ -64,7 +64,7 @@ export const CRC_DB = {
     init: '0xFFFFFFFF',
     refIn: true,
     refOut: true,
-    xorOut: '0x0',
+    xorOut: '0x00000000',
     check: '0x340BC6D9',
   },
   'CRC-32/XFER': {
@@ -72,7 +72,7 @@ export const CRC_DB = {
     init: '0x0',
     refIn: false,
     refOut: false,
-    xorOut: '0x0',
+    xorOut: '0x00000000',
     check: '0xBD0BE338',
   },
 } as const;

@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ReactNode, useCallback, useMemo } from 'react';
+import { ReactNode, Suspense, lazy, useCallback, useMemo } from 'react';
 import {
   Controller,
   ControllerFieldState,
@@ -10,7 +10,6 @@ import {
 } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
-import ByteTable from '@components/ByteTable';
 import { DetailsTrigger } from '@components/DetailsTrigger';
 import { FormSticky } from '@components/FormSticky';
 import PageAccordion from '@components/PageAccordion';
@@ -28,6 +27,8 @@ import { RootState } from '@store/index';
 import { RtcSourceType, RtcState, rtcInitialState, rtcRegisterSchema, rtcStateSchema, setRtc } from '@store/timers/rtc';
 
 import { scale } from '@scripts/helpers';
+
+const ByteTable = lazy(() => import('@components/ByteTable'));
 
 const ByteTableLabel = () => (
   <>
@@ -105,7 +106,9 @@ const RtcSettings = () => {
               <DateForm name="rtcDateTime" />
             </PageAccordion.Item>
             <PageAccordion.Item uuid="rtcRegisters" title="Регистры RTC">
-              <RegisterByteTable />
+              <Suspense fallback={<div css={{ background: '#ececec', minHeight: 1000 }} />}>
+                <RegisterByteTable />
+              </Suspense>
             </PageAccordion.Item>
           </>
         )}

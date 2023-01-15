@@ -1,5 +1,6 @@
-import { ReactComponent as CloseIcon } from '@icons/small/close.svg';
 import { scale } from '@scripts/helpers';
+
+import { ReactComponent as CloseIcon } from '@icons/small/close.svg';
 
 const Clear = ({
   clear,
@@ -16,7 +17,7 @@ const Clear = ({
     <button
       type="button"
       className={className}
-      onClick={(e) => {
+      onClick={e => {
         e.stopPropagation();
         clear();
 

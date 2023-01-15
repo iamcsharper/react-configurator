@@ -1,9 +1,9 @@
 import { CSSObject } from '@emotion/react';
 import { FC, useMemo } from 'react';
+
+// eslint-disable-next-line import/named
 import { useSelectTheme } from '../../context';
-
 import { OptionProps } from '../../types';
-
 import { Checkmark as DefaultCheckMark } from '../checkmark';
 
 export const Option: FC<OptionProps> = ({
@@ -22,14 +22,15 @@ export const Option: FC<OptionProps> = ({
 
   const { getCSS } = useSelectTheme();
 
-  const optionCSS = useMemo<CSSObject>(
+  const optionCSS = useMemo(
     () =>
       getCSS('option', {
         isDisabled: disabled,
         isHover: highlighted,
         isSelected: selected,
-      }),
-    [disabled, getCSS, highlighted, selected],
+        isPreloader: option.isPreloader || false,
+      }) as CSSObject,
+    [disabled, getCSS, highlighted, selected, option.isPreloader]
   );
 
   return (
@@ -40,6 +41,7 @@ export const Option: FC<OptionProps> = ({
           selected={selected}
           multiple={multiple}
           position="before"
+          css={{ display: 'inline-flex' }}
         />
       )}
       {content}
@@ -49,6 +51,7 @@ export const Option: FC<OptionProps> = ({
           disabled={disabled}
           selected={selected}
           multiple={multiple}
+          css={{ display: 'inline-flex' }}
           position="after"
         />
       )}

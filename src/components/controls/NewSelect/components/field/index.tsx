@@ -1,16 +1,13 @@
 import { useCallback, useRef, useState } from 'react';
 
-import FormControl, {
-  FormControlSize,
-  FormControlVariant,
-} from '@components/controls/FormControl';
+import FormControl, { FormControlSize, FormControlVariant } from '@components/controls/FormControl';
 
 import { colors } from '@scripts/colors';
-
 import { getSameEnumValue } from '@scripts/theme';
+
+import { useSelectTheme } from '../../context';
 import { FieldProps as BaseFieldProps } from '../../types';
 import { joinOptions } from '../../utils';
-import { useSelectTheme } from '../../context';
 
 export const Field = ({
   open,
@@ -25,6 +22,7 @@ export const Field = ({
   labelView = 'outer',
   placeholder,
   selectedMultiple = [],
+  wrap,
   selected,
   valueRenderer = joinOptions,
   Arrow,
@@ -48,8 +46,7 @@ export const Field = ({
   const value = valueRenderer({ selected, selectedMultiple });
 
   const filled = Boolean(value);
-  const showLabel =
-    !!label && (filled || !placeholder || labelView === 'outer');
+  const showLabel = !!label && (filled || !placeholder || labelView === 'outer');
 
   const { size, variant, getCSS } = useSelectTheme();
 
@@ -104,10 +101,14 @@ export const Field = ({
           {filled && (
             <div
               css={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
+                ...(wrap && {
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }),
                 textAlign: 'left',
-                whiteSpace: 'nowrap',
+                paddingTop: 1,
+                paddingBottom: 1,
               }}
             >
               {value}
