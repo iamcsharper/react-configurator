@@ -7,11 +7,13 @@ import thunk from 'redux-thunk';
 
 import analogReducer from './analog';
 import apiStorage from './apiStorage';
+import cryptoReducer from './crypto';
 import timersReducer from './timers';
 
 const rootReducer = combineReducers({
   timers: timersReducer,
   analog: analogReducer,
+  crypto: cryptoReducer,
 });
 
 export type RootReducer = ReturnType<typeof rootReducer>;

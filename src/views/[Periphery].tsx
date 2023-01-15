@@ -6,6 +6,7 @@ import { Route, Routes, useParams } from 'react-router-dom';
 import { DetailsProvider, useDetails } from '@context/details';
 
 import Analog from '@containers/utility/Periphery/Analog';
+import Crypto from '@containers/utility/Periphery/Crypto';
 import Timers from '@containers/utility/Periphery/Timers';
 
 const SplitPanes = () => {
@@ -46,6 +47,7 @@ const SplitPanes = () => {
           }}
         >
           <Routes>
+            <Route path="crypto/*" element={<Crypto />} />
             <Route path="analog/*" element={<Analog />} />
             <Route path="timers/*" element={<Timers />} />
             <Route path="*" element={<p>Work in progress</p>} />

@@ -1,5 +1,5 @@
 import { FC, HTMLProps, KeyboardEvent, ReactNode, useCallback } from 'react';
-import { FormProvider, UseFormReturn } from 'react-hook-form';
+import { FormProvider, KeepStateOptions, UseFormReturn } from 'react-hook-form';
 
 import FormField from './Field';
 import FormReset, { FormResetProps } from './Reset';
@@ -15,7 +15,7 @@ export interface FormProps<T extends Record<string, any>>
   children: ReactNode | ReactNode[];
   methods: UseFormReturn<T, any>;
   onSubmit: (values: T) => void;
-  onReset?: (values: T) => void;
+  onReset?: (values: T, keepStateOptions?: KeepStateOptions) => void;
   isSubmitOnEnter?: boolean;
 }
 
@@ -35,7 +35,7 @@ const Form = <T extends Record<string, any>>({
     (newValues, keepStateOptions) => {
       methods.reset(newValues, keepStateOptions);
       const values = methods.getValues();
-      if (onReset) onReset(values);
+      if (onReset) onReset(values, keepStateOptions);
     },
     [methods, onReset]
   );

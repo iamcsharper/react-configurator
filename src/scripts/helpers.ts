@@ -1,17 +1,10 @@
-import {
-  ElementType,
-  ComponentPropsWithRef,
-  LegacyRef,
-  MutableRefObject,
-  RefCallback,
-} from 'react';
-
-import { Schema } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ComponentPropsWithRef, ElementType, LegacyRef, MutableRefObject, RefCallback } from 'react';
 import { FieldError } from 'react-hook-form';
+import { Schema } from 'zod';
 
-export type MergeElementProps<T extends ElementType, P extends object = {}> =
-  Omit<ComponentPropsWithRef<T>, keyof P> & P;
+export type MergeElementProps<T extends ElementType, P extends object = {}> = Omit<ComponentPropsWithRef<T>, keyof P> &
+  P;
 
 export const scale = (n: number, isMinor?: boolean) => {
   const prime = isMinor ? 4 : 8;
@@ -40,11 +33,9 @@ export const rgba = (color: string, alpha: number) => {
   return `${cleanColor}${trunc.toString(16)}`;
 };
 
-export function mergeRefs<T = any>(
-  refs: Array<MutableRefObject<T> | LegacyRef<T>>,
-): RefCallback<T> {
-  return (value) => {
-    refs.forEach((ref) => {
+export function mergeRefs<T = any>(refs: Array<MutableRefObject<T> | LegacyRef<T>>): RefCallback<T> {
+  return value => {
+    refs.forEach(ref => {
       if (typeof ref === 'function') {
         ref(value);
       } else if (ref != null) {
@@ -66,23 +57,21 @@ export const isScrollable = (ele: HTMLElement | null) => {
 
 export const getScrollParent = (ele: HTMLElement | null): HTMLElement | null =>
   // eslint-disable-next-line no-nested-ternary
-  !ele || ele === document.body
-    ? document.body
-    : isScrollable(ele)
-    ? ele
-    : getScrollParent(ele.parentElement);
+  !ele || ele === document.body ? document.body : isScrollable(ele) ? ele : getScrollParent(ele.parentElement);
 
 type ArrayLengthMutationKeys = 'splice' | 'push' | 'pop' | 'shift' | 'unshift';
-export type FixedLengthArray<T, L extends number, TObj = [T, ...Array<T>]> =
-  Pick<TObj, Exclude<keyof TObj, ArrayLengthMutationKeys>> & {
-    readonly length: L;
-    [I: number]: T;
-    [Symbol.iterator]: () => IterableIterator<T>;
-  };
+export type FixedLengthArray<T, L extends number, TObj = [T, ...Array<T>]> = Pick<
+  TObj,
+  Exclude<keyof TObj, ArrayLengthMutationKeys>
+> & {
+  readonly length: L;
+  [I: number]: T;
+  [Symbol.iterator]: () => IterableIterator<T>;
+};
 
 export const parseErrors = (error?: FieldError) => {
   if (Array.isArray(error)) {
-    return error.map((e) => e.message);
+    return error.map(e => e.message);
   }
 
   return error?.message;
@@ -91,7 +80,7 @@ export const parseErrors = (error?: FieldError) => {
 export const formatRHFError = (error?: FieldError) => {
   if (Array.isArray(error)) {
     return error
-      .map((e) => e.message)
+      .map(e => e.message)
       .filter(Boolean)
       .join(', ');
   }
@@ -133,8 +122,7 @@ export const withValidation = (schema: Schema) => ({
 });
 
 export const parseSafeInt = (value: any) => {
-  const converted =
-    value === '' || value === null || value === undefined ? undefined : value;
+  const converted = value === '' || value === null || value === undefined ? undefined : value;
   const val = Number(converted);
 
   if (Number.isNaN(val)) return null;
