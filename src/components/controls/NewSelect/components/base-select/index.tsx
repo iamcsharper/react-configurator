@@ -12,48 +12,48 @@ import { selectThemes } from '../../themes';
 import { BaseSelectProps, OptionShape, SelectState } from '../../types';
 import { processOptions } from '../../utils';
 
-const oldHTMLFocus = HTMLElement.prototype.focus;
+// const oldHTMLFocus = HTMLElement.prototype.focus;
 
-const interruptFocusMap = new WeakMap<HTMLElement, true>();
-const interruptFocus = (element: HTMLElement) => {
-  interruptFocusMap.set(element, true);
-};
-const uninterruptFocus = (element: HTMLElement) => {
-  interruptFocusMap.delete(element);
-};
+// const interruptFocusMap = new WeakMap<HTMLElement, true>();
+// const interruptFocus = (element: HTMLElement) => {
+//   interruptFocusMap.set(element, true);
+// };
+// const uninterruptFocus = (element: HTMLElement) => {
+//   interruptFocusMap.delete(element);
+// };
 
-HTMLElement.prototype.focus = function onFocus(...args) {
-  let initiator = 'unknown place';
-  try {
-    throw new Error();
-  } catch (e: any) {
-    if (typeof e.stack === 'string') {
-      let isFirst = true;
-      // eslint-disable-next-line no-restricted-syntax
-      for (const line of e.stack.split('\n')) {
-        const matches = line.match(/^\s+at\s+(.*)/);
-        if (matches) {
-          if (!isFirst) {
-            // first line - current function
-            // second line - caller (what we are looking for)
-            // eslint-disable-next-line prefer-destructuring
-            initiator = matches[1];
-            break;
-          }
-          isFirst = false;
-        }
-      }
-    }
-  }
+// HTMLElement.prototype.focus = function onFocus(...args) {
+//   let initiator = 'unknown place';
+//   try {
+//     throw new Error();
+//   } catch (e: any) {
+//     if (typeof e.stack === 'string') {
+//       let isFirst = true;
+//       // eslint-disable-next-line no-restricted-syntax
+//       for (const line of e.stack.split('\n')) {
+//         const matches = line.match(/^\s+at\s+(.*)/);
+//         if (matches) {
+//           if (!isFirst) {
+//             // first line - current function
+//             // second line - caller (what we are looking for)
+//             // eslint-disable-next-line prefer-destructuring
+//             initiator = matches[1];
+//             break;
+//           }
+//           isFirst = false;
+//         }
+//       }
+//     }
+//   }
 
-  if (interruptFocusMap.has(this)) {
-    console.log('interrupting focus of', this, 'args=', args, 'initiator=', initiator);
-    return;
-  }
+//   if (interruptFocusMap.has(this)) {
+//     console.log('interrupting focus of', this, 'args=', args, 'initiator=', initiator);
+//     return;
+//   }
 
-  // your custom code
-  oldHTMLFocus.apply(this, args);
-};
+//   // your custom code
+//   oldHTMLFocus.apply(this, args);
+// };
 
 export const BaseSelect = forwardRef(
   (
@@ -66,6 +66,7 @@ export const BaseSelect = forwardRef(
       allowUnselect = false,
       disabled = false,
       closeOnSelect = !multiple,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       circularNavigation = false,
       defaultOpen = false,
       open: openProp,
@@ -173,7 +174,7 @@ export const BaseSelect = forwardRef(
       getMenuProps,
       getInputProps,
       getItemProps,
-      getComboboxProps,
+      // getComboboxProps,
       getLabelProps,
       highlightedIndex,
       toggleMenu,
@@ -181,7 +182,7 @@ export const BaseSelect = forwardRef(
     } = useCombobox<OptionShape>({
       id,
       isOpen: openProp,
-      circularNavigation,
+      // circularNavigation,
       items: flatOptionsToRender,
       itemToString,
       defaultHighlightedIndex,
@@ -385,27 +386,27 @@ export const BaseSelect = forwardRef(
 
     const stupidThingThatGainsFocusRef = useRef<HTMLElement>(null);
 
-    // TODO: improve logic to allow focus from parent component.
-    // probable need to keep track of number of destroys OR
-    useEffect(() => {
-      const { current } = stupidThingThatGainsFocusRef;
-      if (current) {
-        interruptFocus(current);
-      }
+    // // TODO: improve logic to allow focus from parent component.
+    // // probable need to keep track of number of destroys OR
+    // useEffect(() => {
+    //   const { current } = stupidThingThatGainsFocusRef;
+    //   if (current) {
+    //     interruptFocus(current);
+    //   }
 
-      return () => {
-        if (current) uninterruptFocus(current);
+    //   return () => {
+    //     if (current) uninterruptFocus(current);
 
-        // setTimeout(() => {
-        //   stupidThingThatGainsFocusRef.current?.blur();
-        // }, 1);
+    //     // setTimeout(() => {
+    //     //   stupidThingThatGainsFocusRef.current?.blur();
+    //     // }, 1);
 
-        if (stupidThingThatGainsFocusRef.current) {
-          // stupidThingThatGainsFocusRef.current.blur();
-          interruptFocus(stupidThingThatGainsFocusRef.current);
-        }
-      };
-    }, []);
+    //     if (stupidThingThatGainsFocusRef.current) {
+    //       // stupidThingThatGainsFocusRef.current.blur();
+    //       interruptFocus(stupidThingThatGainsFocusRef.current);
+    //     }
+    //   };
+    // }, []);
 
     return (
       <SelectThemeProvider size={size} theme={theme} variant={variant} state={state}>
@@ -416,11 +417,14 @@ export const BaseSelect = forwardRef(
             outline: 0,
             ...(block && { width: '100%' }),
           }}
-          {...getComboboxProps({
-            ref: rootRef,
-            ...(disabled && { 'aria-disabled': true }),
-            className,
-          })}
+          className={className}
+          // {...getComboboxProps({
+          //   ref: rootRef,
+          //   ...(disabled && { 'aria-disabled': true }),
+          //   className,
+          // })}
+          {...(disabled && { 'aria-disabled': true })}
+          ref={rootRef}
           onKeyDown={disabled ? undefined : handleFieldKeyDown}
           tabIndex={-1}
         >
