@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useLayoutEffect, useState } from 'react';
 import { useForm, useFormContext, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -40,7 +40,10 @@ const AdcSettings = () => {
   const isCustom = algorithm === 'CUSTOM';
   const prevAlgo = usePrevious(algorithm);
 
+  const [isLoaded, setLoaded] = useState(false);
+
   useEffect(() => {
+    if (!isLoaded) return;
     if (crcEnabled === undefined || algorithm === undefined) return;
     if (algorithm === prevAlgo) return;
 
@@ -85,7 +88,11 @@ const AdcSettings = () => {
         keepDefaultValues: true,
       }
     );
-  }, [algorithm, formContext, crcEnabled, prevAlgo]);
+  }, [algorithm, formContext, crcEnabled, prevAlgo, isLoaded]);
+
+  useLayoutEffect(() => {
+    setLoaded(true);
+  }, []);
 
   if (!crcEnabled) return null;
 
@@ -187,7 +194,6 @@ const AdcForm = ({ children }: { children: ReactNode }) => {
         onReset={(_, keepStateOptions) => {
           if (!keepStateOptions?.keepIsSubmitted) return;
 
-          console.log('RESET.keepStateOptions=', keepStateOptions, 'vals=', _);
           dispatch(setAdc(form.getValues()));
           form.reset();
         }}

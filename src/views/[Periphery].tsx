@@ -1,13 +1,13 @@
 // import DetailsPane from '@components/DetailsPane';
 import { Allotment, AllotmentHandle } from 'allotment';
-import { useEffect, useRef } from 'react';
+import { Suspense, lazy, useEffect, useRef } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 
 import { DetailsProvider, useDetails } from '@context/details';
 
-import Analog from '@containers/utility/Periphery/Analog';
-import Crypto from '@containers/utility/Periphery/Crypto';
-import Timers from '@containers/utility/Periphery/Timers';
+const Analog = lazy(() => import('@containers/utility/Periphery/Analog'));
+const Crypto = lazy(() => import('@containers/utility/Periphery/Crypto'));
+const Timers = lazy(() => import('@containers/utility/Periphery/Timers'));
 
 const SplitPanes = () => {
   const props = useParams();
@@ -46,12 +46,14 @@ const SplitPanes = () => {
             // paddingBottom: scale(40),
           }}
         >
-          <Routes>
-            <Route path="crypto/*" element={<Crypto />} />
-            <Route path="analog/*" element={<Analog />} />
-            <Route path="timers/*" element={<Timers />} />
-            <Route path="*" element={<p>Work in progress</p>} />
-          </Routes>
+          <Suspense>
+            <Routes>
+              <Route path="crypto/*" element={<Crypto />} />
+              <Route path="analog/*" element={<Analog />} />
+              <Route path="timers/*" element={<Timers />} />
+              <Route path="*" element={<p>Work in progress</p>} />
+            </Routes>
+          </Suspense>
         </div>
       </Allotment.Pane>
       {/* <Allotment.Pane maxSize={150} snap>
