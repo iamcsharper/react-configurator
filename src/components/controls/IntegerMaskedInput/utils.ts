@@ -28,11 +28,11 @@ export const MASKS = [
     mask: Number,
   },
   {
-    mask: '{\\0b}#### #### #### ####',
+    mask: '{\\0b}#### #### #### #### #### #### #### #### ####',
     definitions: { '#': /[0-1]/gi },
   },
   {
-    mask: '{\\0x}#### ####',
+    mask: '{\\0x}#### #### #### #### #### ####',
     definitions: { '#': /[0-9a-f]/gi },
     prepare: (s: string) => s.toUpperCase(),
   },
@@ -103,8 +103,8 @@ export const useIntegerFormats = ({
 
   useEffect(() => {
     setDecValue(safeInitialValue);
-    setMaskValue(safeMaskValue);
-  }, [safeInitialValue, safeMaskValue]);
+    setMaskValue(formatNumber(safeInitialValue, format) || '');
+  }, [format, safeInitialValue]);
 
   const setValue = useCallback(
     (val?: string | number | null) => {
