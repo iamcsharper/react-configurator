@@ -15,7 +15,7 @@ export const dacStateSchema = z.object({
   enabled: z.boolean(),
   vRef: z.nativeEnum(VRef),
   channel: z.nativeEnum(DacChannel),
-  divider: z.string(), // TODO: what?
+  divider: z.number({ invalid_type_error: 'Обязательное поле', required_error: 'Обязательное поле' }),
 });
 
 export type DacState = z.infer<typeof dacStateSchema>;
@@ -24,7 +24,7 @@ export const dacInitialState: DacState = {
   enabled: false,
   channel: DacChannel.CHANNEL_1,
   vRef: VRef.INNER,
-  divider: '0x0',
+  divider: 0,
 };
 
 export const dacSlice = createSlice({

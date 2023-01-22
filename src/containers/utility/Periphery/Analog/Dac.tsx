@@ -9,7 +9,7 @@ import { PeripheryWrapper } from '@components/PeripheryWrapper';
 import FormUnsavedPrompt from '@components/UnsavedPrompt';
 import Checkbox from '@components/controls/Checkbox';
 import Form from '@components/controls/Form';
-import Mask from '@components/controls/Mask';
+import IntegerMaskedInput from '@components/controls/IntegerMaskedInput';
 import Select from '@components/controls/NewSelect';
 import Tabs from '@components/controls/Tabs';
 
@@ -17,6 +17,11 @@ import { DacChannel, DacState, VRef, dacInitialState, dacStateSchema, setDac } f
 import { RootState } from '@store/index';
 
 import { scale } from '@scripts/helpers';
+
+const CHANNEL_OPTIONS: Record<DacChannel, string> = {
+  [DacChannel.CHANNEL_1]: 'ЦАП_1',
+  [DacChannel.CHANNEL_2]: 'ЦАП_2',
+};
 
 const DacSettings = () => {
   const [dacEnabled] = useWatch({
@@ -35,7 +40,10 @@ const DacSettings = () => {
               <DetailsTrigger title="Канал ЦАП" description="Информация о канале. TODO" />
             </div>
           }
-          options={Object.keys(DacChannel).map(name => ({ key: name, value: (DacChannel as any)[name] }))}
+          options={Object.values(DacChannel).map(value => ({
+            key: CHANNEL_OPTIONS[value as DacChannel],
+            value,
+          }))}
         />
       </Form.Field>
       <Form.Field name="vRef" css={{ marginBottom: scale(2) }}>
@@ -66,15 +74,7 @@ const DacSettings = () => {
         />
       </Form.Field>
       <Form.Field name="divider" label="Делитель">
-        <Mask
-          mask={[
-            {
-              mask: '{\\0x}#### ####',
-              definitions: { '#': /[0-9a-f]/gi },
-              prepare: (s: string) => s.toUpperCase(),
-            },
-          ]}
-        />
+        <IntegerMaskedInput placeholder="Вводите 2, 10 или 16-ричное число" />
       </Form.Field>
       <FormUnsavedPrompt />
     </>
@@ -96,8 +96,6 @@ const CommonSettings = () => (
     <DetailsTrigger title="DAC" description="Информация об DAC" />
   </div>
 );
-
-
 
 const DacForm = ({ children }: { children: ReactNode }) => {
   const dispatch = useDispatch();
