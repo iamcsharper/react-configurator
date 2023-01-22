@@ -91,10 +91,7 @@ export const useIntegerFormats = ({
   const currentDecValue = useRef<number | null>(safeInitialValue);
   const [format, setFormat] = useState(initialFormat);
 
-  useEffect(() => {
-    currentDecValue.current = safeInitialValue;
-    setDecValue(safeInitialValue);
-  }, [safeInitialValue]);
+  currentDecValue.current = safeInitialValue;
 
   useEffect(() => {
     setFormat(initialFormat);
@@ -103,6 +100,11 @@ export const useIntegerFormats = ({
   const formattedValue = formatNumber(currentDecValue.current, format);
   const safeMaskValue = typeof formattedValue === 'string' ? formattedValue : '';
   const [maskValue, setMaskValue] = useState(safeMaskValue);
+
+  useEffect(() => {
+    setDecValue(safeInitialValue);
+    setMaskValue(safeMaskValue);
+  }, [safeInitialValue, safeMaskValue]);
 
   const setValue = useCallback(
     (val?: string | number | null) => {
