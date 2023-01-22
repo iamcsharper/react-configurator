@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, RefObject } from 'react';
 
 import { MaskProps } from '../Mask';
 
@@ -28,6 +28,7 @@ export interface IntegerMaskedFormatProps {
   format: IntegerFormat;
   onChange: (format: IntegerFormat) => void;
   isFilled: boolean;
+  inputRef: RefObject<HTMLInputElement>;
 }
 
 export interface IntegerMaskedInputProps
