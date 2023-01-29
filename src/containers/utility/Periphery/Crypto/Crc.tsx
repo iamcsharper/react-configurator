@@ -9,7 +9,7 @@ import { PeripheryWrapper } from '@components/PeripheryWrapper';
 import FormUnsavedPrompt from '@components/UnsavedPrompt';
 import Checkbox from '@components/controls/Checkbox';
 import Form from '@components/controls/Form';
-import Mask from '@components/controls/Mask';
+import IntegerMaskedInput from '@components/controls/IntegerMaskedInput';
 import Select from '@components/controls/NewSelect';
 
 import {
@@ -19,7 +19,7 @@ import {
   KNOWN_CRC_NAMES,
   crcInitialState,
   crcStateSchema,
-  setAdc,
+  setCrc,
 } from '@store/crypto/crc';
 import { RootState } from '@store/index';
 
@@ -31,7 +31,7 @@ const crcOptions = [
   ...KNOWN_CRC_NAMES.map(name => ({ key: name, value: name })),
 ];
 
-const AdcSettings = () => {
+const CrcSettings = () => {
   const formContext = useFormContext<CrcState>();
   const [crcEnabled, algorithm] = useWatch<CrcState>({
     name: ['enabled', 'algorithm'] as const,
@@ -53,13 +53,8 @@ const AdcSettings = () => {
     if (isCustom || !algorithm) {
       formContext.reset(
         {
+          ...crcInitialState,
           enabled: crcEnabled as boolean,
-          algorithm: 'CUSTOM',
-          init: '',
-          poly: '',
-          refIn: false,
-          refOut: false,
-          xorOut: '',
         },
         {
           keepDirty: true,
@@ -110,34 +105,21 @@ const AdcSettings = () => {
         />
       </Form.Field>
       <Form.Field name="poly" label="Poly" css={{ marginBottom: scale(2) }} disabled={!isCustom}>
-        <Mask
-          mask={[
-            {
-              mask: '{\\0x}#### ####',
-              definitions: { '#': /[0-9a-f]/gi },
-              prepare: (s: string) => s.toUpperCase(),
-            },
-          ]}
-        />
+        <IntegerMaskedInput />
       </Form.Field>
       <Form.Field name="init" label="Init" css={{ marginBottom: scale(2) }} disabled={!isCustom}>
-        <Mask
-          mask={[
-            {
-              mask: '{\\0x}#### ####',
-              definitions: { '#': /[0-9a-f]/gi },
-              prepare: (s: string) => s.toUpperCase(),
-            },
-          ]}
-        />
+        <IntegerMaskedInput />
       </Form.Field>
       <Form.Field name="xorOut" label="XOR out" css={{ marginBottom: scale(2) }} disabled={!isCustom}>
-        <Mask
-          mask={[
+        <Select
+          options={[
             {
-              mask: '{\\0x}#### ####',
-              definitions: { '#': /[0-9a-f]/gi },
-              prepare: (s: string) => s.toUpperCase(),
+              key: '0x00000000',
+              value: '0x00000000',
+            },
+            {
+              key: '0xFFFFFFFF',
+              value: '0xFFFFFFFF',
             },
           ]}
         />
@@ -188,13 +170,13 @@ const AdcForm = ({ children }: { children: ReactNode }) => {
       <Form
         methods={form}
         onSubmit={vals => {
-          dispatch(setAdc(vals));
+          dispatch(setCrc(vals));
           form.reset(vals);
         }}
         onReset={(_, keepStateOptions) => {
           if (!keepStateOptions?.keepIsSubmitted) return;
 
-          dispatch(setAdc(form.getValues()));
+          dispatch(setCrc(form.getValues()));
           form.reset();
         }}
         css={{
@@ -218,7 +200,7 @@ const AdcInner = () => {
   return (
     <FormSticky
       onDefaultReset={() => {
-        dispatch(setAdc(crcInitialState));
+        dispatch(setCrc(crcInitialState));
         formContext.reset(crcInitialState);
       }}
       onReset={() => {
@@ -237,7 +219,7 @@ const Adc = () => (
     <PeripheryWrapper title="Настройки CRC">
       <CommonSettings />
       <div css={{ marginTop: scale(2) }}>
-        <AdcSettings />
+        <CrcSettings />
       </div>
     </PeripheryWrapper>
     <AdcInner />

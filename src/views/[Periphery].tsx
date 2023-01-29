@@ -1,9 +1,11 @@
 // import DetailsPane from '@components/DetailsPane';
 import { Allotment, AllotmentHandle } from 'allotment';
-import { Suspense, lazy, useEffect, useRef } from 'react';
+import { lazy, useEffect, useRef } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 
 import { DetailsProvider, useDetails } from '@context/details';
+
+import SpinnerSuspense from '@components/SpinnerSuspense';
 
 const Analog = lazy(() => import('@containers/utility/Periphery/Analog'));
 const Crypto = lazy(() => import('@containers/utility/Periphery/Crypto'));
@@ -46,14 +48,14 @@ const SplitPanes = () => {
             // paddingBottom: scale(40),
           }}
         >
-          <Suspense>
+          <SpinnerSuspense>
             <Routes>
               <Route path="crypto/*" element={<Crypto />} />
               <Route path="analog/*" element={<Analog />} />
               <Route path="timers/*" element={<Timers />} />
               <Route path="*" element={<p>Work in progress</p>} />
             </Routes>
-          </Suspense>
+          </SpinnerSuspense>
         </div>
       </Allotment.Pane>
       {/* <Allotment.Pane maxSize={150} snap>

@@ -25,14 +25,15 @@ export const FORMAT_OPTIONS: OptionShape[] = [
 
 export const MASKS = [
   {
-    mask: Number,
+    mask: '### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###',
+    definitions: { '#': /[0-9]/gi },
   },
   {
-    mask: '{\\0b}#### #### #### #### #### #### #### #### ####',
+    mask: '{\\0b}#### #### #### #### #### #### #### #### #### #### #### #### #### #### #### #### #### ####',
     definitions: { '#': /[0-1]/gi },
   },
   {
-    mask: '{\\0x}#### #### #### #### #### ####',
+    mask: '{\\0x}#### #### #### #### #### #### #### #### #### #### #### #### #### #### #### #### #### #### ####',
     definitions: { '#': /[0-9a-f]/gi },
     prepare: (s: string) => s.toUpperCase(),
   },
@@ -104,6 +105,8 @@ export const useIntegerFormats = ({
   useEffect(() => {
     setDecValue(safeInitialValue);
     setMaskValue(formatNumber(safeInitialValue, format) || '');
+
+    console.log('useEffect.', { format, safeInitialValue }, formatNumber(safeInitialValue, format) || '');
   }, [format, safeInitialValue]);
 
   const setValue = useCallback(

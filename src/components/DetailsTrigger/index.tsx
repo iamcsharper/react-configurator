@@ -1,11 +1,11 @@
-import Tooltip from '@components/controls/Tooltip';
-import { SVGRIcon } from '@customTypes/index';
-import { colors } from '@scripts/colors';
-import {
-  faCircleInfo,
-  IconDefinition,
-} from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import { SVGRIcon } from '@customTypes/index';
+
+import Tooltip from '@components/controls/Tooltip';
+
+import { colors } from '@scripts/colors';
 
 export const DetailsTrigger = ({
   title,
@@ -38,6 +38,9 @@ export const DetailsTrigger = ({
         ':hover': {
           opacity: 0.7,
         },
+      }}
+      onFocus={e => {
+        e.stopPropagation();
       }}
     >
       {typeof Icon === 'function' ? <Icon /> : <FontAwesomeIcon icon={Icon} />}

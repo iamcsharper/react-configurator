@@ -29,6 +29,7 @@ export interface IntegerMaskedFormatProps {
   onChange: (format: IntegerFormat) => void;
   isFilled: boolean;
   inputRef: RefObject<HTMLInputElement>;
+  disabled?: boolean;
 }
 
 export interface IntegerMaskedInputProps

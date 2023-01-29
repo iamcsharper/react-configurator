@@ -29,6 +29,8 @@ const IntegerMaskedInput = forwardRef<HTMLInputElement, IntegerMaskedInputProps>
       onChangeFormat,
     });
 
+    console.log('IntegerMaskedInput value=', value);
+
     if (value !== undefined && !onChange)
       console.warn('[IntegerMaskedInput] controlled value doesnt listen to onChange.');
     if (propsFormat !== undefined && !onChangeFormat)
@@ -56,6 +58,7 @@ const IntegerMaskedInput = forwardRef<HTMLInputElement, IntegerMaskedInputProps>
               inputRef={maskRef}
               format={format}
               isFilled={!!maskValue.length}
+              disabled={restProps.disabled}
               onChange={fmt => {
                 console.log('fmt changed to', fmt);
                 formatChangeRef.current = true;

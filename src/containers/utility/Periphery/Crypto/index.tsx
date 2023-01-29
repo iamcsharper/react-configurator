@@ -1,11 +1,14 @@
 import { Route, Routes } from 'react-router-dom';
 
 import Crc from './Crc';
+import CryptoBlock from './Crypto';
 
-const Crytto = () => (
+const Crypto = () => (
   <Routes>
     <Route path="crc" element={<Crc />} />
+    <Route path="block" element={<CryptoBlock />} />
+    <Route path="*" element={<p>Work in progress</p>} />
   </Routes>
 );
 
-export default Crytto;
+export default Crypto;

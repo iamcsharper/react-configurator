@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ReactNode, Suspense, lazy, useCallback, useMemo } from 'react';
+import { ReactNode, lazy, useCallback, useMemo } from 'react';
 import {
   Controller,
   ControllerFieldState,
@@ -14,6 +14,7 @@ import { DetailsTrigger } from '@components/DetailsTrigger';
 import { FormSticky } from '@components/FormSticky';
 import PageAccordion from '@components/PageAccordion';
 import { PeripheryWrapper } from '@components/PeripheryWrapper';
+import SpinnerSuspense from '@components/SpinnerSuspense';
 import FormUnsavedPrompt from '@components/UnsavedPrompt';
 import Checkbox from '@components/controls/Checkbox';
 import CronDateForm from '@components/controls/CronDateForm';
@@ -106,9 +107,9 @@ const RtcSettings = () => {
               <DateForm name="rtcDateTime" />
             </PageAccordion.Item>
             <PageAccordion.Item uuid="rtcRegisters" title="Регистры RTC">
-              <Suspense fallback={<div css={{ background: '#ececec', minHeight: 1000 }} />}>
+              <SpinnerSuspense>
                 <RegisterByteTable />
-              </Suspense>
+              </SpinnerSuspense>
             </PageAccordion.Item>
           </>
         )}
