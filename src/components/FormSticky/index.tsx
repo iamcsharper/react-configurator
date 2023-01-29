@@ -12,9 +12,7 @@ export type FormStickyProps = {
 } & Pick<FormResetTooltipProps, 'onDefaultReset' | 'onReset'>;
 
 export const FormSticky = ({ onDefaultReset, onReset, className }: FormStickyProps) => {
-  const { isDirty, errors } = useFormState();
-
-  const isValid = Object.keys(errors).length === 0;
+  const { isDirty, isValid } = useFormState();
 
   return (
     <div

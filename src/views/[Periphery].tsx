@@ -1,4 +1,3 @@
-// import DetailsPane from '@components/DetailsPane';
 import { Allotment, AllotmentHandle } from 'allotment';
 import { lazy, useEffect, useRef } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
@@ -10,6 +9,7 @@ import SpinnerSuspense from '@components/SpinnerSuspense';
 const Analog = lazy(() => import('@containers/utility/Periphery/Analog'));
 const Crypto = lazy(() => import('@containers/utility/Periphery/Crypto'));
 const Timers = lazy(() => import('@containers/utility/Periphery/Timers'));
+const Interface = lazy(() => import('@containers/utility/Periphery/Interface'));
 
 const SplitPanes = () => {
   const props = useParams();
@@ -50,6 +50,7 @@ const SplitPanes = () => {
         >
           <SpinnerSuspense>
             <Routes>
+              <Route path="interface/*" element={<Interface />} />
               <Route path="crypto/*" element={<Crypto />} />
               <Route path="analog/*" element={<Analog />} />
               <Route path="timers/*" element={<Timers />} />

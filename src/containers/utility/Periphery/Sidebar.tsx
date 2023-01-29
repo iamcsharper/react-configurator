@@ -218,7 +218,7 @@ const SidebarContainer = ({
         preExpanded={preExpanded}
         animationType="fadeIn"
         allowMultipleExpanded={false}
-        allowZeroExpanded={false}
+        allowZeroExpanded
         variant={isDark ? 'dark' : 'primary'}
         isIconVertical
       >

@@ -7,15 +7,13 @@ import Tooltip from '@components/controls/Tooltip';
 
 import { colors } from '@scripts/colors';
 
-export const DetailsTrigger = ({
-  title,
-  description,
-  Icon = faCircleInfo,
-}: {
+export interface DetailsTriggerProps {
   title: string;
   description: string;
   Icon?: SVGRIcon | IconDefinition;
-}) => (
+}
+
+export const DetailsTrigger = ({ title, description, Icon = faCircleInfo }: DetailsTriggerProps) => (
   // const { currentData, setCurrentData, enabled } = useDetails();
   // const isActive = currentData?.id === id;
 
