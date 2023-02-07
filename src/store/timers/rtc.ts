@@ -152,7 +152,11 @@ export const rtcSlice = createSlice({
   name: 'rtc',
   initialState: rtcInitialState,
   reducers: {
-    setRtc: (_, action: PayloadAction<RtcState>) => ({ ...action.payload }),
+    setRtc: (_, action: PayloadAction<RtcState>) => ({
+      ...action.payload,
+      ...(!action.payload.alarmEnabled && { alarmDateTime: rtcInitialState.alarmDateTime }),
+      ...(!action.payload.rtcEnabled && rtcInitialState),
+    }),
     setAlarmEnabled: (state, action: PayloadAction<boolean>) => {
       state.alarmEnabled = action.payload;
     },

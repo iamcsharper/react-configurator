@@ -8,7 +8,7 @@ import {
   useFormContext,
   useWatch,
 } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 
 import { DetailsTrigger } from '@components/DetailsTrigger';
 import { FormSticky } from '@components/FormSticky';
@@ -113,7 +113,7 @@ const RtcSettings = () => {
             </PageAccordion.Item>
           </>
         )}
-        {alarmEnabled && (
+        {rtcEnabled && alarmEnabled && (
           <PageAccordion.Item uuid="alarmDateTime" title="Дата и время будильника">
             <DetailsTrigger
               title="Дата и время будильника"
@@ -169,6 +169,7 @@ const CommonSettings = () => {
 };
 
 const RtcForm = ({ children }: { children: ReactNode }) => {
+  const store = useStore<RootState>();
   const dispatch = useDispatch();
   const rtc = useSelector<RootState, RtcState>(state => state.timers.rtc);
   const form = useForm<RtcState>({
@@ -188,7 +189,8 @@ const RtcForm = ({ children }: { children: ReactNode }) => {
         methods={form}
         onSubmit={vals => {
           dispatch(setRtc(vals));
-          form.reset(vals);
+          const newVals = store.getState().timers.rtc;
+          form.reset(newVals);
         }}
         onReset={() => {
           dispatch(setRtc(form.getValues()));

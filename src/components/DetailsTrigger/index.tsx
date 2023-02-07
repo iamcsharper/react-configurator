@@ -20,10 +20,26 @@ export const DetailsTrigger = ({ title, description, Icon = faCircleInfo }: Deta
   <Tooltip
     trigger="click"
     content={
-      <div>
+      <>
         <h4>{title}</h4>
-        {description}
-      </div>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: description,
+          }}
+          css={{
+            ul: {
+              listStyle: 'disc',
+              display: 'block',
+              paddingLeft: 14,
+            },
+            li: {
+              listStyle: 'disc',
+              margin: 0,
+              paddingLeft: 0,
+            },
+          }}
+        />
+      </>
     }
     hideOnClick
     interactive={false}

@@ -51,7 +51,17 @@ const CryptoSettings = () => {
           label={
             <div css={{ display: 'flex', gap: scale(1) }}>
               <span>Режим шифрования</span>
-              <DetailsTrigger title="Режим шифрования" description="Информация. TODO" />
+              <DetailsTrigger
+                title="Режим шифрования"
+                description={`
+                  Описание:
+                    <ul>
+                      <li>ECB - Electronic codebook</li>
+                      <li>CBC - Cipher Block Chaining</li>
+                      <li>CTR - Counter mode</li>
+                    </ul>
+                `}
+              />
             </div>
           }
           options={modeOptions}

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ReactNode, useEffect } from 'react';
 import { useForm, useFormContext, useWatch } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 
 import { FormSticky } from '@components/FormSticky';
 import LabelWithInfo from '@components/LabelWithInfo';
@@ -14,6 +14,7 @@ import Tabs from '@components/controls/Tabs';
 import { RootState } from '@store/index';
 import {
   Mode,
+  SlaveSignalControl,
   SpiState,
   dividerOptions,
   modeOptions,
@@ -34,8 +35,8 @@ import { usePrevious } from '@scripts/hooks/usePrevious';
 
 const SpiSettings = () => {
   const { setValue, trigger } = useFormContext<SpiState>();
-  const [mode] = useWatch<SpiState>({
-    name: ['mode'] as const,
+  const [mode, slaveSignalControl] = useWatch<SpiState>({
+    name: ['mode', 'slaveSignalControl'] as const,
   });
 
   const prevMode = usePrevious(mode);
@@ -122,16 +123,18 @@ const SpiSettings = () => {
               options={slaveSignalControlOptions}
             />
           </Form.Field>
-          <Form.Field name="slave" css={{ marginBottom: scale(2) }}>
-            <Select
-              label={
-                <LabelWithInfo title="TODO" description="TODO">
-                  Ведомый
-                </LabelWithInfo>
-              }
-              options={slaveOptions}
-            />
-          </Form.Field>
+          {slaveSignalControl === SlaveSignalControl.AUTO && (
+            <Form.Field name="slave" css={{ marginBottom: scale(2) }}>
+              <Select
+                label={
+                  <LabelWithInfo title="TODO" description="TODO">
+                    Ведомый
+                  </LabelWithInfo>
+                }
+                options={slaveOptions}
+              />
+            </Form.Field>
+          )}
         </>
       )}
 
@@ -164,6 +167,7 @@ const CommonSettings = () => (
 
 const SpiForm = ({ children }: { children: ReactNode }) => {
   const dispatch = useDispatch();
+  const store = useStore<RootState>();
   const spi = useSelector<RootState, SpiState>(state => state.interface.spi);
   const form = useForm<SpiState>({
     defaultValues: spi,
@@ -181,14 +185,9 @@ const SpiForm = ({ children }: { children: ReactNode }) => {
       <Form
         methods={form}
         onSubmit={vals => {
-          if (vals.mode !== Mode.MASTER) {
-            delete vals.peripheralDecoder;
-            delete vals.slaveSignalControl;
-            delete vals.slave;
-          }
-
           dispatch(setSpi(vals));
-          form.reset(vals);
+          const newVals = store.getState().interface.spi;
+          form.reset(newVals);
         }}
         onReset={(_, keepStateOptions) => {
           if (!keepStateOptions?.keepIsSubmitted) return;

@@ -1,3 +1,4 @@
+import { CSSObject } from '@emotion/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ReactNode, useEffect, useLayoutEffect, useState } from 'react';
 import { useForm, useFormContext, useWatch } from 'react-hook-form';
@@ -25,6 +26,12 @@ import { RootState } from '@store/index';
 
 import { scale } from '@scripts/helpers';
 import { usePrevious } from '@scripts/hooks/usePrevious';
+
+const FLEX_CSS: CSSObject = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+};
 
 const crcOptions = [
   { key: 'Кастомный', content: <b>Кастомный</b>, value: 'CUSTOM' },
@@ -124,26 +131,25 @@ const CrcSettings = () => {
           ]}
         />
       </Form.Field>
-      <Form.Field name="refIn" css={{ marginBottom: scale(2) }} disabled={!isCustom}>
-        <Checkbox>Ref IN</Checkbox>
-      </Form.Field>
-      <Form.Field name="refOut" disabled={!isCustom}>
-        <Checkbox>Ref OUT</Checkbox>
-      </Form.Field>
+      <div css={FLEX_CSS}>
+        <Form.Field name="refIn" css={{ marginBottom: scale(2) }} disabled={!isCustom}>
+          <Checkbox>Ref IN</Checkbox>
+        </Form.Field>
+        <DetailsTrigger title="Ref IN" description="Информация о" />
+      </div>
+      <div css={FLEX_CSS}>
+        <Form.Field name="refOut" disabled={!isCustom}>
+          <Checkbox>Ref OUT</Checkbox>
+        </Form.Field>
+        <DetailsTrigger title="Ref OUT" description="Информация о" />
+      </div>
       <FormUnsavedPrompt />
     </>
   );
 };
 
 const CommonSettings = () => (
-  <div
-    css={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: scale(1),
-    }}
-  >
+  <div css={[FLEX_CSS, { marginBottom: scale(1) }]}>
     <Form.Field name="enabled">
       <Checkbox>Включить CRC</Checkbox>
     </Form.Field>

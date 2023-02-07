@@ -203,7 +203,17 @@ export const spiSlice = createSlice({
   name: 'spi',
   initialState: spiInitialState,
   reducers: {
-    setSpi: (_, action: PayloadAction<SpiState>) => ({ ...action.payload }),
+    setSpi: (_, action: PayloadAction<SpiState>) => ({
+      ...action.payload,
+      ...(action.payload.slaveSignalControl === SlaveSignalControl.MANUAL && {
+        slave: Slave.NONE,
+      }),
+      ...(action.payload.mode !== Mode.MASTER && {
+        peripheralDecoder: undefined,
+        slaveSignalControl: undefined,
+        slave: undefined,
+      }),
+    }),
   },
 });
 

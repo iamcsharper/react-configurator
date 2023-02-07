@@ -34,15 +34,15 @@ export enum EncryptionMode {
 export const modeOptions: OptionShape[] = [
   {
     value: EncryptionMode.ECB,
-    key: 'Electronic codebook',
+    key: 'ECB',
   },
   {
     value: EncryptionMode.CBC,
-    key: 'Cipher Block Chaining',
+    key: 'CBC',
   },
   {
     value: EncryptionMode.CTR,
-    key: 'Counter mode',
+    key: 'CTR',
   },
 ];
 
